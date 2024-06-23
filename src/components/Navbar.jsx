@@ -36,6 +36,12 @@ const Navbar = () => {
           >
             Sign Up
           </a>
+          <a
+            href="/create"
+            className="nav-link text-sm font-bold text-neutral-600 hover:text-neutral-950"
+          >
+            Add New Product
+          </a>
         </div>
       </div>
     </div>
