@@ -6,23 +6,14 @@ import Create from "./components/Create";
 import Details from "./components/Details";
 
 export default function App() {
-    return ( <
-        div className = "h-screen w-screen flex flex-col" >
-        <
-        Navbar / >
-        <
-        Routes >
-        <
-        Route path = "/"
-        element = { < Home / > }
-        /> <
-        Route path = "/create"
-        element = { < Create / > }
-        /> <
-        Route path = "/details/:id"
-        element = { < Details / > }
-        /> <
-        /Routes> <
-        /div>
+    return ( 
+        <div className="h-screen w-screen flex flex-col">
+        <Navbar />
+        <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/create" element={<Create />} />
+            <Route path="/details/:id" element={<Details />} />
+        </Routes>
+    </div>
     );
 }
