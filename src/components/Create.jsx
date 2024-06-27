@@ -1,42 +1,53 @@
-// Create.jsx
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { productContext } from "../utills/Context";
+import { nanoid } from "nanoid";
 
 const Create = () => {
+  const [products, setProducts] = useContext(productContext);
   const [title, setTitle] = useState("");
+  const [image, setImage] = useState("");
   const [category, setCategory] = useState("");
   const [price, setPrice] = useState("");
   const [description, setDescription] = useState("");
-  const [image, setImage] = useState("");
+
   const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
+  const Addproducthandler = (e) => {
     e.preventDefault();
 
-    const newProduct = {
+    if (
+      title.trim().length < 5 ||
+      image.trim().length < 5 ||
+      category.trim().length < 5 ||
+      price.trim().length < 1 ||
+      description.trim().length < 5
+    ) {
+      alert("Each input must have at least a character.");
+      return;
+    }
+
+    const product = {
+      id: nanoid(),
       title,
+      image,
       category,
       price,
       description,
-      image,
     };
 
-    try {
-      const response = await axios.post("https://fakestoreapi.com/products", newProduct);
-      console.log("Product created:", response.data);
-      navigate("/"); // Navigate to the home page upon successful submission
-    } catch (error) {
-      console.error("There was an error creating the product!", error);
-    }
+    setProducts([...products, product]);
+    localStorage.setItem("products", JSON.stringify([...products, product]));
+    navigate("/");
   };
 
   return (
     <form
       className="flex flex-col items-center p-[5%] w-screen h-screen"
-      onSubmit={handleSubmit}
+      onSubmit={Addproducthandler}
     >
-      <h1 className="text-2xl font-bold mb-5">Add New Product</h1>
+     <h1 className="text-2xl font-bold mb-5">Add New Product</h1>
       <input
         type="text"
         placeholder="Title"

@@ -1,28 +1,70 @@
-import React, { useState, useEffect } from "react";
+import React, {useContext,useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
+import { productContext } from "../utills/Context";
+
+
 import axios from "axios";
 
-const Details = () => {
-  const { id } = useParams();
-  const [product, setProduct] = useState(null);
 
+const Details = () => {
+  const [products,setProducts] =useContext(productContext);
+  const [product, setProduct] = useState(null);
+  const { id } = useParams();
+  // useEffect(() => {
+  //   const getSingleProduct = async () => {
+  //     try {
+  //       const { data } = await axios.get(
+  //         `https://fakestoreapi.com/products/${id}`
+  //       );
+  //       setProduct(data);
+  //     } catch (error) {
+  //       console.error(error);
+  //     }
+  //   };
+  //   getSingleProduct();
+  // }, [id]);
+
+  // useEffect(() => {
+  //   if (!product) {
+  //     const selectedProduct = products.find(p => p.id === parseInt(id));
+  //     setProduct(selectedProduct);
+  //   }
+  // }, [product, products, id]);
+  
+  // if (!product) {
+  //   return <div>Loading...</div>; // Or handle differently based on your UI needs
+  // }
   useEffect(() => {
-    const getSingleProduct = async () => {
+    const getProduct = async () => {
       try {
-        const { data } = await axios.get(
-          `https://fakestoreapi.com/products/${id}`
-        );
+        const { data } = await axios.get(`https://fakestoreapi.com/products/${id}`);
         setProduct(data);
       } catch (error) {
-        console.error(error);
+        console.error("Error fetching product:", error);
       }
     };
-    getSingleProduct();
-  }, [id]);
+
+    if (products.length > 0) {
+      const selectedProduct = products.find((p) => p.id === id);
+      if (selectedProduct) {
+        setProduct(selectedProduct);
+      } else {
+        getProduct();
+      }
+    } else {
+      getProduct();
+    }
+  }, [id, products]);
 
   if (!product) {
     return <div>Loading...</div>;
   }
+
+  // const ProductDeleteHandler =(id)=>{
+  //   const FilterProducts = products.find((p) => p.id === id);
+  //   setProduct(FilterProducts);
+  //   localStorage.setItem("products",JSON.stringify(FilterProducts));
+  // };
 
   return (
     <div className="w-[70%] flex h-full justify-between m-auto p-[10%]">
@@ -44,12 +86,12 @@ const Details = () => {
             Edit
           </Link>
 
-          <Link
-            to="#"
+          <button
+           // onClick={ProductDeleteHandler(product.id)}
             className="rounded float-right  text-white bg-red-400 hover:bg-red-300 font-bold py-2 px-4 border-b-4 hover:border-red-300 "
           >
             Delete
-          </Link>
+          </button>
         </div>
       </div>
     </div>
