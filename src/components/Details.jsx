@@ -1,13 +1,11 @@
-import React, {useContext,useState, useEffect } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import { productContext } from "../utills/Context";
 
-
 import axios from "axios";
 
-
 const Details = () => {
-  const [products,setProducts] =useContext(productContext);
+  const [products, setProducts] = useContext(productContext);
   const [product, setProduct] = useState(null);
   const { id } = useParams();
   // useEffect(() => {
@@ -30,14 +28,16 @@ const Details = () => {
   //     setProduct(selectedProduct);
   //   }
   // }, [product, products, id]);
-  
+
   // if (!product) {
   //   return <div>Loading...</div>; // Or handle differently based on your UI needs
   // }
   useEffect(() => {
     const getProduct = async () => {
       try {
-        const { data } = await axios.get(`https://fakestoreapi.com/products/${id}`);
+        const { data } = await axios.get(
+          `https://fakestoreapi.com/products/${id}`
+        );
         setProduct(data);
       } catch (error) {
         console.error("Error fetching product:", error);
@@ -87,7 +87,7 @@ const Details = () => {
           </Link>
 
           <button
-           // onClick={ProductDeleteHandler(product.id)}
+            // onClick={ProductDeleteHandler(product.id)}
             className="rounded float-right  text-white bg-red-400 hover:bg-red-300 font-bold py-2 px-4 border-b-4 hover:border-red-300 "
           >
             Delete
