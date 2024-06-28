@@ -13,7 +13,7 @@ export default function App() {
         children={[
           <Route path="/" element={<Home />} />,
           <Route path="/create" element={<Create />} />,
-          <Route path="/create-1" element={<Create />} />,
+          <Route path="/create-1" element={<h1>Hello Home</h1>} />,
           <Route path="/details/:id" element={<Details />} />,
         ]}
       ></Route>
