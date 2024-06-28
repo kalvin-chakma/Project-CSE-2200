@@ -1,22 +1,19 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
 import Home from "./components/Home";
-import { Create } from "./components/Create";
+import Navbar from "./components/Navbar";
+import Create from "./components/Create";
 import Details from "./components/Details";
-import { RootLayout } from "./layouts/root-layout";
 
 export default function App() {
-  return (
-    <Routes>
-      <Route
-        element={<RootLayout />}
-        children={[
-          <Route path="/" element={<Home />} />,
-          <Route path="/create" element={<Create />} />,
-          <Route path="/create-1" element={<h1>Hello Home</h1>} />,
-          <Route path="/details/:id" element={<Details />} />,
-        ]}
-      ></Route>
-    </Routes>
-  );
+    return ( 
+        <div className="h-screen w-screen flex flex-col">
+        <Navbar />
+        <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/create" element={<Create />} />
+            <Route path="/details/:id" element={<Details />} />
+        </Routes>
+    </div>
+    );
 }

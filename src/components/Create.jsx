@@ -1,50 +1,40 @@
-import React, { useContext, useState } from "react";
+// Create.jsx
+import React, { useState } from "react";
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { productContext } from "../utills/Context";
-import { nanoid } from "nanoid";
 
-export function Create() {
-  const [products, setProducts] = useContext(productContext);
+const Create = () => {
   const [title, setTitle] = useState("");
-  const [image, setImage] = useState("");
   const [category, setCategory] = useState("");
   const [price, setPrice] = useState("");
   const [description, setDescription] = useState("");
-
+  const [image, setImage] = useState("");
   const navigate = useNavigate();
 
-  const Addproducthandler = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (
-      title.trim().length < 5 ||
-      image.trim().length < 5 ||
-      category.trim().length < 5 ||
-      price.trim().length < 1 ||
-      description.trim().length < 5
-    ) {
-      alert("Each input must have at least a character.");
-      return;
-    }
-
-    const product = {
-      id: nanoid(),
+    const newProduct = {
       title,
-      image,
       category,
       price,
       description,
+      image,
     };
 
-    setProducts([...products, product]);
-    localStorage.setItem("products", JSON.stringify([...products, product]));
-    navigate("/");
+    try {
+      const response = await axios.post("https://fakestoreapi.com/products", newProduct);
+      console.log("Product created:", response.data);
+      navigate("/"); // Navigate to the home page upon successful submission
+    } catch (error) {
+      console.error("There was an error creating the product!", error);
+    }
   };
 
   return (
     <form
       className="flex flex-col items-center p-[5%] w-screen h-screen"
-      onSubmit={Addproducthandler}
+      onSubmit={handleSubmit}
     >
       <h1 className="text-2xl font-bold mb-5">Add New Product</h1>
       <input
@@ -86,9 +76,14 @@ export function Create() {
         className="text-2xl bg-zinc-100 rounded p-3 w-1/2 mb-3"
         required
       />
-      <button type="submit" className="mt-4 p-2 bg-blue-500 text-white rounded">
+      <button
+        type="submit"
+        className="mt-4 p-2 bg-blue-500 text-white rounded"
+      >
         Submit
       </button>
     </form>
   );
-}
+};
+
+export default Create;
