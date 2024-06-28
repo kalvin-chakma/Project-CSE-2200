@@ -7,7 +7,7 @@ const Navbar = () => {
         <div className="logo text-xl font-bold">WEBSITE LOGO</div>
         <div className="nav-links flex space-x-7 font-semibold opacity-75">
           <a
-            href="/"
+            href="#"
             className="nav-link text-sm font-bold text-neutral-600 hover:text-neutral-950"
           >
             Home
