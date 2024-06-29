@@ -16,7 +16,7 @@ const Create = () => {
 
   const Addproducthandler = (e) => {
     e.preventDefault();
-
+  
     if (
       title.trim().length < 5 ||
       image.trim().length < 5 ||
@@ -24,10 +24,10 @@ const Create = () => {
       price.trim().length < 1 ||
       description.trim().length < 5
     ) {
-      alert("Each input must have at least a character.");
+      alert("Each input must have at least 5 characters.");
       return;
     }
-
+  
     const product = {
       id: nanoid(),
       title,
@@ -36,12 +36,13 @@ const Create = () => {
       price,
       description,
     };
-
-    setProducts([...products, product]);
-    localStorage.setItem("products", JSON.stringify([...products, product]));
+  
+    const updatedProducts = [...products, product];
+    setProducts(updatedProducts);
+    localStorage.setItem("products", JSON.stringify(updatedProducts));
     navigate("/");
   };
-
+  
   return (
     <form
       className="flex flex-col items-center p-[5%] w-screen h-screen"
