@@ -1,5 +1,4 @@
 import React, { useContext, useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { productContext } from "../utills/Context";
 import { nanoid } from "nanoid";
@@ -7,28 +6,19 @@ import { nanoid } from "nanoid";
 const Create = () => {
   const [products, setProducts] = useContext(productContext);
   const [title, setTitle] = useState("");
-  const [image, setImage] = useState(""); ///it will be chnage 
+  const [image, setImage] = useState("");
   const [category, setCategory] = useState("");
   const [price, setPrice] = useState("");
   const [description, setDescription] = useState("");
-
   const navigate = useNavigate();
 
-  const Addproducthandler = (e) => {
-    e.preventDefault();
-
-    if (
-      title.trim().length < 5 ||
-      image.trim().length < 5 ||
-      category.trim().length < 5 ||
-      price.trim().length < 1 ||
-      description.trim().length < 5
-    ) {
-      alert("Each input must have at least a character.");
+  const addProduct = () => {
+    if (!title || !image || !category || !price || !description) {
+      alert("Please fill in all fields.");
       return;
     }
 
-    const product = {
+    const newProduct = {
       id: nanoid(),
       title,
       image,
@@ -37,63 +27,105 @@ const Create = () => {
       description,
     };
 
-    setProducts([...products, product]);
-    localStorage.setItem("products", JSON.stringify([...products, product]));
+    setProducts([...products, newProduct]);
+    localStorage.setItem("products", JSON.stringify([...products, newProduct]));
     navigate("/");
   };
 
   return (
-    <form
-      className="flex flex-col items-center p-[5%] w-screen h-screen"
-      onSubmit={Addproducthandler}
-    >
-     <h1 className="text-2xl font-bold mb-5">Add New Product</h1>
-      <input
-        type="text"
-        placeholder="Title"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        className="text-2xl bg-zinc-100 rounded p-3 w-1/2 mb-3"
-        required
-      />
-      <input
-        type="text"
-        placeholder="Category"
-        value={category}
-        onChange={(e) => setCategory(e.target.value)}
-        className="text-2xl bg-zinc-100 rounded p-3 w-1/2 mb-3"
-        required
-      />
-      <input
-        type="number"
-        placeholder="Price"
-        value={price}
-        onChange={(e) => setPrice(e.target.value)}
-        className="text-2xl bg-zinc-100 rounded p-3 w-1/2 mb-3"
-        required
-      />
-      <textarea
-        placeholder="Description"
-        value={description}
-        onChange={(e) => setDescription(e.target.value)}
-        className="text-2xl bg-zinc-100 rounded p-3 w-1/2 mb-3"
-        required
-      />
-      <input
-        type="text"
-        placeholder="Image URL"
-        value={image}
-        onChange={(e) => setImage(e.target.value)}
-        className="text-2xl bg-zinc-100 rounded p-3 w-1/2 mb-3"
-        required
-      />
-      <button
-        type="submit"
-        className="mt-4 p-2 bg-blue-500 text-white rounded"
+    <div className="container mx-auto p-8">
+      <h1 className="text-3xl font-bold mb-8 text-center">Add New Product</h1>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          addProduct();
+        }}
+        className="max-w-md mx-auto bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4"
       >
-        Submit
-      </button>
-    </form>
+        <div className="mb-4">
+          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="title">
+            Title
+          </label>
+          <input
+            type="text"
+            id="title"
+            placeholder="Title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            required
+          />
+        </div>
+
+        <div className="mb-4">
+          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="category">
+            Category
+          </label>
+          <input
+            type="text"
+            id="category"
+            placeholder="Category"
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            required
+          />
+        </div>
+
+        <div className="mb-4">
+          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="price">
+            Price
+          </label>
+          <input
+            type="number"
+            id="price"
+            placeholder="Price"
+            value={price}
+            onChange={(e) => setPrice(e.target.value)}
+            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            required
+          />
+        </div>
+
+        <div className="mb-4">
+          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="description">
+            Description
+          </label>
+          <textarea
+            id="description"
+            placeholder="Description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            required
+          />
+        </div>
+
+        <div className="mb-4">
+          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="image">
+            Image URL
+          </label>
+          <input
+            type="text"
+            id="image"
+            placeholder="Image URL"
+            value={image}
+            onChange={(e) => setImage(e.target.value)}
+            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            required
+          />
+        </div>
+
+        <div className="flex items-center justify-between">
+          <button
+            type="submit"
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+          >
+            Add Product
+          </button>
+        </div>
+      </form>
+    </div>
   );
 };
 
