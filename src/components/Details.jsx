@@ -17,7 +17,7 @@ const Details = () => {
         console.error(error);
       }
     };
-    getSingleProduct();
+    getSingleProduct();///singleproduct
   }, [id]);
 
   if (!product) {
