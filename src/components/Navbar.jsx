@@ -40,7 +40,7 @@ const Navbar = () => {
             href="/create"
             className="nav-link text-sm font-bold text-neutral-600 hover:text-neutral-950"
           >
-            Add New Product  //change here
+            Add New Product
           </a>
         </div>
       </div>
