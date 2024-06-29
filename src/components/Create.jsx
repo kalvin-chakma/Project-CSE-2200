@@ -7,7 +7,7 @@ import { nanoid } from "nanoid";
 const Create = () => {
   const [products, setProducts] = useContext(productContext);
   const [title, setTitle] = useState("");
-  const [image, setImage] = useState("");
+  const [image, setImage] = useState(""); ///it will be chnage 
   const [category, setCategory] = useState("");
   const [price, setPrice] = useState("");
   const [description, setDescription] = useState("");
@@ -16,7 +16,7 @@ const Create = () => {
 
   const Addproducthandler = (e) => {
     e.preventDefault();
-  
+
     if (
       title.trim().length < 5 ||
       image.trim().length < 5 ||
@@ -24,10 +24,10 @@ const Create = () => {
       price.trim().length < 1 ||
       description.trim().length < 5
     ) {
-      alert("Each input must have at least 5 characters.");
+      alert("Each input must have at least a character.");
       return;
     }
-  
+
     const product = {
       id: nanoid(),
       title,
@@ -36,13 +36,12 @@ const Create = () => {
       price,
       description,
     };
-  
-    const updatedProducts = [...products, product];
-    setProducts(updatedProducts);
-    localStorage.setItem("products", JSON.stringify(updatedProducts));
+
+    setProducts([...products, product]);
+    localStorage.setItem("products", JSON.stringify([...products, product]));
     navigate("/");
   };
-  
+
   return (
     <form
       className="flex flex-col items-center p-[5%] w-screen h-screen"
