@@ -3,11 +3,11 @@ import React from "react";
 const Navbar = () => {
   return (
     <div className="main">
-      <div className="px-5 py-3 flex justify-between items-center">
+      <div className="px-5 py-5 flex justify-between items-center shadow-xl">
         <div className="logo text-xl font-bold">WEBSITE LOGO</div>
         <div className="nav-links flex space-x-7 font-semibold opacity-75">
           <a
-            href="/"
+            href="/Home"
             className="nav-link text-sm font-bold text-neutral-600 hover:text-neutral-950"
           >
             Home
@@ -31,7 +31,7 @@ const Navbar = () => {
             Contact Us
           </a>
           <a
-            href="#"
+            href="/LogInPage"
             className="nav-link text-sm font-bold text-neutral-600 hover:text-neutral-950"
           >
             Sign Up
