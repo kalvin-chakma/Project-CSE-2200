@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { productContext } from "../utills/Context";
 import Loading from "./Loading";
 import SearchBar from "./SearchBar";
+import Navbar from "./Navbar";
 
 function Home() {
   const [products] = useContext(productContext);
@@ -22,7 +23,8 @@ function Home() {
 
   return (
     <>
-      <div className="justify-center items-center flex">
+      <Navbar />
+      <div className="justify-center items-center flex mt-4">
         <SearchBar
           placeholder="Search for products"
           value={searchQuery}
