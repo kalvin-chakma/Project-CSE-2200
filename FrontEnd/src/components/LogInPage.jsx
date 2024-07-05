@@ -1,9 +1,76 @@
-import React from "react";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import loginImage from "../assets/loginPageImage.jpg";
 import Password from "./FormElement/Password";
 import EmailAdress from "./FormElement/EmailAdress";
 
 function LogInPage() {
+  const [loginInfo, setLoginInfo] = useState({
+    email: "",
+    password: "",
+  });
+
+  const navigate = useNavigate();
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setLoginInfo((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
+  };
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    const { email, password } = loginInfo;
+    if (!email || !password) {
+      return handleError("Email and password are required");
+    }
+    try {
+      const url = "http://localhost:8080/auth/login";
+      console.log('Sending request to:', url);
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(loginInfo),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      const { success, message, jwtToken, name, error } = result;
+      if (success) {
+        handleSuccess(message);
+        localStorage.setItem('token', jwtToken);
+        localStorage.setItem('loggedInUser', name);
+        setTimeout(() => {
+          navigate("/Home"); // Redirect to dashboard or any other page
+        }, 1000);
+      } else if (error) {
+        const details = error?.details[0]?.message;
+        handleError(details);
+      } else if (!success) {
+        handleError(message);
+      }
+      console.log(result);
+    } catch (err) {
+      handleError(err.message);
+      console.error('Fetch error:', err);
+    }
+  };
+
+  const handleSuccess = (message) => {
+    alert(`Success: ${message}`);
+  };
+
+  const handleError = (message) => {
+    alert(`Error: ${message}`);
+  };
+
   return (
     <div className="h-screen flex flex-col">
       <div className="w-full px-40 m-10 flex justify-start items-center"></div>
@@ -22,9 +89,17 @@ function LogInPage() {
               <p className="mt-2 font-semibold opacity-50">
                 Please login to your account
               </p>
-              <form className="mt-20 space-y-7">
-                <EmailAdress />
-                <Password />
+              <form className="mt-20 space-y-7" onSubmit={handleLogin}>
+                <EmailAdress
+                  name="email"
+                  value={loginInfo.email}
+                  onChange={handleChange}
+                />
+                <Password
+                  name="password"
+                  value={loginInfo.password}
+                  onChange={handleChange}
+                />
                 <div className="text-right">
                   <a
                     href="#"
