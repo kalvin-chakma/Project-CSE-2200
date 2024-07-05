@@ -30,7 +30,7 @@ function RegisterPage() {
       return handleError("Name, email, and password are required");
     }
     try {
-      const url = "http://localhost:8080/auth/signup";
+      const url = "https://project-cse-2200.vercel.app/auth/signup";
       console.log('Sending request to:', url);
       const response = await fetch(url, {
         method: "POST",
