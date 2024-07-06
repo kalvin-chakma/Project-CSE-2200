@@ -15,7 +15,7 @@ const Navbar = () => {
     alert('User Logged out');
     setLoggedInUser('');
     setTimeout(() => {
-      navigate('/LogInPage');
+      navigate('/Home');
     }, 1000);
   };
 

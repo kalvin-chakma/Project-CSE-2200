@@ -19,8 +19,8 @@ export default function App() {
     <div className="h-screen w-screen flex flex-col">
       <RefrshHandler setIsAuthenticated={setIsAuthenticated} />
       <Routes>
-       <Route path="/" element={<LogInPage />} />
-        <Route path="/Home" element={<PrivateRoute element={<Home />} />} />
+       <Route path="/" element={<Home />} />
+        <Route path="/Home" element={<Home />} />
         <Route path="/LogInPage" element={<LogInPage />} />
         <Route path="/RegisterPage" element={<RegisterPage />} />
         <Route path="/create" element={<Create />} />
