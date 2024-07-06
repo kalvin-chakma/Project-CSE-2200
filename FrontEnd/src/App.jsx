@@ -24,15 +24,9 @@ export default function App() {
         <Route path="/Home" element={<Home />} />
         <Route path="/LogInPage" element={<LogInPage />} />
         <Route path="/RegisterPage" element={<RegisterPage />} />
-        <Route 
-          path="/create" 
-          element={<Create />}
-        />
+        <Route path="/create" element={<Create />} />
         <Route path="/details/:id" element={<Details />} />
-        <Route 
-          path="/dashboard" 
-          element={<Dashboard />} 
-        />
+        <Route path="/dashboard" element={<Dashboard />} />
       </Routes>
     </div>
   );
