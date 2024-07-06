@@ -47,6 +47,7 @@ function LogInPage() {
         handleSuccess(message);
         localStorage.setItem('token', jwtToken);
         localStorage.setItem('loggedInUser', name);
+        localStorage.setItem('userEmail', email); 
         setTimeout(() => {
           navigate("/Home"); // Redirect to dashboard or any other page
         }, 1000);
