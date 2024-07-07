@@ -42,14 +42,20 @@ function LogInPage() {
       }
 
       const result = await response.json();
-      const { success, message, jwtToken, name, error } = result;
+      console.log('Full server response:', result); // Log the entire response
+
+      const { success, message, accessToken, jwtToken, refreshToken, name, error } = result;
       if (success) {
         handleSuccess(message);
+        console.log('Access Token:', accessToken);
+console.log('Refresh Token:', refreshToken);
+        localStorage.setItem('accessToken', accessToken);
+        localStorage.setItem('refreshToken', refreshToken);
         localStorage.setItem('token', jwtToken);
         localStorage.setItem('loggedInUser', name);
-        localStorage.setItem('userEmail', email); 
+        localStorage.setItem('userEmail', email);
         setTimeout(() => {
-          navigate("/Home"); // Redirect to dashboard or any other page
+          navigate("/Home");
         }, 1000);
       } else if (error) {
         const details = error?.details[0]?.message;
@@ -57,7 +63,6 @@ function LogInPage() {
       } else if (!success) {
         handleError(message);
       }
-      console.log(result);
     } catch (err) {
       handleError(err.message);
       console.error('Fetch error:', err);
