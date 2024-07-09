@@ -1,28 +1,28 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import WebsiteLogo from "../assets/Logo.png";
 
 const Navbar = () => {
-  const [loggedInUser, setLoggedInUser] = useState('');
+  const [loggedInUser, setLoggedInUser] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
-    setLoggedInUser(localStorage.getItem('loggedInUser'));
+    setLoggedInUser(localStorage.getItem("loggedInUser"));
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('loggedInUser');
-    localStorage.removeItem('userEmail');
-    localStorage.removeItem('refreshToken'); // Also clear refresh token if stored
-    alert('User Logged out');
-    setLoggedInUser('');
+    localStorage.removeItem("token");
+    localStorage.removeItem("loggedInUser");
+    localStorage.removeItem("userEmail");
+    localStorage.removeItem("refreshToken"); // Also clear refresh token if stored
+    alert("User Logged out");
+    setLoggedInUser("");
     setShowDropdown(false);
     setTimeout(() => {
-      navigate('/Home');
+      navigate("/Home");
     }, 1000);
   };
-
 
   const toggleDropdown = () => {
     setShowDropdown(!showDropdown);
@@ -30,19 +30,38 @@ const Navbar = () => {
 
   return (
     <div className="main">
-      <div className="px-5 py-5 flex justify-between items-center shadow-xl">
-        <div className="logo text-xl font-bold">WEBSITE LOGO</div>
+      <div className="px-5 py-2 flex justify-between items-center shadow-xl">
+        <div className="logo text-xl font-bold">
+          <img
+            src={WebsiteLogo}
+            alt="Website_Logo"
+            className="object-fit rounded-xl"
+            style={{ width: "100px", height: "50px" }}
+          />
+        </div>
         <div className="nav-links flex space-x-7 font-semibold opacity-75">
-          <Link to="/" className="nav-link text-sm font-bold text-neutral-600 hover:text-neutral-950">
+          <Link
+            to="/"
+            className="nav-link text-sm font-bold text-neutral-600 hover:text-neutral-950"
+          >
             Home
           </Link>
-          <Link to="#" className="nav-link text-sm font-bold text-neutral-600 hover:text-neutral-950">
+          <Link
+            to="#"
+            className="nav-link text-sm font-bold text-neutral-600 hover:text-neutral-950"
+          >
             Category
           </Link>
-          <Link to="#" className="nav-link text-sm font-bold text-neutral-600 hover:text-neutral-950">
+          <Link
+            to="#"
+            className="nav-link text-sm font-bold text-neutral-600 hover:text-neutral-950"
+          >
             About Us
           </Link>
-          <Link to="#" className="nav-link text-sm font-bold text-neutral-600 hover:text-neutral-950">
+          <Link
+            to="#"
+            className="nav-link text-sm font-bold text-neutral-600 hover:text-neutral-950"
+          >
             Contact Us
           </Link>
           {loggedInUser ? (
@@ -77,7 +96,10 @@ const Navbar = () => {
               )}
             </div>
           ) : (
-            <Link to="/LogInPage" className="nav-link text-sm font-bold text-neutral-600 hover:text-neutral-950">
+            <Link
+              to="/LogInPage"
+              className="nav-link text-sm font-bold text-neutral-600 hover:text-neutral-950"
+            >
               Log In
             </Link>
           )}
