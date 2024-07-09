@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 
 const Sidebar = () => {
   const navigate = useNavigate();
@@ -25,25 +25,33 @@ const Sidebar = () => {
         <div className="py-4 px-6 font-bold text-xl ml-10">Dashboard</div>
         <div className="w-10/12 h-0.5 bg-gray-400 mx-auto"></div>
         <div className="py-4 px-6">
-          <Link
+          <NavLink
             to="/Dashboard"
-            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+            className={({ isActive }) =>
+              isActive
+                ? "block px-4 py-2 text-sm rounded-md text-white bg-gray-700"
+                : "block px-4 py-2 text-sm rounded-md text-gray-700 hover:bg-gray-100"
+            }
           >
             My Profile
-          </Link>
+          </NavLink>
         </div>
         <div className="py-4 px-6">
-          <Link
+          <NavLink
             to="/create"
-            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+            className={({ isActive }) =>
+              isActive
+                ? "block px-4 py-2 text-sm rounded-md text-white bg-gray-700"
+                : "block px-4 py-2 text-sm rounded-md text-gray-700 hover:bg-gray-100"
+            }
           >
             Add New Product
-          </Link>
+          </NavLink>
         </div>
         <div className="py-4 px-6">
           <button
             onClick={handleLogout}
-            className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+            className="block w-full text-left px-4 py-2 text-sm rounded-md text-gray-700 hover:bg-gray-100"
           >
             Logout
           </button>
