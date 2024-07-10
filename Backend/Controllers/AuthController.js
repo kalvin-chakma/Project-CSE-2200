@@ -2,6 +2,9 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const UserModel = require("../Models/user");
 
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
+
 // Function to generate tokens
 const generateTokens = (user) => {
   const accessToken = jwt.sign(
@@ -31,7 +34,8 @@ const signup = async (req, res) => {
       return res.status(409).json({ message: 'User already exists, you can login', success: false });
     }
     const hashedPassword = await bcrypt.hash(password, 10);
-    const userModel = new UserModel({ name, email, password: hashedPassword });
+    const role = email === ADMIN_EMAIL ? 'admin' : 'user'; // Only check the email for signup
+    const userModel = new UserModel({ name, email, password: hashedPassword, role });
 
     const { accessToken, refreshToken, jwtToken } = generateTokens(userModel);
     userModel.refreshToken = refreshToken;
@@ -44,9 +48,11 @@ const signup = async (req, res) => {
       refreshToken,
       jwtToken,
       name: userModel.name,
-      email: userModel.email
+      email: userModel.email,
+      role: userModel.role
     });
   } catch (err) {
+    console.error("Signup error:", err);
     res.status(500).json({
       message: "Internal server error",
       success: false
@@ -58,11 +64,23 @@ const signup = async (req, res) => {
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const user = await UserModel.findOne({ email });
+    let user = await UserModel.findOne({ email });
     const errorMsg = 'Auth failed: email or password is wrong';
+    
     if (!user) {
-      return res.status(403).json({ message: errorMsg, success: false });
+      if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+        // Admin login
+        user = new UserModel({
+          email: ADMIN_EMAIL,
+          role: 'admin',
+          name: 'Admin User',
+          password: await bcrypt.hash(ADMIN_PASSWORD, 10)
+        });
+      } else {
+        return res.status(403).json({ message: errorMsg, success: false });
+      }
     }
+    
     const isPassEqual = await bcrypt.compare(password, user.password);
     if (!isPassEqual) {
       return res.status(403).json({ message: errorMsg, success: false });
@@ -79,9 +97,11 @@ const login = async (req, res) => {
       refreshToken,
       jwtToken,
       email,
-      name: user.name
+      name: user.name,
+      role: user.role
     });
   } catch (err) {
+    console.error("Login error:", err);
     res.status(500).json({
       message: "Internal server error",
       success: false
@@ -115,6 +135,7 @@ const refreshToken = async (req, res) => {
       jwtToken
     });
   } catch (error) {
+    console.error("Refresh token error:", error);
     return res.status(403).json({ message: "Invalid refresh token", success: false });
   }
 };
@@ -130,6 +151,7 @@ const logout = async (req, res) => {
     }
     res.status(200).json({ message: "Logged out successfully", success: true });
   } catch (error) {
+    console.error("Logout error:", error);
     res.status(500).json({ message: "Internal server error", success: false });
   }
 };

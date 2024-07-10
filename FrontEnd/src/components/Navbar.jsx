@@ -4,20 +4,26 @@ import WebsiteLogo from "../assets/Logo.png";
 
 const Navbar = () => {
   const [loggedInUser, setLoggedInUser] = useState("");
+  const [userRole, setUserRole] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
-    setLoggedInUser(localStorage.getItem("loggedInUser"));
+    const user = localStorage.getItem("loggedInUser");
+    const role = localStorage.getItem("userRole");
+    setLoggedInUser(user);
+    setUserRole(role);
   }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("loggedInUser");
     localStorage.removeItem("userEmail");
-    localStorage.removeItem("refreshToken"); // Also clear refresh token if stored
+    localStorage.removeItem("refreshToken");
+    localStorage.removeItem("userRole");
     alert("User Logged out");
     setLoggedInUser("");
+    setUserRole("");
     setShowDropdown(false);
     setTimeout(() => {
       navigate("/Home");
@@ -80,12 +86,21 @@ const Navbar = () => {
                   >
                     Dashboard
                   </Link>
-                  <Link
-                    to="/create"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                  >
-                    Add New Product
-                  </Link>
+                  {userRole === "admin" ? (
+                    <Link
+                      to="/create"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      Add New Product
+                    </Link>
+                  ) : (
+                    <Link
+                      to="/cart"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      My Cart
+                    </Link>
+                  )}
                   <button
                     onClick={handleLogout}
                     className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"

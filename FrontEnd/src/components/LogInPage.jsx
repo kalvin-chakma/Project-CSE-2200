@@ -27,7 +27,7 @@ function LogInPage() {
       return handleError("Email and password are required");
     }
     try {
-      const url = "https://project-cse-2200.vercel.app/auth/login";
+      const url = "http://localhost:8080/auth/login";
       console.log('Sending request to:', url);
       const response = await fetch(url, {
         method: "POST",
@@ -44,7 +44,7 @@ function LogInPage() {
       const result = await response.json();
       console.log('Full server response:', result); // Log the entire response
 
-      const { success, message, accessToken, jwtToken, refreshToken, name, error } = result;
+      const { success, message, accessToken, jwtToken, refreshToken, name, role, error } = result;
       if (success) {
         handleSuccess(message);
         console.log('Access Token:', accessToken);
@@ -54,8 +54,9 @@ function LogInPage() {
         localStorage.setItem('token', jwtToken);
         localStorage.setItem('loggedInUser', name);
         localStorage.setItem('userEmail', email);
+        localStorage.setItem('userRole', role);
         setTimeout(() => {
-          navigate("/Home");
+          navigate(role === 'admin' ? "/Home" : "/Home");
         }, 1000);
       } else if (error) {
         const details = error?.details[0]?.message;

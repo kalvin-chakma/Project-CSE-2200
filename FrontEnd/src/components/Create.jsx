@@ -14,26 +14,41 @@ const Create = () => {
   const [description, setDescription] = useState("");
   const navigate = useNavigate();
 
-  const addProduct = () => {
-    if (!title || !image || !category || !price || !description) {
-      alert("Please fill in all fields.");
-      return;
-    }
+const addProduct = async () => {
+  if (!title || !image || !category || !price || !description) {
+    alert("Please fill in all fields.");
+    return;
+  }
 
-    const newProduct = {
-      id: nanoid(),
-      title,
-      image,
-      category,
-      price,
-      description,
-    };
-
-    setProducts([...products, newProduct]);
-    localStorage.setItem("products", JSON.stringify([...products, newProduct]));
-    navigate("/");
+  const newProduct = {
+    title,
+    image,
+    category,
+    price,
+    description,
   };
 
+  try {
+    const response = await fetch('http://localhost:8080/api/products', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(newProduct),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to add product');
+    }
+
+    const data = await response.json();
+    setProducts([...products, data]);
+    navigate("/");
+  } catch (error) {
+    console.error('Error adding product:', error);
+    alert('Failed to add product. Please try again.');
+  }
+};
   return (
     <>
       <div className="flex flex-col min-h-screen">

@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import RegisterPageImage from "../assets/RegisterPageImage.jpg";
 import Password from "./FormElement/Password";
-import ConfirmPassword from "./FormElement/ConfirmPassword";
 import EmailAdress from "./FormElement/EmailAdress";
 import UserName from "./FormElement/UserName";
 
@@ -30,7 +29,7 @@ function RegisterPage() {
       return handleError("Name, email, and password are required");
     }
     try {
-      const url = "https://project-cse-2200.vercel.app/auth/signup";
+      const url = "http://localhost:8080/auth/signup";
       console.log('Sending request to:', url);
       const response = await fetch(url, {
         method: "POST",
@@ -45,11 +44,11 @@ function RegisterPage() {
       }
 
       const result = await response.json();
-      const { success, message, error } = result;
+      const { success, message, role, error } = result;
       if (success) {
         handleSuccess(message);
         setTimeout(() => {
-          navigate("/LogInPage");
+          navigate(role === 'admin' ? "/LogInPage" : "/LogInPage");
         }, 1000);
       } else if (error) {
         const details = error?.details[0]?.message;

@@ -2,23 +2,53 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "./Navbar";
 import Sidebar from "./FormElement/Sidebar";
+import AdminDashboard from "./AdminDashboard";
+import UserDashboard from "./UserDashboard";
 
 const Dashboard = () => {
   const [loggedInUser, setLoggedInUser] = useState("");
   const [userEmail, setUserEmail] = useState("");
+  const [userRole, setUserRole] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Fetch user data from backend
+    const fetchUserData = async () => {
+      try {
+        const response = await fetch('/api/user', {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('jwtToken')}`,
+          },
+        });
+        const data = await response.json();
+        if (response.ok) {
+          setLoggedInUser(data.name);
+          setUserEmail(data.email);
+          setUserRole(data.role);
+          localStorage.setItem('loggedInUser', data.name);
+          localStorage.setItem('userEmail', data.email);
+          localStorage.setItem('userRole', data.role);
+        } else {
+          console.error('Failed to fetch user data');
+          navigate('/login');
+        }
+      } catch (error) {
+        console.error('Error fetching user data', error);
+        navigate('/login');
+      }
+    };
+
     const user = localStorage.getItem("loggedInUser");
     const email = localStorage.getItem("userEmail");
-    if (user) setLoggedInUser(user);
-    if (email) {
+    const role = localStorage.getItem("userRole");
+    if (user && email && role) {
+      setLoggedInUser(user);
       setUserEmail(email);
+      setUserRole(role);
     } else {
-      console.log("Email not found in localStorage");
-      // You might want to fetch the email from your backend here
+      fetchUserData();
     }
-  }, []);
+  }, [navigate]);
 
   if (!loggedInUser) return <div>Loading...</div>;
 
@@ -32,23 +62,11 @@ const Dashboard = () => {
           </div>
           <div className="w-3/5 overflow-y-auto p-4">
             <div className="max-w-2xl mx-auto">
-              <div className="text-3xl font-bold mb-4">Profile Information</div>
-              <div className="shadow rounded-md p-4">
-                <div className="mt-4">
-                  <p>
-                    <strong>Name:</strong>{" "}
-                    <span className="text-red-600">{loggedInUser}</span>
-                  </p>
-                </div>
-                <div className="mt-4">
-                  <p>
-                    <strong>Email:</strong>{" "}
-                    <span className="text-red-600">
-                      {userEmail || "Email not available"}
-                    </span>
-                  </p>
-                </div>
-              </div>
+              {userRole === "admin" ? (
+                <AdminDashboard loggedInUser={loggedInUser} userEmail={userEmail} />
+              ) : (
+                <UserDashboard loggedInUser={loggedInUser} userEmail={userEmail} />
+              )}
             </div>
           </div>
         </div>

@@ -8,6 +8,7 @@ const Sidebar = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("loggedInUser");
     localStorage.removeItem("userEmail");
+    localStorage.removeItem("userRole");
     handleSuccess("User Logged out");
     setTimeout(() => {
       navigate("/Home"); // Redirect to "/Home" after logout
