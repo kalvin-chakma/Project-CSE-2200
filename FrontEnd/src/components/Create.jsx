@@ -39,7 +39,7 @@ const Create = () => {
         },
         body: JSON.stringify(newProduct),
       });
->>>>>>> 958e74f626200bd9036edfdfc7b97a1c7e76bcd5
+
 
       if (!response.ok) {
         throw new Error("Failed to add product");
