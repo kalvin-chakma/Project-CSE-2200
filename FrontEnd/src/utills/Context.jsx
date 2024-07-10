@@ -9,13 +9,10 @@ const Context = (props) => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const storedProducts = JSON.parse(localStorage.getItem("products"));
-        if (storedProducts) {
-          setProducts(storedProducts);
-        } else {
-          const response = await axios.get("https://fakestoreapi.com/products");
-          setProducts(response.data);
-        }
+        const response = await axios.get(
+          "https://project-cse-2200.vercel.app/api/products"
+        );
+        setProducts(response.data);
       } catch (error) {
         console.error("Error fetching products:", error);
       }
