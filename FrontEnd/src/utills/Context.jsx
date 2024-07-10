@@ -9,7 +9,9 @@ const Context = (props) => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get("https://project-cse-2200.vercel.app/api/products");
+        const response = await axios.get(
+          "https://project-cse-2200.vercel.app/api/products"
+        );
         setProducts(response.data);
       } catch (error) {
         console.error("Error fetching products:", error);

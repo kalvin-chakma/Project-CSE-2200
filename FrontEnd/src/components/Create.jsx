@@ -22,7 +22,7 @@ const Create = () => {
     }
 
     const newProduct = {
-      id: generateRandomId(), // generate unique 3-digit random id
+      id: generateRandomId(),
       title,
       image,
       category,
@@ -31,6 +31,18 @@ const Create = () => {
     };
 
     try {
+<<<<<<< HEAD
+      const response = await fetch(
+        "https://project-cse-2200.vercel.app/api/products",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(newProduct),
+        }
+      );
+=======
       const response = await fetch("https://project-cse-2200.vercel.app/api/products", {
         method: "POST",
         headers: {
@@ -38,6 +50,7 @@ const Create = () => {
         },
         body: JSON.stringify(newProduct),
       });
+>>>>>>> 958e74f626200bd9036edfdfc7b97a1c7e76bcd5
 
       if (!response.ok) {
         throw new Error("Failed to add product");
