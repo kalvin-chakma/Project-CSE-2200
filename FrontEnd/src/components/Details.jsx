@@ -1,24 +1,18 @@
 import React, { useContext, useState, useEffect } from "react";
-import { Link, useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { productContext } from "../utills/Context";
 import axios from "axios";
 import Navbar from "./Navbar";
+import EditProduct from "./EditProduct";
 
 const Details = () => {
   const [products, setProducts] = useContext(productContext);
   const [product, setProduct] = useState(null);
-  const [quantity, setQuantity] = useState(1); // Counter for quantity
-  const [isEditing, setIsEditing] = useState(false); // State for edit mode
-  const [editProduct, setEditProduct] = useState({
-    title: "",
-    category: "",
-    price: "",
-    description: "",
-    image: ""
-  });
+  const [quantity, setQuantity] = useState(1);
+  const [isEditing, setIsEditing] = useState(false);
   const { id } = useParams();
   const navigate = useNavigate();
-  const userRole = localStorage.getItem("userRole"); // Get the user's role from localStorage
+  const userRole = localStorage.getItem("userRole");
 
   useEffect(() => {
     const getProduct = async () => {
@@ -44,18 +38,6 @@ const Details = () => {
     }
   }, [id, products]);
 
-  useEffect(() => {
-    if (product) {
-      setEditProduct({
-        title: product.title,
-        category: product.category,
-        price: product.price,
-        description: product.description,
-        image: product.image
-      });
-    }
-  }, [product]);
-
   if (!product) {
     return (
       <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center">
@@ -64,43 +46,29 @@ const Details = () => {
     );
   }
 
-  const ProductDeleteHandler = (id) => {
-    const updatedProducts = products.filter((p) => p.id !== id);
-    setProducts(updatedProducts);
-    localStorage.setItem("products", JSON.stringify(updatedProducts));
-    navigate("/");
-  };
-
-  const ProductEditHandler = async (e) => {
-    e.preventDefault();
-    const updatedProduct = {
-      ...product,
-      title: editProduct.title,
-      category: editProduct.category,
-      price: editProduct.price,
-      description: editProduct.description,
-      image: editProduct.image
-    };
-
+  const ProductDeleteHandler = async (id) => {
     try {
-      const { data } = await axios.put(
-        `https://fakestoreapi.com/products/${id}`,
-        updatedProduct
-      );
-      const updatedProducts = products.map((p) =>
-        p.id === id ? data : p
-      );
+      await axios.delete(`https://fakestoreapi.com/products/${id}`);
+      const updatedProducts = products.filter((p) => p.id !== id);
       setProducts(updatedProducts);
       localStorage.setItem("products", JSON.stringify(updatedProducts));
-      setIsEditing(false);
-      setProduct(data);
+      navigate("/");
     } catch (error) {
-      console.error("Error updating product:", error);
+      console.error("Error deleting product:", error);
     }
   };
 
+  const handleProductUpdate = (updatedProduct) => {
+    const updatedProducts = products.map((p) =>
+      p.id === updatedProduct.id ? updatedProduct : p
+    );
+    setProducts(updatedProducts);
+    localStorage.setItem("products", JSON.stringify(updatedProducts));
+    setIsEditing(false);
+    setProduct(updatedProduct);
+  };
+
   const handleAddToCart = () => {
-    // Implement add to cart logic here
     console.log("Added to cart:", product, "Quantity:", quantity);
   };
 
@@ -121,98 +89,11 @@ const Details = () => {
               <h2 className="text-2xl text-red-500 mb-4">$ {product.price}</h2>
               <p className="text-lg mb-8">{product.description}</p>
               {isEditing ? (
-                <form onSubmit={ProductEditHandler} className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Title
-                    </label>
-                    <input
-                      type="text"
-                      name="title"
-                      value={editProduct.title}
-                      onChange={(e) =>
-                        setEditProduct({ ...editProduct, title: e.target.value })
-                      }
-                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Category
-                    </label>
-                    <input
-                      type="text"
-                      name="category"
-                      value={editProduct.category}
-                      onChange={(e) =>
-                        setEditProduct({
-                          ...editProduct,
-                          category: e.target.value
-                        })
-                      }
-                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Price
-                    </label>
-                    <input
-                      type="number"
-                      name="price"
-                      value={editProduct.price}
-                      onChange={(e) =>
-                        setEditProduct({ ...editProduct, price: e.target.value })
-                      }
-                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Description
-                    </label>
-                    <textarea
-                      name="description"
-                      value={editProduct.description}
-                      onChange={(e) =>
-                        setEditProduct({
-                          ...editProduct,
-                          description: e.target.value
-                        })
-                      }
-                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Image URL
-                    </label>
-                    <input
-                      type="text"
-                      name="image"
-                      value={editProduct.image}
-                      onChange={(e) =>
-                        setEditProduct({ ...editProduct, image: e.target.value })
-                      }
-                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
-                    />
-                  </div>
-                  <div className="flex space-x-4">
-                    <button
-                      type="submit"
-                      className="rounded bg-green-500 hover:bg-green-400 text-white font-bold py-2 px-4"
-                    >
-                      Save
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setIsEditing(false)}
-                      className="rounded bg-red-500 hover:bg-red-400 text-white font-bold py-2 px-4"
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </form>
+                <EditProduct
+                  product={product}
+                  onUpdate={handleProductUpdate}
+                  onCancel={() => setIsEditing(false)}
+                />
               ) : (
                 <div className="flex space-x-4">
                   {userRole === "admin" ? (

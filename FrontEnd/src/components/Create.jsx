@@ -1,7 +1,6 @@
 import React, { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { productContext } from "../utills/Context";
-import { nanoid } from "nanoid";
 import Navbar from "./Navbar";
 import Sidebar from "./FormElement/Sidebar";
 
@@ -14,41 +13,45 @@ const Create = () => {
   const [description, setDescription] = useState("");
   const navigate = useNavigate();
 
-const addProduct = async () => {
-  if (!title || !image || !category || !price || !description) {
-    alert("Please fill in all fields.");
-    return;
-  }
+  const generateRandomId = () => Math.floor(Math.random() * 900) + 100;
 
-  const newProduct = {
-    title,
-    image,
-    category,
-    price,
-    description,
-  };
-
-  try {
-    const response = await fetch('http://localhost:8080/api/products', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(newProduct),
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to add product');
+  const addProduct = async () => {
+    if (!title || !image || !category || !price || !description) {
+      alert("Please fill in all fields.");
+      return;
     }
 
-    const data = await response.json();
-    setProducts([...products, data]);
-    navigate("/");
-  } catch (error) {
-    console.error('Error adding product:', error);
-    alert('Failed to add product. Please try again.');
-  }
-};
+    const newProduct = {
+      id: generateRandomId(), // generate unique 3-digit random id
+      title,
+      image,
+      category,
+      price,
+      description,
+    };
+
+    try {
+      const response = await fetch("http://localhost:8080/api/products", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newProduct),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to add product");
+      }
+
+      const data = await response.json();
+      setProducts([...products, data]);
+      navigate("/");
+    } catch (error) {
+      console.error("Error adding product:", error);
+      alert("Failed to add product. Please try again.");
+    }
+  };
+
   return (
     <>
       <div className="flex flex-col min-h-screen">
