@@ -1,4 +1,3 @@
-// Home.jsx
 import React, { useContext, useState } from "react";
 import { Link } from "react-router-dom";
 import { productContext } from "../utills/Context";
@@ -14,12 +13,9 @@ function Home() {
     setSearchQuery(value);
   };
 
-  // Check if products is null or undefined before filtering
-  const filteredProducts = products
-    ? products.filter((product) =>
-        product.title.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-    : [];
+  const filteredProducts = products.filter((product) =>
+    product.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <>
@@ -35,8 +31,8 @@ function Home() {
         {filteredProducts.length > 0 ? (
           filteredProducts.map((product) => (
             <Link
-              key={product.id}
-              to={`/details/${product.id}`}
+              key={product._id}
+              to={`/details/${product._id}`}
               className="w-[13%] h-[30vh] bg-white rounded-lg shadow-md m-5 flex-col justify-center items-center"
             >
               <div
