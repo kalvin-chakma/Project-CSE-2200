@@ -31,7 +31,7 @@ const Create = () => {
     };
 
     try {
-      const response = await fetch("http://localhost:8080/api/products", {
+      const response = await fetch("https://project-cse-2200.vercel.app/api/products", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
