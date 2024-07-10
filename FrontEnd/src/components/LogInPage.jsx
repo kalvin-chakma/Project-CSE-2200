@@ -27,7 +27,7 @@ function LogInPage() {
       return handleError("Email and password are required");
     }
     try {
-      const url = "http://localhost:8080/auth/login";
+      const url = "https://project-cse-2200.vercel.app/auth/login";
       console.log('Sending request to:', url);
       const response = await fetch(url, {
         method: "POST",
