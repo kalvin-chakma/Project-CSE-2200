@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect } from "react";
-import { Link, useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { productContext } from "../utills/Context";
 import axios from "axios";
 import Navbar from "./Navbar";
@@ -14,7 +14,7 @@ const Details = () => {
     category: "",
     price: "",
     description: "",
-    image: ""
+    image: "",
   });
   const { id } = useParams();
   const navigate = useNavigate();
@@ -51,7 +51,7 @@ const Details = () => {
         category: product.category,
         price: product.price,
         description: product.description,
-        image: product.image
+        image: product.image,
       });
     }
   }, [product]);
@@ -64,11 +64,16 @@ const Details = () => {
     );
   }
 
-  const ProductDeleteHandler = (id) => {
-    const updatedProducts = products.filter((p) => p.id !== id);
-    setProducts(updatedProducts);
-    localStorage.setItem("products", JSON.stringify(updatedProducts));
-    navigate("/");
+  const ProductDeleteHandler = async (id) => {
+    try {
+      await axios.delete(`https://fakestoreapi.com/products/${id}`);
+      const updatedProducts = products.filter((p) => p.id !== id);
+      setProducts(updatedProducts);
+      localStorage.setItem("products", JSON.stringify(updatedProducts));
+      navigate("/");
+    } catch (error) {
+      console.error("Error deleting product:", error);
+    }
   };
 
   const ProductEditHandler = async (e) => {
@@ -79,7 +84,7 @@ const Details = () => {
       category: editProduct.category,
       price: editProduct.price,
       description: editProduct.description,
-      image: editProduct.image
+      image: editProduct.image,
     };
 
     try {
@@ -87,9 +92,7 @@ const Details = () => {
         `https://fakestoreapi.com/products/${id}`,
         updatedProduct
       );
-      const updatedProducts = products.map((p) =>
-        p.id === id ? data : p
-      );
+      const updatedProducts = products.map((p) => (p.id === id ? data : p));
       setProducts(updatedProducts);
       localStorage.setItem("products", JSON.stringify(updatedProducts));
       setIsEditing(false);
@@ -131,7 +134,10 @@ const Details = () => {
                       name="title"
                       value={editProduct.title}
                       onChange={(e) =>
-                        setEditProduct({ ...editProduct, title: e.target.value })
+                        setEditProduct({
+                          ...editProduct,
+                          title: e.target.value,
+                        })
                       }
                       className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
                     />
@@ -147,7 +153,7 @@ const Details = () => {
                       onChange={(e) =>
                         setEditProduct({
                           ...editProduct,
-                          category: e.target.value
+                          category: e.target.value,
                         })
                       }
                       className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
@@ -162,7 +168,10 @@ const Details = () => {
                       name="price"
                       value={editProduct.price}
                       onChange={(e) =>
-                        setEditProduct({ ...editProduct, price: e.target.value })
+                        setEditProduct({
+                          ...editProduct,
+                          price: e.target.value,
+                        })
                       }
                       className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
                     />
@@ -177,7 +186,7 @@ const Details = () => {
                       onChange={(e) =>
                         setEditProduct({
                           ...editProduct,
-                          description: e.target.value
+                          description: e.target.value,
                         })
                       }
                       className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
@@ -192,7 +201,10 @@ const Details = () => {
                       name="image"
                       value={editProduct.image}
                       onChange={(e) =>
-                        setEditProduct({ ...editProduct, image: e.target.value })
+                        setEditProduct({
+                          ...editProduct,
+                          image: e.target.value,
+                        })
                       }
                       className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
                     />
