@@ -15,6 +15,8 @@ const Create = () => {
 
   const generateRandomId = () => Math.floor(Math.random() * 900) + 100;
 
+  const normalizeCategory = (cat) => cat.trim().toLowerCase();
+
   const addProduct = async () => {
     if (!title || !image || !category || !price || !description) {
       alert("Please fill in all fields.");
@@ -25,13 +27,12 @@ const Create = () => {
       id: generateRandomId(),
       title,
       image,
-      category,
+      category: normalizeCategory(category), // Normalize category here
       price,
       description,
     };
 
     try {
-
       const response = await fetch("https://project-cse-2200.vercel.app/api/products", {
         method: "POST",
         headers: {
@@ -39,7 +40,6 @@ const Create = () => {
         },
         body: JSON.stringify(newProduct),
       });
-
 
       if (!response.ok) {
         throw new Error("Failed to add product");
@@ -104,7 +104,7 @@ const Create = () => {
                     id="category"
                     placeholder="Category"
                     value={category}
-                    onChange={(e) => setCategory(e.target.value)}
+                    onChange={(e) => setCategory(normalizeCategory(e.target.value))} // Normalize input here
                     className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                     required
                   />
