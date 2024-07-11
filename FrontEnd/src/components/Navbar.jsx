@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import WebsiteLogo from "../assets/Logo.png";
 
-const Navbar = () => {
+const Navbar = ({ categories }) => {
   const [loggedInUser, setLoggedInUser] = useState("");
   const [userRole, setUserRole] = useState("");
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
@@ -45,7 +45,6 @@ const Navbar = () => {
     navigate(`/category/${category}`);
     setShowCategoryDropdown(false);
   };
-
   return (
     <div className="main">
       <div className="px-5 py-2 flex justify-between items-center shadow-xl">
@@ -73,24 +72,15 @@ const Navbar = () => {
             </button>
             {showCategoryDropdown && (
               <div className="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
-                <button
-                  onClick={() => handleCategoryClick("men")}
-                  className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                >
-                  Men
-                </button>
-                <button
-                  onClick={() => handleCategoryClick("women")}
-                  className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                >
-                  Women
-                </button>
-                <button
-                  onClick={() => handleCategoryClick("electronics")}
-                  className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                >
-                  Electronics
-                </button>
+                {categories.map((cat) => (
+                  <button
+                    key={cat}
+                    onClick={() => handleCategoryClick(cat)}
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  >
+                    {cat.charAt(0).toUpperCase() + cat.slice(1)}
+                  </button>
+                ))}
               </div>
             )}
           </div>

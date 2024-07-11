@@ -1,9 +1,10 @@
 import React, { createContext, useEffect, useState } from "react";
 import axios from "axios";
 
+// Create a context for products
 export const productContext = createContext();
 
-const Context = (props) => {
+const Context = ({ children }) => {
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
@@ -15,6 +16,7 @@ const Context = (props) => {
         setProducts(response.data);
       } catch (error) {
         console.error("Error fetching products:", error);
+        // You might want to add some error handling here, e.g., setting an error state
       }
     };
 
@@ -23,7 +25,7 @@ const Context = (props) => {
 
   return (
     <productContext.Provider value={[products, setProducts]}>
-      {props.children}
+      {children}
     </productContext.Provider>
   );
 };
