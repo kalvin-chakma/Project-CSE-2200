@@ -53,14 +53,13 @@ const Dashboard = () => {
   if (!loggedInUser) return <div>Loading...</div>;
 
   return (
-    <div className="max-w-400px mx-auto h-900px">
-      <div className="flex flex-col h-full">
-        <Navbar />
+    <>
+      <div className="flex flex-col min-h-screen">
         <div className="flex flex-grow overflow-hidden">
-          <div className="w-full md:w-1/5 min-w-[200px]">
+          <div className="w-1/5 min-w-[200px]">
             <Sidebar />
           </div>
-          <div className="w-full md:w-3/5 overflow-y-auto p-4">
+          <div className="w-3/5 overflow-y-auto p-4">
             <div className="max-w-2xl mx-auto">
               {userRole === "admin" ? (
                 <AdminDashboard
@@ -77,7 +76,7 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 
