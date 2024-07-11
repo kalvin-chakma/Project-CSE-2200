@@ -58,6 +58,8 @@ const Details = () => {
       });
       if (!response.ok) {
         const errorData = await response.json();
+        console.error("Response Status:", response.status);
+        console.error("Response Text:", errorData.message);
         throw new Error(errorData.message || 'Failed to delete product');
       }
       const updatedProducts = products.filter((p) => p._id !== id);
@@ -68,7 +70,7 @@ const Details = () => {
       alert('Failed to delete product: ' + error.message);
     }
   };
-
+  
   const ProductEditHandler = async (e) => {
     e.preventDefault();
     const updatedProduct = {
