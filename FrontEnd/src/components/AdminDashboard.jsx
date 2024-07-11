@@ -2,8 +2,8 @@ import React from "react";
 
 const AdminDashboard = ({ loggedInUser, userEmail }) => {
   return (
-    <div>
-      <div className="text-3xl font-bold mb-4">Admin Dashboard</div>
+    <div className="max-w-400px mx-auto h-900px p-4">
+      <div className="text-2xl md:text-3xl font-bold mb-4">Admin Dashboard</div>
       <div className="shadow rounded-md p-4">
         <div className="mt-4">
           <p>
@@ -14,7 +14,9 @@ const AdminDashboard = ({ loggedInUser, userEmail }) => {
         <div className="mt-4">
           <p>
             <strong>Email:</strong>{" "}
-            <span className="text-red-600">{userEmail || "Email not available"}</span>
+            <span className="text-red-600">
+              {userEmail || "Email not available"}
+            </span>
           </p>
         </div>
       </div>

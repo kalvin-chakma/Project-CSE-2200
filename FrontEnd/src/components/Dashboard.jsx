@@ -15,9 +15,9 @@ const Dashboard = () => {
     // Fetch user data from backend
     const fetchUserData = async () => {
       try {
-        const response = await fetch('/api/user', {
+        const response = await fetch("/api/user", {
           headers: {
-            'Authorization': `Bearer ${localStorage.getItem('jwtToken')}`,
+            Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
           },
         });
         const data = await response.json();
@@ -25,16 +25,16 @@ const Dashboard = () => {
           setLoggedInUser(data.name);
           setUserEmail(data.email);
           setUserRole(data.role);
-          localStorage.setItem('loggedInUser', data.name);
-          localStorage.setItem('userEmail', data.email);
-          localStorage.setItem('userRole', data.role);
+          localStorage.setItem("loggedInUser", data.name);
+          localStorage.setItem("userEmail", data.email);
+          localStorage.setItem("userRole", data.role);
         } else {
-          console.error('Failed to fetch user data');
-          navigate('/login');
+          console.error("Failed to fetch user data");
+          navigate("/login");
         }
       } catch (error) {
-        console.error('Error fetching user data', error);
-        navigate('/login');
+        console.error("Error fetching user data", error);
+        navigate("/login");
       }
     };
 
@@ -53,25 +53,31 @@ const Dashboard = () => {
   if (!loggedInUser) return <div>Loading...</div>;
 
   return (
-    <>
-      <div className="flex flex-col min-h-screen">
+    <div className="max-w-400px mx-auto h-900px">
+      <div className="flex flex-col h-full">
         <Navbar />
         <div className="flex flex-grow overflow-hidden">
-          <div className="w-1/5 min-w-[200px]">
+          <div className="w-full md:w-1/5 min-w-[200px]">
             <Sidebar />
           </div>
-          <div className="w-3/5 overflow-y-auto p-4">
+          <div className="w-full md:w-3/5 overflow-y-auto p-4">
             <div className="max-w-2xl mx-auto">
               {userRole === "admin" ? (
-                <AdminDashboard loggedInUser={loggedInUser} userEmail={userEmail} />
+                <AdminDashboard
+                  loggedInUser={loggedInUser}
+                  userEmail={userEmail}
+                />
               ) : (
-                <UserDashboard loggedInUser={loggedInUser} userEmail={userEmail} />
+                <UserDashboard
+                  loggedInUser={loggedInUser}
+                  userEmail={userEmail}
+                />
               )}
             </div>
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

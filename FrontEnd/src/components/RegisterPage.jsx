@@ -30,7 +30,7 @@ function RegisterPage() {
     }
     try {
       const url = "https://project-cse-2200.vercel.app/auth/signup";
-      console.log('Sending request to:', url);
+      console.log("Sending request to:", url);
       const response = await fetch(url, {
         method: "POST",
         headers: {
@@ -48,7 +48,7 @@ function RegisterPage() {
       if (success) {
         handleSuccess(message);
         setTimeout(() => {
-          navigate(role === 'admin' ? "/LogInPage" : "/LogInPage");
+          navigate(role === "admin" ? "/LogInPage" : "/LogInPage");
         }, 1000);
       } else if (error) {
         const details = error?.details[0]?.message;
@@ -59,7 +59,7 @@ function RegisterPage() {
       console.log(result);
     } catch (err) {
       handleError(err.message);
-      console.error('Fetch error:', err);
+      console.error("Fetch error:", err);
     }
   };
 

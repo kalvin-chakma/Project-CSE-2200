@@ -4,7 +4,7 @@ import { productContext } from "../utills/Context";
 import Navbar from "./Navbar";
 import Sidebar from "./FormElement/Sidebar";
 
-const Create = () => {
+const Create = ({ addCategory }) => {
   const [products, setProducts] = useContext(productContext);
   const [title, setTitle] = useState("");
   const [image, setImage] = useState("");
@@ -27,19 +27,22 @@ const Create = () => {
       id: generateRandomId(),
       title,
       image,
-      category: normalizeCategory(category), // Normalize category here
+      category: normalizeCategory(category),
       price,
       description,
     };
 
     try {
-      const response = await fetch("https://project-cse-2200.vercel.app/api/products", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(newProduct),
-      });
+      const response = await fetch(
+        "https://project-cse-2200.vercel.app/api/products",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(newProduct),
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Failed to add product");
@@ -47,6 +50,10 @@ const Create = () => {
 
       const data = await response.json();
       setProducts([...products, data]);
+
+      // Add new category
+      addCategory(normalizeCategory(category));
+
       navigate("/");
     } catch (error) {
       console.error("Error adding product:", error);
@@ -57,7 +64,6 @@ const Create = () => {
   return (
     <>
       <div className="flex flex-col min-h-screen">
-        <Navbar />
         <div className="flex flex-grow overflow-hidden">
           <div className="w-1/5 min-w-[200px]">
             <Sidebar />
@@ -104,7 +110,9 @@ const Create = () => {
                     id="category"
                     placeholder="Category"
                     value={category}
-                    onChange={(e) => setCategory(normalizeCategory(e.target.value))} // Normalize input here
+                    onChange={(e) =>
+                      setCategory(normalizeCategory(e.target.value))
+                    } // Normalize input here
                     className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                     required
                   />
