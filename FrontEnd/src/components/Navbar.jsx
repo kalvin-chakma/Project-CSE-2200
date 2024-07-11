@@ -5,7 +5,8 @@ import WebsiteLogo from "../assets/Logo.png";
 const Navbar = () => {
   const [loggedInUser, setLoggedInUser] = useState("");
   const [userRole, setUserRole] = useState("");
-  const [showDropdown, setShowDropdown] = useState(false);
+  const [showProfileDropdown, setShowProfileDropdown] = useState(false);
+  const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -24,14 +25,25 @@ const Navbar = () => {
     alert("User Logged out");
     setLoggedInUser("");
     setUserRole("");
-    setShowDropdown(false);
+    setShowProfileDropdown(false);
     setTimeout(() => {
       navigate("/Home");
     }, 1000);
   };
 
-  const toggleDropdown = () => {
-    setShowDropdown(!showDropdown);
+  const toggleProfileDropdown = () => {
+    setShowProfileDropdown(!showProfileDropdown);
+    setShowCategoryDropdown(false);
+  };
+
+  const toggleCategoryDropdown = () => {
+    setShowCategoryDropdown(!showCategoryDropdown);
+    setShowProfileDropdown(false);
+  };
+
+  const handleCategoryClick = (category) => {
+    navigate(`/category/${category}`);
+    setShowCategoryDropdown(false);
   };
 
   return (
@@ -52,12 +64,36 @@ const Navbar = () => {
           >
             Home
           </Link>
-          <Link
-            to="#"
-            className="nav-link text-sm font-bold text-neutral-600 hover:text-neutral-950"
-          >
-            Category
-          </Link>
+          <div className="relative">
+            <button
+              onClick={toggleCategoryDropdown}
+              className="nav-link text-sm font-bold text-neutral-600 hover:text-neutral-950"
+            >
+              Category
+            </button>
+            {showCategoryDropdown && (
+              <div className="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
+                <button
+                  onClick={() => handleCategoryClick("men")}
+                  className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                >
+                  Men
+                </button>
+                <button
+                  onClick={() => handleCategoryClick("women")}
+                  className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                >
+                  Women
+                </button>
+                <button
+                  onClick={() => handleCategoryClick("electronics")}
+                  className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                >
+                  Electronics
+                </button>
+              </div>
+            )}
+          </div>
           <Link
             to="#"
             className="nav-link text-sm font-bold text-neutral-600 hover:text-neutral-950"
@@ -73,12 +109,12 @@ const Navbar = () => {
           {loggedInUser ? (
             <div className="relative">
               <button
-                onClick={toggleDropdown}
+                onClick={toggleProfileDropdown}
                 className="nav-link text-sm font-bold text-neutral-600 hover:text-neutral-950"
               >
                 Profile
               </button>
-              {showDropdown && (
+              {showProfileDropdown && (
                 <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
                   <Link
                     to="/Dashboard"

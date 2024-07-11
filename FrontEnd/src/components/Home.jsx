@@ -1,21 +1,25 @@
-import React, { useContext, useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useContext, useState, useEffect } from "react";
+import { Link, useParams } from "react-router-dom";
 import { productContext } from "../utills/Context";
-import Loading from "./Loading";
 import SearchBar from "./SearchBar";
 import Navbar from "./Navbar";
 
 function Home() {
   const [products] = useContext(productContext);
   const [searchQuery, setSearchQuery] = useState("");
+  const { category } = useParams();
 
   const handleSearchChange = (value) => {
     setSearchQuery(value);
   };
 
-  const filteredProducts = products.filter((product) =>
-    product.title.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredProducts = products.filter((product) => {
+    const matchesSearch = product.title
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase());
+    const matchesCategory = !category || product.category === category;
+    return matchesSearch && matchesCategory;
+  });
 
   return (
     <>
