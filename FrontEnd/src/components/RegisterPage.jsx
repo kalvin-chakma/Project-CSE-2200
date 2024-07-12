@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import RegisterPageImage from "../assets/RegisterPageImage.jpg";
 import Password from "./FormElement/Password";
 import EmailAdress from "./FormElement/EmailAdress";
@@ -46,10 +48,10 @@ function RegisterPage() {
       const result = await response.json();
       const { success, message, role, error } = result;
       if (success) {
-        handleSuccess(message);
+        handleSuccess("Registration successful! Please log in.");
         setTimeout(() => {
-          navigate(role === "admin" ? "/LogInPage" : "/LogInPage");
-        }, 1000);
+          navigate("/LogInPage");
+        }, 3000);
       } else if (error) {
         const details = error?.details[0]?.message;
         handleError(details);
@@ -64,11 +66,27 @@ function RegisterPage() {
   };
 
   const handleSuccess = (message) => {
-    alert(`Success: ${message}`);
+    toast.success(message, {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    });
   };
 
   const handleError = (message) => {
-    alert(`Error: ${message}`);
+    toast.error(message, {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    });
   };
 
   return (
@@ -118,6 +136,7 @@ function RegisterPage() {
           </div>
         </div>
       </div>
+      <ToastContainer />
     </div>
   );
 }

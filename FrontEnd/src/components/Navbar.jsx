@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import WebsiteLogo from "../assets/Logo.png";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Navbar = ({ categories }) => {
   const [loggedInUser, setLoggedInUser] = useState("");
@@ -31,7 +33,15 @@ const Navbar = ({ categories }) => {
     localStorage.removeItem("userEmail");
     localStorage.removeItem("refreshToken");
     localStorage.removeItem("userRole");
-    alert("User Logged out");
+    toast.success("User Logged out", {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    });
     setLoggedInUser("");
     setUserRole("");
     setShowProfileDropdown(false);
@@ -40,6 +50,7 @@ const Navbar = ({ categories }) => {
       navigate("/Home");
     }, 1000);
   };
+
   const toggleProfileDropdown = () => {
     setShowProfileDropdown(!showProfileDropdown);
     setShowCategoryDropdown(false);
@@ -54,6 +65,7 @@ const Navbar = ({ categories }) => {
     navigate(`/category/${category}`);
     setShowCategoryDropdown(false);
   };
+
   return (
     <div className="main">
       <div className="px-5 py-2 flex justify-between items-center shadow-xl">
@@ -155,6 +167,7 @@ const Navbar = ({ categories }) => {
           )}
         </div>
       </div>
+      <ToastContainer />
     </div>
   );
 };

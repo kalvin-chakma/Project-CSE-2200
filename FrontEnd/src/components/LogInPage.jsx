@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import loginImage from "../assets/loginPageImage.jpg";
 import Password from "./FormElement/Password";
-import EmailAdress from "./FormElement/EmailAdress";
+import EmailAddress from "./FormElement/EmailAdress";
 
 function LogInPage() {
   const [loginInfo, setLoginInfo] = useState({
@@ -55,7 +57,7 @@ function LogInPage() {
         error,
       } = result;
       if (success) {
-        handleSuccess(message);
+        handleSuccess("Login successful!");
         console.log("Access Token:", accessToken);
         console.log("Refresh Token:", refreshToken);
         localStorage.setItem("accessToken", accessToken);
@@ -70,7 +72,7 @@ function LogInPage() {
 
         setTimeout(() => {
           navigate(role === "admin" ? "/Home" : "/Home");
-        }, 1000);
+        }, 3000); // Wait for 3 seconds before redirecting
       } else if (error) {
         const details = error?.details[0]?.message;
         handleError(details);
@@ -84,11 +86,27 @@ function LogInPage() {
   };
 
   const handleSuccess = (message) => {
-    alert(`Success: ${message}`);
+    toast.success(message, {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    });
   };
 
   const handleError = (message) => {
-    alert(`Error: ${message}`);
+    toast.error(message, {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    });
   };
 
   return (
@@ -116,7 +134,7 @@ function LogInPage() {
                   className="mt-10 sm:mt-20 space-y-4 sm:space-y-7"
                   onSubmit={handleLogin}
                 >
-                  <EmailAdress
+                  <EmailAddress
                     name="email"
                     value={loginInfo.email}
                     onChange={handleChange}
@@ -159,6 +177,7 @@ function LogInPage() {
           </div>
         </div>
       </div>
+      <ToastContainer />
     </div>
   );
 }
