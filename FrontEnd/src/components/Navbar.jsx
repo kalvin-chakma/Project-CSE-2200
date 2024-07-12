@@ -10,10 +10,19 @@ const Navbar = ({ categories }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const user = localStorage.getItem("loggedInUser");
-    const role = localStorage.getItem("userRole");
-    setLoggedInUser(user);
-    setUserRole(role);
+    const checkLoginStatus = () => {
+      const user = localStorage.getItem("loggedInUser");
+      const role = localStorage.getItem("userRole");
+      setLoggedInUser(user);
+      setUserRole(role);
+    };
+
+    checkLoginStatus();
+    window.addEventListener("storage", checkLoginStatus);
+
+    return () => {
+      window.removeEventListener("storage", checkLoginStatus);
+    };
   }, []);
 
   const handleLogout = () => {
@@ -26,11 +35,11 @@ const Navbar = ({ categories }) => {
     setLoggedInUser("");
     setUserRole("");
     setShowProfileDropdown(false);
+    window.dispatchEvent(new Event("storage"));
     setTimeout(() => {
       navigate("/Home");
     }, 1000);
   };
-
   const toggleProfileDropdown = () => {
     setShowProfileDropdown(!showProfileDropdown);
     setShowCategoryDropdown(false);
