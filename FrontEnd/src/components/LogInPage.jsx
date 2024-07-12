@@ -42,7 +42,7 @@ function LogInPage() {
       }
 
       const result = await response.json();
-      console.log("Full server response:", result); // Log the entire response
+      console.log("Full server response:", result);
 
       const {
         success,
@@ -64,6 +64,10 @@ function LogInPage() {
         localStorage.setItem("loggedInUser", name);
         localStorage.setItem("userEmail", email);
         localStorage.setItem("userRole", role);
+
+        // Dispatch a storage event to update the Navbar
+        window.dispatchEvent(new Event("storage"));
+
         setTimeout(() => {
           navigate(role === "admin" ? "/Home" : "/Home");
         }, 1000);
