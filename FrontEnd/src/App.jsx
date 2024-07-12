@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import Home from "./components/Home";
 import Navbar from "./components/Navbar";
 import Create from "./components/Create";
@@ -31,9 +33,20 @@ export default function App() {
         ];
         setCategories(uniqueCategories);
         localStorage.setItem("categories", JSON.stringify(uniqueCategories));
+      } else {
+        throw new Error("Failed to fetch categories");
       }
     } catch (error) {
       console.error("Error fetching categories:", error);
+      toast.error("Error fetching categories", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
     }
   };
 
@@ -67,6 +80,7 @@ export default function App() {
         <Route path="/details/:id" element={<Details />} />
         <Route path="/dashboard" element={<Dashboard />} />
       </Routes>
+      <ToastContainer />
     </div>
   );
 }
