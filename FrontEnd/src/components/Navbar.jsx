@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import WebsiteLogo from "../assets/Logo.png";
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 
 const Navbar = ({ categories }) => {
   const [loggedInUser, setLoggedInUser] = useState("");
   const [userRole, setUserRole] = useState("");
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
+  const [notification, setNotification] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -27,21 +26,21 @@ const Navbar = ({ categories }) => {
     };
   }, []);
 
+  const showNotification = (message) => {
+    setNotification(message);
+    setTimeout(() => setNotification(null), 3000);
+  };
+
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("loggedInUser");
     localStorage.removeItem("userEmail");
     localStorage.removeItem("refreshToken");
     localStorage.removeItem("userRole");
-    toast.success("User Logged out", {
-      position: "top-right",
-      autoClose: 3000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-    });
+    localStorage.removeItem("accessToken");
+    
+    showNotification("User Logged out");
+    
     setLoggedInUser("");
     setUserRole("");
     setShowProfileDropdown(false);
@@ -66,6 +65,9 @@ const Navbar = ({ categories }) => {
     setShowCategoryDropdown(false);
   };
 
+  const navLinkStyle = "nav-link text-sm font-bold text-neutral-600 hover:text-neutral-950 transition-colors duration-300";
+  const dropdownItemStyle = "block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-300";
+
   return (
     <div className="main">
       <div className="px-5 py-2 flex justify-between items-center shadow-xl">
@@ -78,16 +80,13 @@ const Navbar = ({ categories }) => {
           />
         </div>
         <div className="nav-links flex space-x-7 font-semibold opacity-75">
-          <Link
-            to="/"
-            className="nav-link text-sm font-bold text-neutral-600 hover:text-neutral-950"
-          >
+          <Link to="/" className={navLinkStyle}>
             Home
           </Link>
           <div className="relative">
             <button
               onClick={toggleCategoryDropdown}
-              className="nav-link text-sm font-bold text-neutral-600 hover:text-neutral-950"
+              className={navLinkStyle}
             >
               Category
             </button>
@@ -97,7 +96,7 @@ const Navbar = ({ categories }) => {
                   <button
                     key={cat}
                     onClick={() => handleCategoryClick(cat)}
-                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    className={dropdownItemStyle}
                   >
                     {cat.charAt(0).toUpperCase() + cat.slice(1)}
                   </button>
@@ -105,23 +104,17 @@ const Navbar = ({ categories }) => {
               </div>
             )}
           </div>
-          <Link
-            to="#"
-            className="nav-link text-sm font-bold text-neutral-600 hover:text-neutral-950"
-          >
+          <Link to="#" className={navLinkStyle}>
             About Us
           </Link>
-          <Link
-            to="#"
-            className="nav-link text-sm font-bold text-neutral-600 hover:text-neutral-950"
-          >
+          <Link to="#" className={navLinkStyle}>
             Contact Us
           </Link>
           {loggedInUser ? (
             <div className="relative">
               <button
                 onClick={toggleProfileDropdown}
-                className="nav-link text-sm font-bold text-neutral-600 hover:text-neutral-950"
+                className={navLinkStyle}
               >
                 Profile
               </button>
@@ -129,28 +122,28 @@ const Navbar = ({ categories }) => {
                 <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
                   <Link
                     to="/Dashboard"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    className={dropdownItemStyle}
                   >
                     Dashboard
                   </Link>
                   {userRole === "admin" ? (
                     <Link
                       to="/create"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      className={dropdownItemStyle}
                     >
                       Add New Product
                     </Link>
                   ) : (
                     <Link
                       to="/cart"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      className={dropdownItemStyle}
                     >
                       My Cart
                     </Link>
                   )}
                   <button
                     onClick={handleLogout}
-                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    className={dropdownItemStyle}
                   >
                     Logout
                   </button>
@@ -160,14 +153,18 @@ const Navbar = ({ categories }) => {
           ) : (
             <Link
               to="/LogInPage"
-              className="nav-link text-sm font-bold text-neutral-600 hover:text-neutral-950"
+              className={navLinkStyle}
             >
               Log In
             </Link>
           )}
         </div>
       </div>
-      <ToastContainer />
+      {notification && (
+        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-green-500 text-white rounded shadow-lg px-6 py-3 transition-opacity duration-300">
+          {notification}
+        </div>
+      )}
     </div>
   );
 };
