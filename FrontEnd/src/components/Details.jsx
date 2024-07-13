@@ -2,6 +2,7 @@ import React, { useContext, useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { productContext } from "../utills/Context";
 import Navbar from "./Navbar";
+import { ThreeDots } from 'react-loader-spinner';
 
 const Details = () => {
   const [products, setProducts] = useContext(productContext);
@@ -78,6 +79,7 @@ const Details = () => {
 
   const ProductEditHandler = async (e) => {
     e.preventDefault();
+    setLoading(true);
     const updatedProduct = {
       title: editProduct.title,
       category: editProduct.category,
@@ -108,6 +110,8 @@ const Details = () => {
     } catch (error) {
       console.error("Error updating product:", error);
       alert("Failed to update product: " + error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -151,7 +155,11 @@ const Details = () => {
   };
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <ThreeDots color="#3498db" height={80} width={80} />
+      </div>
+    );
   }
 
   if (error) {
@@ -297,14 +305,20 @@ const Details = () => {
                   <div className="flex space-x-4">
                     <button
                       type="submit"
-                      className="rounded bg-green-500 hover:bg-green-400 text-white font-bold py-2 px-4 w-full md:w-auto"
+                      className="rounded bg-green-500 hover:bg-green-400 text-white font-bold py-2 px-4 w-full md:w-auto flex items-center justify-center"
+                      disabled={loading}
                     >
-                      Save
+                      {loading ? (
+                        <ThreeDots color="#ffffff" height={24} width={24} />
+                      ) : (
+                        "Save"
+                      )}
                     </button>
                     <button
                       type="button"
                       onClick={() => setIsEditing(false)}
                       className="rounded bg-red-500 hover:bg-red-400 text-white font-bold py-2 px-4 w-full md:w-auto"
+                      disabled={loading}
                     >
                       Cancel
                     </button>
