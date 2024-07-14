@@ -55,7 +55,7 @@ function RegisterPage() {
         setRegisterSuccess(true);
         handleSuccess("Registration successful!");
         setTimeout(() => {
-          navigate("/login");
+          navigate("/LogInPage");
         }, 3000);
       } else if (error) {
         const details = error?.details[0]?.message;
