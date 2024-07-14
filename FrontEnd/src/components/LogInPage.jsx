@@ -1,16 +1,19 @@
+// LogInPage.js
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import loginImage from "../assets/loginPageImage.jpg";
 import Password from "./FormElement/Password";
 import EmailAddress from "./FormElement/EmailAdress";
+import AnimatedButton from "./AnimatedButton";
 
 function LogInPage() {
   const [loginInfo, setLoginInfo] = useState({
     email: "",
     password: "",
   });
+  const [loginSuccess, setLoginSuccess] = useState(false);
 
   const navigate = useNavigate();
 
@@ -57,6 +60,7 @@ function LogInPage() {
         error,
       } = result;
       if (success) {
+        setLoginSuccess(true);
         handleSuccess("Login successful!");
         console.log("Access Token:", accessToken);
         console.log("Refresh Token:", refreshToken);
@@ -67,12 +71,11 @@ function LogInPage() {
         localStorage.setItem("userEmail", email);
         localStorage.setItem("userRole", role);
 
-        // Dispatch a storage event to update the Navbar
         window.dispatchEvent(new Event("storage"));
 
         setTimeout(() => {
           navigate(role === "admin" ? "/Home" : "/Home");
-        }, 3000); // Wait for 3 seconds before redirecting
+        }, 3000);
       } else if (error) {
         const details = error?.details[0]?.message;
         handleError(details);
@@ -112,7 +115,9 @@ function LogInPage() {
   return (
     <div className="max-w-400px mx-auto h-900px">
       <div className="h-full flex flex-col">
-        <div className="w-full px-6 sm:px-10 lg:px-40 m-6 sm:m-10 flex justify-start items-center"></div>
+        <div className="w-full px-6 sm:px-10 lg:px-40 m-6 sm:m-10 flex justify-start items-center">
+          {/* Content of this div is missing */}
+        </div>
         <div className="flex p-6 flex-col sm:flex-row flex-grow items-center justify-center">
           <div className="w-full h-full sm:w-5/12 flex items-center justify-center rounded-xl shadow-2xl">
             <img
@@ -153,12 +158,12 @@ function LogInPage() {
                     </a>
                   </div>
                   <div className="mt-8 sm:mt-10 flex justify-center">
-                    <button
-                      type="submit"
-                      className="w-full sm:w-4/6 flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-500 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                    >
-                      Log In
-                    </button>
+                    <AnimatedButton
+                      initialText="Log In"
+                      successText="Login Successful"
+                      onClick={handleLogin}
+                      isSuccess={loginSuccess}
+                    />
                   </div>
                 </form>
               </div>

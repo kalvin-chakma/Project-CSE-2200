@@ -5,4 +5,16 @@ export default {
     extend: {},
   },
   plugins: [],
+  theme: {
+    extend: {
+      keyframes: {
+        layer: {
+          "100%": { left: "0%" },
+        },
+      },
+      animation: {
+        layer: "layer 6s ease-in-out forwards",
+      },
+    },
+  },
 };

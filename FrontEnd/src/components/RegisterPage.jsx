@@ -1,34 +1,36 @@
+// RegisterPage.js
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import RegisterPageImage from "../assets/RegisterPageImage.jpg";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import registerImage from "../assets/RegisterPageImage.jpg";
 import Password from "./FormElement/Password";
-import EmailAdress from "./FormElement/EmailAdress";
-import UserName from "./FormElement/UserName";
+import EmailAddress from "./FormElement/EmailAdress";
+import AnimatedButton from "./AnimatedButton";
 
 function RegisterPage() {
-  const [signupInfo, setSignupInfo] = useState({
+  const [registerInfo, setRegisterInfo] = useState({
     name: "",
     email: "",
     password: "",
   });
+  const [registerSuccess, setRegisterSuccess] = useState(false);
 
   const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setSignupInfo((prevState) => ({
+    setRegisterInfo((prevState) => ({
       ...prevState,
       [name]: value,
     }));
   };
 
-  const handleSignup = async (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
-    const { name, email, password } = signupInfo;
+    const { name, email, password } = registerInfo;
     if (!name || !email || !password) {
-      return handleError("Name, email, and password are required");
+      return handleError("All fields are required");
     }
     try {
       const url = "https://project-cse-2200.vercel.app/auth/signup";
@@ -38,7 +40,7 @@ function RegisterPage() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(signupInfo),
+        body: JSON.stringify(registerInfo),
       });
 
       if (!response.ok) {
@@ -46,11 +48,14 @@ function RegisterPage() {
       }
 
       const result = await response.json();
-      const { success, message, role, error } = result;
+      console.log("Full server response:", result);
+
+      const { success, message, error } = result;
       if (success) {
-        handleSuccess("Registration successful! Please log in.");
+        setRegisterSuccess(true);
+        handleSuccess("Registration successful!");
         setTimeout(() => {
-          navigate("/LogInPage");
+          navigate("/login");
         }, 3000);
       } else if (error) {
         const details = error?.details[0]?.message;
@@ -58,7 +63,6 @@ function RegisterPage() {
       } else if (!success) {
         handleError(message);
       }
-      console.log(result);
     } catch (err) {
       handleError(err.message);
       console.error("Fetch error:", err);
@@ -90,48 +94,71 @@ function RegisterPage() {
   };
 
   return (
-    <div className="h-screen flex flex-col">
-      <div className="w-full px-40 mt-10 flex justify-start items-center"></div>
-      <div className="flex flex-row flex-grow items-center justify-center">
-        <div className="h-5/6 w-10/12 p-5 flex flex-row justify-between rounded-3xl relative shadow-2xl bg-white">
-          <div className="w-2/3">
+    <div className="max-w-400px mx-auto h-900px">
+      <div className="h-full flex flex-col">
+        <div className="w-full px-6 sm:px-10 lg:px-40 m-6 sm:m-10 flex justify-start items-center">
+          {/* Content here */}
+        </div>
+        <div className="flex p-6 flex-col sm:flex-row flex-grow items-center justify-center">
+          <div className="w-full h-full sm:w-5/12 flex items-center justify-center rounded-xl shadow-2xl">
             <img
-              src={RegisterPageImage}
-              alt="Register Page"
-              className="object-cover h-full w-full rounded-l-3xl"
+              src={registerImage}
+              alt="Register"
+              className="object-cover h-full w-full rounded-xl"
             />
           </div>
-          <div className="w-2/5 flex flex-col justify-between p-10">
-            <div>
-              <p className="text-2xl font-semibold">Register Now!</p>
-              <p className="mt-2 font-semibold opacity-50">
-                Please Register to create your account
-              </p>
-              <form className="mt-10 space-y-5" onSubmit={handleSignup}>
-                <UserName
-                  name="name"
-                  value={signupInfo.name}
-                  onChange={handleChange}
-                />
-                <EmailAdress
-                  name="email"
-                  value={signupInfo.email}
-                  onChange={handleChange}
-                />
-                <Password
-                  name="password"
-                  value={signupInfo.password}
-                  onChange={handleChange}
-                />
-                <div className="mb-8 flex justify-center">
-                  <button
-                    type="submit"
-                    className="w-4/6 flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-500 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                  >
-                    Register
-                  </button>
-                </div>
-              </form>
+          <div className="w-full sm:w-5/12 px-6 sm:px-28 py-6 sm:py-12 ml-6 sm:ml-10 flex flex-col relative bg-white">
+            <div className="mt-5 flex flex-col justify-between h-full">
+              <div>
+                <p className="text-lg sm:text-2xl font-semibold">
+                  Create an Account
+                </p>
+                <p className="mt-2 font-semibold text-sm sm:text-base opacity-50">
+                  Please fill in your details
+                </p>
+                <form
+                  className="mt-10 sm:mt-20 space-y-4 sm:space-y-7"
+                  onSubmit={handleRegister}
+                >
+                  <input
+                    type="text"
+                    name="name"
+                    value={registerInfo.name}
+                    onChange={handleChange}
+                    placeholder="Full Name"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                  />
+                  <EmailAddress
+                    name="email"
+                    value={registerInfo.email}
+                    onChange={handleChange}
+                  />
+                  <Password
+                    name="password"
+                    value={registerInfo.password}
+                    onChange={handleChange}
+                  />
+                  <div className="mt-8 sm:mt-10 flex justify-center">
+                    <AnimatedButton
+                      initialText="Register"
+                      successText="Registration Successful"
+                      onClick={handleRegister}
+                      isSuccess={registerSuccess}
+                    />
+                  </div>
+                </form>
+              </div>
+              <div className="mt-10 sm:mt-14 flex flex-col sm:flex-row justify-between">
+                <h3 className="text-xs sm:text-sm font-semibold opacity-50">
+                  Already have an account?
+                </h3>
+                <a
+                  href="/login"
+                  className="mt-2 sm:mt-0 text-xs sm:text-sm font-bold text-indigo-400 hover:text-indigo-700"
+                >
+                  Log in
+                </a>
+              </div>
             </div>
           </div>
         </div>
