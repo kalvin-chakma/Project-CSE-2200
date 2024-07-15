@@ -10,6 +10,7 @@ import LogInPage from "./components/LogInPage";
 import RegisterPage from "./components/RegisterPage";
 import RefrshHandler from "./components/RefrshHandler";
 import Dashboard from "./components/Dashboard";
+import TokenRefresher from "./components/TokenRefresher";
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -66,6 +67,7 @@ export default function App() {
   return (
     <div className="h-screen w-screen flex flex-col">
       <RefrshHandler setIsAuthenticated={setIsAuthenticated} />
+      <TokenRefresher />
       <Navbar categories={categories} />
       <Routes>
         <Route path="/" element={<Home categories={categories} />} />

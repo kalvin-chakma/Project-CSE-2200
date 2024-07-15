@@ -1,4 +1,3 @@
-// LogInPage.js
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
@@ -64,6 +63,7 @@ function LogInPage() {
         handleSuccess("Login successful!");
         console.log("Access Token:", accessToken);
         console.log("Refresh Token:", refreshToken);
+        console.log("JWT Token:", jwtToken);
         localStorage.setItem("accessToken", accessToken);
         localStorage.setItem("refreshToken", refreshToken);
         localStorage.setItem("token", jwtToken);
