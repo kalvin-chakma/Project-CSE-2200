@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { refreshTokens } from "../utills/auth";
+import React, { useEffect } from 'react';
+import { refreshTokens } from '../utils/auth';
 
 const TokenRefresher = () => {
   useEffect(() => {
@@ -7,16 +7,10 @@ const TokenRefresher = () => {
       refreshTokens();
     };
 
-    const handleClick = () => {
-      refreshTokens();
-    };
-
-    window.addEventListener("storage", handleStorage);
-    document.addEventListener("click", handleClick);
+    window.addEventListener('storage', handleStorage);
 
     return () => {
-      window.removeEventListener("storage", handleStorage);
-      document.removeEventListener("click", handleClick);
+      window.removeEventListener('storage', handleStorage);
     };
   }, []);
 
