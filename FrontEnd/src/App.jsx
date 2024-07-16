@@ -67,7 +67,6 @@ export default function App() {
   return (
     <div className="h-screen w-screen flex flex-col">
       <RefrshHandler setIsAuthenticated={setIsAuthenticated} />
-      <TokenRefresher />
       <Navbar categories={categories} />
       <Routes>
         <Route path="/" element={<Home categories={categories} />} />
@@ -76,12 +75,15 @@ export default function App() {
           path="/category/:category"
           element={<Home categories={categories} />}
         />
-        <Route path="/LogInPage" element={<LogInPage />} />
-        <Route path="/RegisterPage" element={<RegisterPage />} />
+        
         <Route path="/create" element={<Create addCategory={addCategory} />} />
         <Route path="/details/:id" element={<Details />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        
+        <Route path="/LogInPage" element={<LogInPage />} />
+        <Route path="/RegisterPage" element={<RegisterPage />} />
       </Routes>
+      <TokenRefresher />
       <ToastContainer />
     </div>
   );
