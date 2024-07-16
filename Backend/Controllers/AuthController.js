@@ -1,5 +1,5 @@
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 const UserModel = require("../Models/user");
 
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
@@ -10,17 +10,17 @@ const generateTokens = (user) => {
   const accessToken = jwt.sign(
     { email: user.email, id: user._id },
     process.env.JWT_SECRET,
-    { expiresIn: '15m' }
+    { expiresIn: "15min" } // Changed to 2 seconds
   );
   const refreshToken = jwt.sign(
     { email: user.email, id: user._id },
     process.env.REFRESH_TOKEN_SECRET,
-    { expiresIn: '7d' }
+    { expiresIn: "7d" }
   );
   const jwtToken = jwt.sign(
     { email: user.email, id: user._id },
     process.env.JWT_SECRET,
-    { expiresIn: '24h' }
+    { expiresIn: "24h" }
   );
   return { accessToken, refreshToken, jwtToken };
 };
@@ -31,11 +31,19 @@ const signup = async (req, res) => {
     const { name, email, password } = req.body;
     const user = await UserModel.findOne({ email });
     if (user) {
-      return res.status(409).json({ message: 'User already exists, you can login', success: false });
+      return res.status(409).json({
+        message: "User already exists, you can login",
+        success: false,
+      });
     }
     const hashedPassword = await bcrypt.hash(password, 10);
-    const role = email === ADMIN_EMAIL ? 'admin' : 'user'; // Only check the email for signup
-    const userModel = new UserModel({ name, email, password: hashedPassword, role });
+    const role = email === ADMIN_EMAIL ? "admin" : "user"; // Only check the email for signup
+    const userModel = new UserModel({
+      name,
+      email,
+      password: hashedPassword,
+      role,
+    });
 
     const { accessToken, refreshToken, jwtToken } = generateTokens(userModel);
     userModel.refreshToken = refreshToken;
@@ -49,13 +57,13 @@ const signup = async (req, res) => {
       jwtToken,
       name: userModel.name,
       email: userModel.email,
-      role: userModel.role
+      role: userModel.role,
     });
   } catch (err) {
     console.error("Signup error:", err);
     res.status(500).json({
       message: "Internal server error",
-      success: false
+      success: false,
     });
   }
 };
@@ -65,22 +73,22 @@ const login = async (req, res) => {
   try {
     const { email, password } = req.body;
     let user = await UserModel.findOne({ email });
-    const errorMsg = 'Auth failed: email or password is wrong';
-    
+    const errorMsg = "Auth failed: email or password is wrong";
+
     if (!user) {
       if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
         // Admin login
         user = new UserModel({
           email: ADMIN_EMAIL,
-          role: 'admin',
-          name: 'Admin User',
-          password: await bcrypt.hash(ADMIN_PASSWORD, 10)
+          role: "admin",
+          name: "Admin User",
+          password: await bcrypt.hash(ADMIN_PASSWORD, 10),
         });
       } else {
         return res.status(403).json({ message: errorMsg, success: false });
       }
     }
-    
+
     const isPassEqual = await bcrypt.compare(password, user.password);
     if (!isPassEqual) {
       return res.status(403).json({ message: errorMsg, success: false });
@@ -98,13 +106,13 @@ const login = async (req, res) => {
       jwtToken,
       email,
       name: user.name,
-      role: user.role
+      role: user.role,
     });
   } catch (err) {
     console.error("Login error:", err);
     res.status(500).json({
       message: "Internal server error",
-      success: false
+      success: false,
     });
   }
 };
@@ -113,7 +121,9 @@ const login = async (req, res) => {
 const refreshToken = async (req, res) => {
   const { refreshToken } = req.body;
   if (!refreshToken) {
-    return res.status(401).json({ message: "Refresh token is required", success: false });
+    return res
+      .status(401)
+      .json({ message: "Refresh token is required", success: false });
   }
 
   try {
@@ -121,10 +131,16 @@ const refreshToken = async (req, res) => {
     const user = await UserModel.findOne({ _id: decoded.id, refreshToken });
 
     if (!user) {
-      return res.status(403).json({ message: "Invalid refresh token", success: false });
+      return res
+        .status(403)
+        .json({ message: "Invalid refresh token", success: false });
     }
 
-    const { accessToken, refreshToken: newRefreshToken, jwtToken } = generateTokens(user);
+    const {
+      accessToken,
+      refreshToken: newRefreshToken,
+      jwtToken,
+    } = generateTokens(user);
     user.refreshToken = newRefreshToken;
     await user.save();
 
@@ -132,11 +148,13 @@ const refreshToken = async (req, res) => {
       success: true,
       accessToken,
       refreshToken: newRefreshToken,
-      jwtToken
+      jwtToken,
     });
   } catch (error) {
     console.error("Refresh token error:", error);
-    return res.status(403).json({ message: "Invalid refresh token", success: false });
+    return res
+      .status(403)
+      .json({ message: "Invalid refresh token", success: false });
   }
 };
 
@@ -160,5 +178,5 @@ module.exports = {
   signup,
   login,
   refreshToken,
-  logout
+  logout,
 };

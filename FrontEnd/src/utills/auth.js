@@ -19,13 +19,13 @@ export const refreshTokens = async () => {
     } = response.data;
 
     console.log("Tokens refreshed successfully");
-    console.log("New Access Token:", accessToken);
-    console.log("New Refresh Token:", newRefreshToken);
-    console.log("New JWT Token:", jwtToken);
+    // console.log("New Access Token:", accessToken);
+    // console.log("New Refresh Token:", newRefreshToken);
+    // console.log("New JWT Token:", jwtToken);
 
     localStorage.setItem("accessToken", accessToken);
     localStorage.setItem("refreshToken", newRefreshToken);
-    localStorage.setItem("jwtToken", jwtToken);
+    localStorage.setItem("jwtToken", jwtToken); // Changed from 'token' to 'jwtToken'
 
     return { accessToken, refreshToken: newRefreshToken, jwtToken };
   } catch (error) {
@@ -34,7 +34,6 @@ export const refreshTokens = async () => {
   }
 };
 
-// Add this function to handle API requests with token refresh
 export const apiRequest = async (method, url, data = null) => {
   try {
     const accessToken = localStorage.getItem("accessToken");

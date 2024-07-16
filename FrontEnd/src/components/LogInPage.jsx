@@ -4,7 +4,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import loginImage from "../assets/loginPageImage.jpg";
 import Password from "./FormElement/Password";
-import EmailAddress from "./FormElement/EmailAdress";
+import EmailAddress from "../components/FormElement/EmailAdress";
 import AnimatedButton from "./AnimatedButton";
 
 function LogInPage() {
@@ -13,16 +13,7 @@ function LogInPage() {
     password: "",
   });
   const [loginSuccess, setLoginSuccess] = useState(false);
-
   const navigate = useNavigate();
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setLoginInfo((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
-  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -64,9 +55,10 @@ function LogInPage() {
         console.log("Access Token:", accessToken);
         console.log("Refresh Token:", refreshToken);
         console.log("JWT Token:", jwtToken);
+
         localStorage.setItem("accessToken", accessToken);
         localStorage.setItem("refreshToken", refreshToken);
-        localStorage.setItem("token", jwtToken);
+        localStorage.setItem("jwtToken", jwtToken);
         localStorage.setItem("loggedInUser", name);
         localStorage.setItem("userEmail", email);
         localStorage.setItem("userRole", role);
@@ -112,6 +104,14 @@ function LogInPage() {
     });
   };
 
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setLoginInfo((prevLoginInfo) => ({
+      ...prevLoginInfo,
+      [name]: value,
+    }));
+  };
+
   return (
     <div className="max-w-400px mx-auto h-900px">
       <div className="h-full flex flex-col">
@@ -142,12 +142,12 @@ function LogInPage() {
                   <EmailAddress
                     name="email"
                     value={loginInfo.email}
-                    onChange={handleChange}
+                    onChange={handleChange} // Pass handleChange here
                   />
                   <Password
                     name="password"
                     value={loginInfo.password}
-                    onChange={handleChange}
+                    onChange={handleChange} // Pass handleChange here
                   />
                   <div className="text-right">
                     <a

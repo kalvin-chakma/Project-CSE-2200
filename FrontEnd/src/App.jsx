@@ -11,6 +11,7 @@ import RegisterPage from "./components/RegisterPage";
 import RefrshHandler from "./components/RefrshHandler";
 import Dashboard from "./components/Dashboard";
 import TokenRefresher from "./components/TokenRefresher";
+import { apiRequest, refreshTokens } from "./utills/auth"; // Corrected import path
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -22,21 +23,17 @@ export default function App() {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch(
+      const products = await apiRequest(
+        "get",
         "https://project-cse-2200.vercel.app/api/products"
       );
-      if (response.ok) {
-        const products = await response.json();
-        const uniqueCategories = [
-          ...new Set(
-            products.map((product) => product.category.toLowerCase().trim())
-          ),
-        ];
-        setCategories(uniqueCategories);
-        localStorage.setItem("categories", JSON.stringify(uniqueCategories));
-      } else {
-        throw new Error("Failed to fetch categories");
-      }
+      const uniqueCategories = [
+        ...new Set(
+          products.map((product) => product.category.toLowerCase().trim())
+        ),
+      ];
+      setCategories(uniqueCategories);
+      localStorage.setItem("categories", JSON.stringify(uniqueCategories));
     } catch (error) {
       console.error("Error fetching categories:", error);
       toast.error("Error fetching categories", {
@@ -67,6 +64,7 @@ export default function App() {
   return (
     <div className="h-screen w-screen flex flex-col">
       <RefrshHandler setIsAuthenticated={setIsAuthenticated} />
+      <TokenRefresher />
       <Navbar categories={categories} />
       <Routes>
         <Route path="/" element={<Home categories={categories} />} />
@@ -75,15 +73,12 @@ export default function App() {
           path="/category/:category"
           element={<Home categories={categories} />}
         />
-        
+        <Route path="/LogInPage" element={<LogInPage />} />
+        <Route path="/RegisterPage" element={<RegisterPage />} />
         <Route path="/create" element={<Create addCategory={addCategory} />} />
         <Route path="/details/:id" element={<Details />} />
         <Route path="/dashboard" element={<Dashboard />} />
-        
-        <Route path="/LogInPage" element={<LogInPage />} />
-        <Route path="/RegisterPage" element={<RegisterPage />} />
       </Routes>
-      <TokenRefresher />
       <ToastContainer />
     </div>
   );
