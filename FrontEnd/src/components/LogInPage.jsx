@@ -48,6 +48,7 @@ function LogInPage() {
         name,
         role,
         error,
+        userId,
       } = result;
       if (success) {
         setLoginSuccess(true);
@@ -55,14 +56,15 @@ function LogInPage() {
         console.log("Access Token:", accessToken);
         console.log("Refresh Token:", refreshToken);
         console.log("JWT Token:", jwtToken);
-
+        console.log("User ID:", userId);
         localStorage.setItem("accessToken", accessToken);
         localStorage.setItem("refreshToken", refreshToken);
         localStorage.setItem("jwtToken", jwtToken);
         localStorage.setItem("loggedInUser", name);
         localStorage.setItem("userEmail", email);
         localStorage.setItem("userRole", role);
-
+        localStorage.setItem("userId", userId);
+       
         window.dispatchEvent(new Event("storage"));
 
         setTimeout(() => {

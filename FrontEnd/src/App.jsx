@@ -12,6 +12,7 @@ import RefrshHandler from "./components/RefrshHandler";
 import Dashboard from "./components/Dashboard";
 import TokenRefresher from "./components/TokenRefresher";
 import { apiRequest, refreshTokens } from "./utills/auth"; // Corrected import path
+import CartPage from './components/CartPage';
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -78,6 +79,7 @@ export default function App() {
         <Route path="/create" element={<Create addCategory={addCategory} />} />
         <Route path="/details/:id" element={<Details />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/cartPage" element={<CartPage />} />
       </Routes>
       <ToastContainer />
     </div>

@@ -32,24 +32,27 @@ const Navbar = ({ categories }) => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+    localStorage.removeItem("jwtToken");
     localStorage.removeItem("loggedInUser");
     localStorage.removeItem("userEmail");
-    localStorage.removeItem("refreshToken");
     localStorage.removeItem("userRole");
-    localStorage.removeItem("accessToken");
-    
+    localStorage.removeItem("userId");
+  
     showNotification("User Logged out");
-    
+  
     setLoggedInUser("");
     setUserRole("");
     setShowProfileDropdown(false);
+  
     window.dispatchEvent(new Event("storage"));
+  
     setTimeout(() => {
       navigate("/Home");
     }, 1000);
   };
-
+  
   const toggleProfileDropdown = () => {
     setShowProfileDropdown(!showProfileDropdown);
     setShowCategoryDropdown(false);
@@ -135,7 +138,7 @@ const Navbar = ({ categories }) => {
                     </Link>
                   ) : (
                     <Link
-                      to="/cart"
+                      to="/CartPage"
                       className={dropdownItemStyle}
                     >
                       My Cart

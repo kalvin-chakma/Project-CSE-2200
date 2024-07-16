@@ -7,23 +7,26 @@ const cors = require("cors");
 
 // Import routers
 const AuthRouter = require("./Routes/AuthRouter");
-const ProductsRouter = require("./Routes/products");
+const products = require("./Routes/products");
+const cartRoutes = require('./Routes/cartRoutes');
 
-// Middleware
-app.use(cors()); // Enable CORS for all routes
-app.use(bodyParser.json()); // Parse application/json requests
+
 
 // Routes
 app.get("/ping", (req, res) => {
   res.send("PONG");
 });
 
+// Middleware
+app.use(cors()); // Enable CORS for all routes
+app.use(bodyParser.json()); // Parse application/json requests
+
 // Authentication routes
 app.use("/auth", AuthRouter);
 
 // Products routes
-app.use("/api/products", ProductsRouter);
-
+app.use("/api/products", products);
+app.use('/api/cart', cartRoutes);
 // Error handling middleware (must be placed after all routes/middleware)
 app.use((err, req, res, next) => {
   console.error("Error:", err);
