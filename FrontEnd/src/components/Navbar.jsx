@@ -137,12 +137,20 @@ const Navbar = ({ categories }) => {
                       Add New Product
                     </Link>
                   ) : (
-                    <Link
-                      to="/CartPage"
-                      className={dropdownItemStyle}
-                    >
-                      My Cart
-                    </Link>
+                    <>
+                      <Link
+                        to="/CartPage"
+                        className={dropdownItemStyle}
+                      >
+                        My Cart
+                      </Link>
+                      <Link
+                        to="/your-orders"
+                        className={dropdownItemStyle}
+                      >
+                        Your Orders
+                      </Link>
+                    </>
                   )}
                   <button
                     onClick={handleLogout}

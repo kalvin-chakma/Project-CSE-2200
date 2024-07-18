@@ -1,25 +1,12 @@
-import React from "react";
+import React from 'react';
+import AllUsers from './AllUsers';
+import AllCartItems from './AllCartItems';
 
 const AdminDashboard = ({ loggedInUser, userEmail }) => {
   return (
-    <div className="max-w-400px mx-auto h-900px p-4">
-      <div className="text-2xl md:text-3xl font-bold mb-4">Admin Dashboard</div>
-      <div className="shadow rounded-md p-4">
-        <div className="mt-4">
-          <p>
-            <strong>Name:</strong>{" "}
-            <span className="text-red-600">{loggedInUser}</span>
-          </p>
-        </div>
-        <div className="mt-4">
-          <p>
-            <strong>Email:</strong>{" "}
-            <span className="text-red-600">
-              {userEmail || "Email not available"}
-            </span>
-          </p>
-        </div>
-      </div>
+    <div>
+      <h1>Admin Dashboard</h1>
+      <p>Welcome, {loggedInUser} ({userEmail})</p>
     </div>
   );
 };

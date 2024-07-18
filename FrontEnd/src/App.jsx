@@ -13,6 +13,13 @@ import Dashboard from "./components/Dashboard";
 import TokenRefresher from "./components/TokenRefresher";
 import { apiRequest, refreshTokens } from "./utills/auth"; // Corrected import path
 import CartPage from './components/CartPage';
+import AllUsers from "./components/AllUsers";
+import AllCartItems from "./components/AllCartItems";
+import PaymentPage from './components/PaymentPage';
+import PaymentSuccessPage from './components/PaymentSuccessPage';
+import OrderPage from './components/OrderPage';
+import AdminOrderPage from './components/AdminOrderPage';
+import UserOrders from './components/UserOrders';
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -80,6 +87,13 @@ export default function App() {
         <Route path="/details/:id" element={<Details />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/cartPage" element={<CartPage />} />
+        <Route path="/AllUsers" element={<AllUsers />} />
+        <Route path="/AllCartItems" element={<AllCartItems />} />
+        <Route path="/payment" element={<PaymentPage />} />
+        <Route path="/payment-success" element={<PaymentSuccessPage />} />
+        <Route path="/your-orders" element={<OrderPage />} />
+        <Route path="/AdminOrderPage" element={<AdminOrderPage />} />
+        <Route path="/your-orders" element={<UserOrders />} />
       </Routes>
       <ToastContainer />
     </div>

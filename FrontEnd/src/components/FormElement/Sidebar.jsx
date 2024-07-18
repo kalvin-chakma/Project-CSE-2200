@@ -1,57 +1,76 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
+import { FaUser, FaShoppingCart, FaCreditCard, FaBox, FaUsers, FaClipboardList, FaSignOutAlt } from 'react-icons/fa';
 
 const Sidebar = () => {
   const navigate = useNavigate();
+  const [userRole, setUserRole] = useState("");
+
+  useEffect(() => {
+    const role = localStorage.getItem("userRole");
+    if (role) {
+      setUserRole(role);
+    }
+  }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("loggedInUser");
-    localStorage.removeItem("userEmail");
-    localStorage.removeItem("userRole");
+    localStorage.clear();
     handleSuccess("User Logged out");
     setTimeout(() => {
-      navigate("/Home"); // Redirect to "/Home" after logout
+      navigate("/Home");
     }, 1000);
   };
 
   const handleSuccess = (message) => {
-    // Implement your success message handling here
     console.log(message);
   };
 
+  const NavItem = ({ to, icon, children }) => (
+    <NavLink
+      to={to}
+      className={({ isActive }) =>
+        `flex items-center space-x-2 px-4 py-3 rounded-lg transition-colors duration-300 ${
+          isActive
+            ? "text-white bg-blue-600"
+            : "text-gray-600 hover:bg-gray-100"
+        }`
+      }
+    >
+      {icon}
+      <span>{children}</span>
+    </NavLink>
+  );
+
   return (
-    <div className="max-w-400px mx-auto h-900px">
-      <div className="h-screen flex flex-col border-r-2 border-gray-400">
-        <div className="flex-grow">
-          <div className="py-4 px-6 font-bold text-xl ml-10">Dashboard</div>
-          <div className="w-10/12 h-0.5 bg-gray-400 mx-auto"></div>
-          <div className="py-4 px-6">
-            <NavLink
-              to="/Dashboard"
-              className="block px-4 py-2 text-sm rounded-md text-gray-700 hover:bg-gray-100"
-              activeClassName="block px-4 py-2 text-sm rounded-md text-white bg-gray-700"
-            >
-              My Profile
-            </NavLink>
-          </div>
-          <div className="py-4 px-6">
-            <NavLink
-              to="/create"
-              className="block px-4 py-2 text-sm rounded-md text-gray-700 hover:bg-gray-100"
-              activeClassName="block px-4 py-2 text-sm rounded-md text-white bg-gray-700"
-            >
-              Add New Product
-            </NavLink>
-          </div>
-          <div className="py-4 px-6">
-            <button
-              onClick={handleLogout}
-              className="block w-full text-left px-4 py-2 text-sm rounded-md text-gray-700 hover:bg-gray-100"
-            >
-              Logout
-            </button>
-          </div>
+    <div className="w-64 h-screen bg-white shadow-lg">
+      <div className="flex flex-col h-full">
+        <div className="p-5">
+          <h2 className="text-2xl font-bold text-gray-800">Dashboard</h2>
+        </div>
+        <nav className="flex-grow">
+          <NavItem to="/Dashboard" icon={<FaUser className="w-5 h-5" />}>My Profile</NavItem>
+          {userRole === "admin" && (
+            <>
+              <NavItem to="/Create" icon={<FaBox className="w-5 h-5" />}>Add New Product</NavItem>
+              <NavItem to="/AllUsers" icon={<FaUsers className="w-5 h-5" />}>All User Details</NavItem>
+              <NavItem to="/AdminOrderPage" icon={<FaClipboardList className="w-5 h-5" />}>Admin Order Page</NavItem>
+            </>
+          )}
+          {userRole === "user" && (
+            <>
+              <NavItem to="/CartPage" icon={<FaShoppingCart className="w-5 h-5" />}>My Cart</NavItem>
+              <NavItem to="/payment" icon={<FaCreditCard className="w-5 h-5" />}>Payment</NavItem>
+            </>
+          )}
+        </nav>
+        <div className="p-4">
+          <button
+            onClick={handleLogout}
+            className="flex items-center space-x-2 w-full px-4 py-2 text-left text-red-600 hover:bg-red-100 rounded-lg transition-colors duration-300"
+          >
+            <FaSignOutAlt className="w-5 h-5" />
+            <span>Logout</span>
+          </button>
         </div>
       </div>
     </div>
