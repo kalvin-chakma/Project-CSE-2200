@@ -13,7 +13,7 @@ const OrderPage = () => {
 
   const fetchOrders = async () => {
     try {
-      const response = await axios.get(`https://project-cse-2200-ui.vercel.app/api/orders/user/${userId}`, {
+      const response = await axios.get(`https://project-cse-2200.vercel.app/api/orders/user/${userId}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('jwtToken')}` }
       });
       setOrders(response.data.orders);

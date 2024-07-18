@@ -27,7 +27,7 @@ const PaymentPage = () => {
     setIsLoading(true);
     setError('');
     try {
-      const response = await axios.post('https://project-cse-2200-ui.vercel.app/api/orders/create',
+      const response = await axios.post('https://project-cse-2200.vercel.app/api/orders/create',
         { userId, paymentMethod, address },
         { headers: { Authorization: `Bearer ${localStorage.getItem('jwtToken')}` } }
       );

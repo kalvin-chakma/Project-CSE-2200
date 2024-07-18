@@ -13,7 +13,7 @@ const AdminOrderPage = () => {
   const fetchOrders = async () => {
     try {
       const token = localStorage.getItem("jwtToken");
-      const response = await axios.get('https://project-cse-2200-ui.vercel.app/api/orders/all', {
+      const response = await axios.get('https://project-cse-2200.vercel.app/api/orders/all', {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -30,7 +30,7 @@ const AdminOrderPage = () => {
   const handleDeleteOrder = async (orderId) => {
     if (window.confirm('Are you sure you want to delete this order?')) {
       try {
-        await axios.delete(`https://project-cse-2200-ui.vercel.app/api/orders/${orderId}`, {
+        await axios.delete(`https://project-cse-2200.vercel.app/api/orders/${orderId}`, {
           headers: { Authorization: `Bearer ${localStorage.getItem('jwtToken')}` }
         });
         setOrders(orders.filter(order => order._id !== orderId));
@@ -44,7 +44,7 @@ const AdminOrderPage = () => {
   const handleUpdateStatus = async (orderId, newStatus) => {
     try {
       const token = localStorage.getItem("jwtToken");
-      await axios.put(`https://project-cse-2200-ui.vercel.app/api/orders/${orderId}/status`, 
+      await axios.put(`https://project-cse-2200.vercel.app/api/orders/${orderId}/status`, 
         { status: newStatus },
         { headers: { Authorization: `Bearer ${token}` } }
       );

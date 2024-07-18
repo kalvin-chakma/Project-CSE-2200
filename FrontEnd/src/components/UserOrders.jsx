@@ -11,7 +11,7 @@ const UserOrders = () => {
       try {
         const userId = localStorage.getItem('userId');
         const token = localStorage.getItem('jwtToken');
-        const response = await axios.get(`https://project-cse-2200-ui.vercel.app/api/orders/user/${userId}`, {
+        const response = await axios.get(`https://project-cse-2200.vercel.app/api/orders/user/${userId}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         console.log('API Response:', response.data); // Log the entire response

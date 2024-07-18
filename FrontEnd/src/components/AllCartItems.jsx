@@ -9,7 +9,7 @@ const AllCartItems = () => {
     const fetchCartItems = async () => {
       const token = localStorage.getItem("jwtToken");
       try {
-        const response = await fetch("https://project-cse-2200-ui.vercel.app/api/admin/cartitems", {
+        const response = await fetch("https://project-cse-2200.vercel.app/api/admin/cartitems", {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
