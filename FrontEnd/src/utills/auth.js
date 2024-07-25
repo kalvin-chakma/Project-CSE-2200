@@ -36,13 +36,13 @@ export const refreshTokens = async () => {
 
 export const apiRequest = async (method, url, data = null) => {
   try {
-    const accessToken = localStorage.getItem("accessToken");
+    const jwtToken = localStorage.getItem("jwtToken");
     const response = await axios({
       method,
       url,
       data,
       headers: {
-        Authorization: `Bearer ${accessToken}`,
+        Authorization: `Bearer ${jwtToken}`,
       },
     });
     return response.data;
