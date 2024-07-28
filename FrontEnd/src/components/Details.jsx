@@ -127,7 +127,7 @@ const Details = () => {
   
     try {
       const response = await fetch(
-        `http://localhost:8080/api/cart/add`,
+        `https://project-cse-2200.vercel.app/api/cart/add`,
         {
           method: "POST",
           headers: {
