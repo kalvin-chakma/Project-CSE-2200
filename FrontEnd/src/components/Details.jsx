@@ -1,7 +1,7 @@
 import React, { useContext, useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { productContext } from "../utills/Context";
-import Navbar from "./Navbar";
+import { ThreeDots } from "react-loader-spinner";
 
 const Details = () => {
   const [products, setProducts] = useContext(productContext);
@@ -17,10 +17,33 @@ const Details = () => {
   });
   const { id } = useParams();
   const navigate = useNavigate();
-  const userRole = localStorage.getItem("userRole");
-  const userId = localStorage.getItem("userId");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [userRole, setUserRole] = useState(null);
+
+  useEffect(() => {
+    const fetchUserRole = async () => {
+      try {
+        const token = localStorage.getItem("jwtToken");
+        const response = await fetch(
+          "https://project-cse-2200-xi.vercel.app/api/user/role",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        if (response.ok) {
+          const data = await response.json();
+          setUserRole(data.role);
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    };
+
+    fetchUserRole();
+  }, []);
 
   useEffect(() => {
     if (!id) {
@@ -33,8 +56,14 @@ const Details = () => {
       setLoading(true);
       setError(null);
       try {
+        const token = localStorage.getItem("jwtToken");
         const response = await fetch(
-          `https://project-cse-2200.vercel.app/api/products/${id}`
+          `https://project-cse-2200-xi.vercel.app/api/products/${id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
         if (!response.ok) {
           const errorData = await response.json();
@@ -55,16 +84,18 @@ const Details = () => {
 
   const ProductDeleteHandler = async () => {
     try {
+      const token = localStorage.getItem("jwtToken");
       const response = await fetch(
-        `https://project-cse-2200.vercel.app/api/products/${id}`,
+        `https://project-cse-2200-xi.vercel.app/api/products/${id}`,
         {
           method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
       if (!response.ok) {
         const errorData = await response.json();
-        console.error("Response Status:", response.status);
-        console.error("Response Text:", errorData.message);
         throw new Error(errorData.message || "Failed to delete product");
       }
       const updatedProducts = products.filter((p) => p._id !== id);
@@ -86,12 +117,14 @@ const Details = () => {
       image: editProduct.image,
     };
     try {
+      const token = localStorage.getItem("jwtToken");
       const response = await fetch(
-        `https://project-cse-2200.vercel.app/api/products/${id}`,
+        `https://project-cse-2200-xi.vercel.app/api/products/${id}`,
         {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify(updatedProduct),
         }
@@ -110,52 +143,60 @@ const Details = () => {
       alert("Failed to update product: " + error.message);
     }
   };
-  
+
   const handleAddToCart = async () => {
-    const userId = localStorage.getItem('userId');
-    const userRole = localStorage.getItem('userRole');
-  
-    if (!userId) {
+    const token = localStorage.getItem("jwtToken");
+    if (!token) {
       navigate("/LogInPage");
       return;
     }
-  
-    if (userRole !== "user") {
-      alert("Only users can add items to cart");
-      return;
-    }
-  
+
     try {
+      const userId = localStorage.getItem("userId");
+
       const response = await fetch(
-        `https://project-cse-2200.vercel.app/api/cart/add`,
+        "https://project-cse-2200-xi.vercel.app/api/cart/add",
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
-            userId,  // This should be the string version of the MongoDB _id
-            productId: id,  // This should be the MongoDB _id of the product
+            userId,
+            productId: id,
+            image: product.image,
             quantity,
           }),
         }
       );
-  
+
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to add item to cart");
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
-  
+
       const result = await response.json();
-      alert(result.message);
-      navigate('/CartPage');
+      alert("Item added to cart successfully");
+      navigate("/CartPage");
     } catch (error) {
       console.error("Error adding product to cart:", error);
-      alert("Failed to add product to cart: " + error.message);
+      setError(`Failed to add product to cart: ${error.message}`);
     }
   };
+
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <ThreeDots
+          height="80"
+          width="80"
+          radius="9"
+          color="#4fa94d"
+          ariaLabel="three-dots-loading"
+          visible={true}
+        />
+      </div>
+    );
   }
 
   if (error) {
@@ -207,10 +248,8 @@ const Details = () => {
                         })
                       }
                       className="w-full p-2 border rounded"
-                      placeholder="Title"
                     />
                   </div>
-
                   <div className="mb-4">
                     <label
                       htmlFor="category"
@@ -229,10 +268,8 @@ const Details = () => {
                         })
                       }
                       className="w-full p-2 border rounded"
-                      placeholder="Category"
                     />
                   </div>
-
                   <div className="mb-4">
                     <label
                       htmlFor="price"
@@ -251,10 +288,8 @@ const Details = () => {
                         })
                       }
                       className="w-full p-2 border rounded"
-                      placeholder="Price"
                     />
                   </div>
-
                   <div className="mb-4">
                     <label
                       htmlFor="description"
@@ -272,10 +307,8 @@ const Details = () => {
                         })
                       }
                       className="w-full p-2 border rounded"
-                      placeholder="Description"
                     />
                   </div>
-
                   <div className="mb-4">
                     <label
                       htmlFor="image"
@@ -294,21 +327,19 @@ const Details = () => {
                         })
                       }
                       className="w-full p-2 border rounded"
-                      placeholder="Image URL"
                     />
                   </div>
-
                   <div className="flex space-x-4">
                     <button
                       type="submit"
-                      className="rounded bg-green-500 hover:bg-green-400 text-white font-bold py-2 px-4 w-full md:w-auto"
+                      className="rounded bg-green-500 hover:bg-green-400 text-white font-bold py-2 px-4"
                     >
                       Save
                     </button>
                     <button
                       type="button"
                       onClick={() => setIsEditing(false)}
-                      className="rounded bg-red-500 hover:bg-red-400 text-white font-bold py-2 px-4 w-full md:w-auto"
+                      className="rounded bg-red-500 hover:bg-red-400 text-white font-bold py-2 px-4"
                     >
                       Cancel
                     </button>

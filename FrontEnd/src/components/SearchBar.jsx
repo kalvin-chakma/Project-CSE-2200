@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React from "react";
+import { FaSearch } from "react-icons/fa";
 
 const SearchBar = ({ placeholder, value, onChange }) => {
   const handleInputChange = (e) => {
@@ -6,17 +7,25 @@ const SearchBar = ({ placeholder, value, onChange }) => {
   };
 
   return (
-    <div className="p-1 w-[60%] flex justify-between items-center">
-      <input
-        type="search"
-        placeholder={placeholder}
-        value={value}
-        onChange={handleInputChange}
-        className="px-4 py-3 rounded-md border border-gray-800 focus:outline-none focus:border-indigo-500 w-[90%] h-10 mr-2"
-      />
-      <button className="rounded float-right text-white bg-green-500 hover:bg-green-400 font-bold py-2 px-4 border-b-4 hover:border-green-500">
-        Search
-      </button>
+    <div className="flex justify-center items-center w-full max-w-xl mx-auto">
+      <div className="relative w-full">
+        <input
+          type="search"
+          placeholder={placeholder}
+          value={value}
+          onChange={handleInputChange}
+          className="w-full px-4 py-2 pl-10 pr-12 text-sm text-gray-700 bg-gray-100 border-2 border-gray-200 rounded-full focus:outline-none focus:border-pink-500 focus:bg-white transition-colors duration-300"
+        />
+        <div className="absolute inset-y-0 left-0 flex items-center pl-3">
+          <FaSearch className="text-gray-400" />
+        </div>
+        <button
+          type="submit"
+          className="absolute inset-y-0 right-0 flex items-center px-4 text-sm font-medium text-white bg-pink-500 rounded-r-full hover:bg-pink-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 transition-colors duration-300"
+        >
+          Search
+        </button>
+      </div>
     </div>
   );
 };
