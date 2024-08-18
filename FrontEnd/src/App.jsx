@@ -11,30 +11,45 @@ import RegisterPage from "./components/RegisterPage";
 import RefrshHandler from "./components/RefrshHandler";
 import Dashboard from "./components/Dashboard";
 import TokenRefresher from "./components/TokenRefresher";
-import { apiRequest, refreshTokens } from "./utills/auth"; // Corrected import path
-import CartPage from './components/CartPage';
+import { apiRequest } from "./utills/auth";
+import CartPage from "./components/CartPage";
 import AllUsers from "./components/AllUsers";
 import AllCartItems from "./components/AllCartItems";
-import PaymentPage from './components/PaymentPage';
-import PaymentSuccessPage from './components/PaymentSuccessPage';
-import OrderPage from './components/OrderPage';
-import AdminOrderPage from './components/AdminOrderPage';
-import UserOrders from './components/UserOrders';
+import PaymentPage from "./components/PaymentPage";
+import PaymentSuccessPage from "./components/PaymentSuccessPage";
+import OrderPage from "./components/OrderPage";
+import AdminOrderPage from "./components/AdminOrderPage";
+import UserOrders from "./components/UserOrders";
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [sortOrder, setSortOrder] = useState("asc");
+
+  const PrivateRoute = ({ element }) => {
+    return isAuthenticated ? element : <Navigate to="/LogInPage" />;
+  };
 
   useEffect(() => {
     fetchCategories();
-  }, []);
+  }, [isAuthenticated]);
 
   const fetchCategories = async () => {
     try {
-      const products = await apiRequest(
-        "get",
-        "https://project-cse-2200.vercel.app/api/products"
-      );
+      let url = "https://project-cse-2200.vercel.app/api/products";
+      let options = {};
+
+      if (isAuthenticated) {
+        const token = localStorage.getItem("token");
+        if (token) {
+          options.headers = {
+            Authorization: `Bearer ${token}`,
+          };
+        }
+      }
+
+      const products = await apiRequest("get", url, null, options);
       const uniqueCategories = [
         ...new Set(
           products.map((product) => product.category.toLowerCase().trim())
@@ -44,15 +59,14 @@ export default function App() {
       localStorage.setItem("categories", JSON.stringify(uniqueCategories));
     } catch (error) {
       console.error("Error fetching categories:", error);
-      toast.error("Error fetching categories", {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      });
+      if (error.response && error.response.status === 401) {
+        setIsAuthenticated(false);
+        localStorage.removeItem("token");
+        localStorage.removeItem("refreshToken");
+        toast.error("Session expired. Please log in again.");
+      } else {
+        toast.error("Error fetching categories");
+      }
     }
   };
 
@@ -65,35 +79,114 @@ export default function App() {
     }
   };
 
-  const PrivateRoute = ({ element }) => {
-    return isAuthenticated ? element : <Navigate to="/LogInPage" />;
+  const handleCategoryChange = (category) => {
+    setSelectedCategory(category);
+  };
+
+  const handleSortOrderChange = (order) => {
+    setSortOrder(order);
   };
 
   return (
     <div className="h-screen w-screen flex flex-col">
       <RefrshHandler setIsAuthenticated={setIsAuthenticated} />
       <TokenRefresher />
-      <Navbar categories={categories} />
+      <Navbar
+        categories={categories}
+        isAuthenticated={isAuthenticated}
+        onCategoryChange={handleCategoryChange}
+        onSortOrderChange={handleSortOrderChange}
+      />
       <Routes>
-        <Route path="/" element={<Home categories={categories} />} />
-        <Route path="/Home" element={<Home categories={categories} />} />
+        <Route
+          path="/"
+          element={
+            <Home
+              categories={categories}
+              isAuthenticated={isAuthenticated}
+              selectedCategory={selectedCategory}
+              sortOrder={sortOrder}
+            />
+          }
+        />
+        <Route
+          path="/Home"
+          element={
+            <PrivateRoute
+              element={
+                <Home
+                  categories={categories}
+                  isAuthenticated={isAuthenticated}
+                  selectedCategory={selectedCategory}
+                  sortOrder={sortOrder}
+                />
+              }
+            />
+          }
+        />
         <Route
           path="/category/:category"
-          element={<Home categories={categories} />}
+          element={
+            <PrivateRoute
+              element={
+                <Home
+                  categories={categories}
+                  isAuthenticated={isAuthenticated}
+                  selectedCategory={selectedCategory}
+                  sortOrder={sortOrder}
+                />
+              }
+            />
+          }
         />
-        <Route path="/LogInPage" element={<LogInPage />} />
+        <Route
+          path="/LogInPage"
+          element={<LogInPage setIsAuthenticated={setIsAuthenticated} />}
+        />
         <Route path="/RegisterPage" element={<RegisterPage />} />
-        <Route path="/create" element={<Create addCategory={addCategory} />} />
+        <Route
+          path="/create"
+          element={
+            <PrivateRoute element={<Create addCategory={addCategory} />} />
+          }
+        />
         <Route path="/details/:id" element={<Details />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/cartPage" element={<CartPage />} />
-        <Route path="/AllUsers" element={<AllUsers />} />
-        <Route path="/AllCartItems" element={<AllCartItems />} />
-        <Route path="/payment" element={<PaymentPage />} />
-        <Route path="/payment-success" element={<PaymentSuccessPage />} />
-        <Route path="/your-orders" element={<OrderPage />} />
-        <Route path="/AdminOrderPage" element={<AdminOrderPage />} />
-        <Route path="/your-orders" element={<UserOrders />} />
+        <Route
+          path="/dashboard"
+          element={<PrivateRoute element={<Dashboard />} />}
+        />
+        <Route
+          path="/cartPage"
+          element={<PrivateRoute element={<CartPage />} />}
+        />
+        <Route
+          path="/AllUsers"
+          element={<PrivateRoute element={<AllUsers />} />}
+        />
+        <Route
+          path="/AllCartItems"
+          element={<PrivateRoute element={<AllCartItems />} />}
+        />
+        <Route
+          path="/payment"
+          element={<PrivateRoute element={<PaymentPage />} />}
+        />
+        <Route
+          path="/payment-success"
+          element={<PrivateRoute element={<PaymentSuccessPage />} />}
+        />
+        <Route
+          path="/your-orders"
+          element={<PrivateRoute element={<OrderPage />} />}
+        />
+        <Route
+          path="/AdminOrderPage"
+          element={<PrivateRoute element={<AdminOrderPage />} />}
+        />
+        <Route
+          path="/your-orders"
+          element={<PrivateRoute element={<UserOrders />} />}
+        />
       </Routes>
       <ToastContainer />
     </div>
