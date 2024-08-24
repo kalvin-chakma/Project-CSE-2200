@@ -37,7 +37,9 @@ function Home({ categories, isAuthenticated, selectedCategory, sortOrder }) {
           selectedCategories.includes(product.category.toLowerCase().trim())
         );
       } else if (category || selectedCategory) {
-        const filterCategory = (category || selectedCategory).toLowerCase().trim();
+        const filterCategory = (category || selectedCategory)
+          .toLowerCase()
+          .trim();
         filtered = filtered.filter(
           (product) => product.category.toLowerCase().trim() === filterCategory
         );
@@ -73,12 +75,20 @@ function Home({ categories, isAuthenticated, selectedCategory, sortOrder }) {
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [products, category, selectedCategory, searchQuery, sortOrder, selectedCategories, priceRange]);
+  }, [
+    products,
+    category,
+    selectedCategory,
+    searchQuery,
+    sortOrder,
+    selectedCategories,
+    priceRange,
+  ]);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentPromotedIndex((prevIndex) =>
-        (prevIndex + 1) % (promotedProducts.length || 1)
+      setCurrentPromotedIndex(
+        (prevIndex) => (prevIndex + 1) % (promotedProducts.length || 1)
       );
     }, 2500); // Change promoted product every 2.5 seconds
 
@@ -142,7 +152,7 @@ function Home({ categories, isAuthenticated, selectedCategory, sortOrder }) {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50">
+    <div className="flex flex-col min-h-screen bg-gray-50 ">
       <div className="bg-white shadow-md py-6">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between">
@@ -168,8 +178,12 @@ function Home({ categories, isAuthenticated, selectedCategory, sortOrder }) {
                     <input
                       type="checkbox"
                       className="form-checkbox text-pink-500"
-                      checked={selectedCategories.includes(category.toLowerCase())}
-                      onChange={() => handleCategoryChange(category.toLowerCase())}
+                      checked={selectedCategories.includes(
+                        category.toLowerCase()
+                      )}
+                      onChange={() =>
+                        handleCategoryChange(category.toLowerCase())
+                      }
                     />
                     <span className="ml-2">{category}</span>
                   </label>
@@ -206,37 +220,46 @@ function Home({ categories, isAuthenticated, selectedCategory, sortOrder }) {
         <div className="container mx-auto">
           <h2 className="text-3xl font-bold mb-4">Featured Product</h2>
           <AnimatePresence mode="wait">
-            {promotedProducts.length > 0 && promotedProducts[currentPromotedIndex] && (
-              <motion.div
-                key={promotedProducts[currentPromotedIndex]._id}
-                initial={{ opacity: 0, y: 50 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -50 }}
-                transition={{ duration: 0.5 }}
-                className="flex items-center"
-              >
-                <img
-                  src={promotedProducts[currentPromotedIndex].image}
-                  alt={promotedProducts[currentPromotedIndex].title}
-                  className="w-64 h-64 object-cover rounded-lg shadow-lg mr-8"
-                  onClick={() => handleProductClick(promotedProducts[currentPromotedIndex]._id)}
-                />
-                <div>
-                  <h3 className="text-2xl font-semibold mb-2">
-                    {promotedProducts[currentPromotedIndex].title}
-                  </h3>
-                  <p className="text-xl mb-4">
-                    ${promotedProducts[currentPromotedIndex].price.toFixed(2)}
-                  </p>
-                  <button
-                    onClick={() => handleProductClick(promotedProducts[currentPromotedIndex]._id)}
-                    className="bg-white text-pink-500 px-6 py-2 rounded-full font-semibold hover:bg-pink-100 transition-colors duration-300"
-                  >
-                    View Details
-                  </button>
-                </div>
-              </motion.div>
-            )}
+            {promotedProducts.length > 0 &&
+              promotedProducts[currentPromotedIndex] && (
+                <motion.div
+                  key={promotedProducts[currentPromotedIndex]._id}
+                  initial={{ opacity: 0, y: 50 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -50 }}
+                  transition={{ duration: 0.5 }}
+                  className="flex items-center"
+                >
+                  <img
+                    src={promotedProducts[currentPromotedIndex].image}
+                    alt={promotedProducts[currentPromotedIndex].title}
+                    className="w-64 h-64 object-cover rounded-lg shadow-lg mr-8"
+                    onClick={() =>
+                      handleProductClick(
+                        promotedProducts[currentPromotedIndex]._id
+                      )
+                    }
+                  />
+                  <div>
+                    <h3 className="text-2xl font-semibold mb-2">
+                      {promotedProducts[currentPromotedIndex].title}
+                    </h3>
+                    <p className="text-xl mb-4">
+                      ${promotedProducts[currentPromotedIndex].price.toFixed(2)}
+                    </p>
+                    <button
+                      onClick={() =>
+                        handleProductClick(
+                          promotedProducts[currentPromotedIndex]._id
+                        )
+                      }
+                      className="bg-white text-pink-500 px-6 py-2 rounded-full font-semibold hover:bg-pink-100 transition-colors duration-300"
+                    >
+                      View Details
+                    </button>
+                  </div>
+                </motion.div>
+              )}
           </AnimatePresence>
         </div>
       </div>

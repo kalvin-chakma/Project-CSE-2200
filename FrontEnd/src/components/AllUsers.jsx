@@ -8,7 +8,7 @@ const AllUsers = () => {
   const [editingId, setEditingId] = useState(null);
 
   const API_BASE_URL = "https://project-cse-2200.vercel.app/api/admin";
-  const token = localStorage.getItem("jwtToken"); // Ensure you use the correct token
+  const token = localStorage.getItem("jwtToken");
 
   useEffect(() => {
     fetchUsers();
@@ -47,7 +47,6 @@ const AllUsers = () => {
 
   const handleSave = async (id) => {
     const userToSave = users.find((user) => user._id === id);
-    const token = localStorage.getItem("jwtToken"); // Ensure consistency
 
     try {
       const response = await fetch(`${API_BASE_URL}/users/${id}`, {
@@ -76,7 +75,6 @@ const AllUsers = () => {
   };
 
   const handleDelete = async (id) => {
-    const token = localStorage.getItem("jwtToken"); // Ensure consistency
     try {
       const response = await fetch(`${API_BASE_URL}/users/${id}`, {
         method: "DELETE",
@@ -101,9 +99,114 @@ const AllUsers = () => {
     }
   };
 
-  if (loading) {
-    return <div className="text-center py-4">Loading...</div>;
-  }
+  const renderContent = () => {
+    if (loading) {
+      return <div className="text-center py-4">Loading...</div>;
+    }
+
+    if (error) {
+      return <div className="text-red-500 mb-4">{error}</div>;
+    }
+
+    if (users.length === 0) {
+      return <p className="text-center py-4">No users found.</p>;
+    }
+
+    return (
+      <div className="overflow-x-auto">
+        <table className="bg-white shadow-md rounded-lg overflow-hidden">
+          <thead className="bg-gray-100">
+            <tr>
+              <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                User No.
+              </th>
+              <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                Name
+              </th>
+              <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                Email
+              </th>
+              <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                Role
+              </th>
+              <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-200">
+            {users.map((user, index) => (
+              <tr key={user._id} className="hover:bg-gray-50">
+                <td className="px-4 py-2 whitespace-nowrap">{index + 1}</td>
+                <td className="px-4 py-2 whitespace-nowrap">
+                  {editingId === user._id ? (
+                    <input
+                      type="text"
+                      value={user.name}
+                      onChange={(e) => {
+                        const updatedUsers = users.map((u) =>
+                          u._id === user._id
+                            ? { ...u, name: e.target.value }
+                            : u
+                        );
+                        setUsers(updatedUsers);
+                      }}
+                      className="w-full px-2 py-1 border rounded"
+                    />
+                  ) : (
+                    user.name
+                  )}
+                </td>
+                <td className="px-4 py-2 whitespace-nowrap">{user.email}</td>
+                <td className="px-4 py-2 whitespace-nowrap">
+                  {editingId === user._id ? (
+                    <input
+                      type="text"
+                      value={user.role}
+                      onChange={(e) => {
+                        const updatedUsers = users.map((u) =>
+                          u._id === user._id
+                            ? { ...u, role: e.target.value }
+                            : u
+                        );
+                        setUsers(updatedUsers);
+                      }}
+                      className="w-full px-2 py-1 border rounded"
+                    />
+                  ) : (
+                    user.role
+                  )}
+                </td>
+                <td className="px-4 py-2 whitespace-nowrap">
+                  {editingId === user._id ? (
+                    <button
+                      onClick={() => handleSave(user._id)}
+                      className="bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-2 rounded mr-2"
+                    >
+                      Save
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => handleEdit(user._id)}
+                      className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-2 rounded mr-2"
+                    >
+                      Edit
+                    </button>
+                  )}
+                  <button
+                    onClick={() => handleDelete(user._id)}
+                    className="bg-red-500 hover:bg-red-600 text-white font-bold py-1 px-2 rounded"
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
+  };
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -111,110 +214,10 @@ const AllUsers = () => {
         <div className="w-1/5 min-w-[200px]">
           <Sidebar />
         </div>
-        <div className="w-4/5 overflow-y-auto p-4 item-center justify-center flex">
+        <div className="w-4/5 overflow-y-auto ml-20 p-4">
           <div className="m-auto">
             <h2 className="text-2xl font-bold mb-4">All Users</h2>
-            {error && <div className="text-red-500 mb-4">{error}</div>}
-            {users.length > 0 ? (
-              <div className="overflow-x-auto">
-                <table className="bg-white shadow-md rounded-lg overflow-hidden">
-                  <thead className="bg-gray-100">
-                    <tr>
-                      <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                        User No.
-                      </th>
-                      <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                        Name
-                      </th>
-                      <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                        Email
-                      </th>
-                      <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                        Role
-                      </th>
-                      <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                        Actions
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-200">
-                    {users.map((user, index) => (
-                      <tr key={user._id} className="hover:bg-gray-50">
-                        <td className="px-4 py-2 whitespace-nowrap">
-                          {index + 1}
-                        </td>
-                        <td className="px-4 py-2 whitespace-nowrap">
-                          {editingId === user._id ? (
-                            <input
-                              type="text"
-                              value={user.name}
-                              onChange={(e) => {
-                                const updatedUsers = users.map((u) =>
-                                  u._id === user._id
-                                    ? { ...u, name: e.target.value }
-                                    : u
-                                );
-                                setUsers(updatedUsers);
-                              }}
-                              className="w-full px-2 py-1 border rounded"
-                            />
-                          ) : (
-                            user.name
-                          )}
-                        </td>
-                        <td className="px-4 py-2 whitespace-nowrap">
-                          {user.email}
-                        </td>
-                        <td className="px-4 py-2 whitespace-nowrap">
-                          {editingId === user._id ? (
-                            <input
-                              type="text"
-                              value={user.role}
-                              onChange={(e) => {
-                                const updatedUsers = users.map((u) =>
-                                  u._id === user._id
-                                    ? { ...u, role: e.target.value }
-                                    : u
-                                );
-                                setUsers(updatedUsers);
-                              }}
-                              className="w-full px-2 py-1 border rounded"
-                            />
-                          ) : (
-                            user.role
-                          )}
-                        </td>
-                        <td className="px-4 py-2 whitespace-nowrap">
-                          {editingId === user._id ? (
-                            <button
-                              onClick={() => handleSave(user._id)}
-                              className="bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-2 rounded mr-2"
-                            >
-                              Save
-                            </button>
-                          ) : (
-                            <button
-                              onClick={() => handleEdit(user._id)}
-                              className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-2 rounded mr-2"
-                            >
-                              Edit
-                            </button>
-                          )}
-                          <button
-                            onClick={() => handleDelete(user._id)}
-                            className="bg-red-500 hover:bg-red-600 text-white font-bold py-1 px-2 rounded"
-                          >
-                            Delete
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            ) : (
-              <p className="text-center py-4">No users found.</p>
-            )}
+            {renderContent()}
           </div>
         </div>
       </div>

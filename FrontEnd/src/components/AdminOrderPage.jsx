@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import Sidebar from "./FormElement/Sidebar"; // Assuming Sidebar is imported from this path
+import Sidebar from "./FormElement/Sidebar"; // Adjust path if necessary
 
 const AdminOrderPage = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [sidebarVisible, setSidebarVisible] = useState(true); // State to control sidebar visibility
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -116,23 +117,55 @@ const AdminOrderPage = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        Loading...
+      <div className="flex h-screen">
+        {sidebarVisible && (
+          <div className="w-1/5 min-w-[200px]">
+            <Sidebar />
+          </div>
+        )}
+        <div
+          className={`w-${
+            sidebarVisible ? "4/5" : "full"
+          } flex justify-center items-center`}
+        >
+          <div className="flex justify-center items-center h-full">
+            <p>Loading...</p>
+          </div>
+        </div>
       </div>
     );
   }
 
   if (error) {
-    return <div className="text-red-500 text-center">{error}</div>;
+    return (
+      <div className="flex h-screen">
+        {sidebarVisible && (
+          <div className="w-1/5 min-w-[200px]">
+            <Sidebar />
+          </div>
+        )}
+        <div
+          className={`w-${
+            sidebarVisible ? "4/5" : "full"
+          } flex justify-center items-center`}
+        >
+          <div className="text-red-500">{error}</div>
+        </div>
+      </div>
+    );
   }
 
   return (
     <div className="flex flex-col min-h-screen">
       <div className="flex flex-grow overflow-hidden">
-        <div className="w-1/5 min-w-[200px]">
-          <Sidebar />
-        </div>
-        <div className="w-4/5 overflow-y-auto p-4">
+        {sidebarVisible && (
+          <div className="w-1/5 min-w-[200px]">
+            <Sidebar />
+          </div>
+        )}
+        <div
+          className={`w-${sidebarVisible ? "4/5" : "full"} overflow-y-auto p-4`}
+        >
           <div className="m-auto">
             <h1 className="text-3xl font-bold mb-6 text-center">All Orders</h1>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
