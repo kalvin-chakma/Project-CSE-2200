@@ -20,6 +20,7 @@ import PaymentSuccessPage from "./components/PaymentSuccessPage";
 import OrderPage from "./components/OrderPage";
 import AdminOrderPage from "./components/AdminOrderPage";
 import UserOrders from "./components/UserOrders";
+import About from "./components/About";
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -139,6 +140,8 @@ export default function App() {
             />
           }
         />
+        <Route path="/About" element={<About />} />
+
         <Route
           path="/LogInPage"
           element={<LogInPage setIsAuthenticated={setIsAuthenticated} />}

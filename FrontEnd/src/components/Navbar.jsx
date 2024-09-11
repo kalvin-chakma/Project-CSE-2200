@@ -26,10 +26,16 @@ const Navbar = ({ categories, isAuthenticated, onCategoryChange }) => {
     window.addEventListener("storage", checkLoginStatus);
 
     const handleClickOutside = (event) => {
-      if (categoryDropdownRef.current && !categoryDropdownRef.current.contains(event.target)) {
+      if (
+        categoryDropdownRef.current &&
+        !categoryDropdownRef.current.contains(event.target)
+      ) {
         setShowCategoryDropdown(false);
       }
-      if (profileDropdownRef.current && !profileDropdownRef.current.contains(event.target)) {
+      if (
+        profileDropdownRef.current &&
+        !profileDropdownRef.current.contains(event.target)
+      ) {
         setShowProfileDropdown(false);
       }
     };
@@ -93,8 +99,10 @@ const Navbar = ({ categories, isAuthenticated, onCategoryChange }) => {
     setShowCategoryDropdown(false);
   };
 
-  const navLinkStyle = "text-sm font-medium text-gray-700 hover:text-pink-500 transition-colors duration-300";
-  const dropdownItemStyle = "block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-pink-500 transition-colors duration-300";
+  const navLinkStyle =
+    "text-sm font-medium text-gray-700 hover:text-pink-500 transition-colors duration-300";
+  const dropdownItemStyle =
+    "block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-pink-500 transition-colors duration-300";
 
   return (
     <nav className="bg-white shadow-md sticky top-0 z-50">
@@ -113,11 +121,8 @@ const Navbar = ({ categories, isAuthenticated, onCategoryChange }) => {
                 <Link to="/" className={navLinkStyle}>
                   Home
                 </Link>
-                <div 
-                  className="relative" 
-                  ref={categoryDropdownRef}
-                >
-                  <button 
+                <div className="relative" ref={categoryDropdownRef}>
+                  <button
                     className={`${navLinkStyle} focus:outline-none`}
                     onClick={toggleCategoryDropdown}
                     onMouseEnter={() => setShowCategoryDropdown(true)}
@@ -125,7 +130,7 @@ const Navbar = ({ categories, isAuthenticated, onCategoryChange }) => {
                     Category
                   </button>
                   {showCategoryDropdown && (
-                    <div 
+                    <div
                       className="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10"
                       onMouseLeave={() => setShowCategoryDropdown(false)}
                     >
@@ -151,19 +156,22 @@ const Navbar = ({ categories, isAuthenticated, onCategoryChange }) => {
             </div>
           </div>
           <div className="hidden md:flex items-center">
-            <Link to="/wishlist" className={`${navLinkStyle} mx-3 flex items-center`}>
+            <Link
+              to="/wishlist"
+              className={`${navLinkStyle} mx-3 flex items-center`}
+            >
               <FaHeart className="mr-1" />
               Wishlist
             </Link>
-            <Link to="/CartPage" className={`${navLinkStyle} mx-3 flex items-center`}>
+            <Link
+              to="/CartPage"
+              className={`${navLinkStyle} mx-3 flex items-center`}
+            >
               <FaShoppingBag className="mr-1" />
               Bag
             </Link>
             {loggedInUser ? (
-              <div 
-                className="relative" 
-                ref={profileDropdownRef}
-              >
+              <div className="relative" ref={profileDropdownRef}>
                 <button
                   className={`${navLinkStyle} flex items-center focus:outline-none`}
                   onClick={toggleProfileDropdown}
@@ -173,21 +181,27 @@ const Navbar = ({ categories, isAuthenticated, onCategoryChange }) => {
                   Profile
                 </button>
                 {showProfileDropdown && (
-                  <div 
+                  <div
                     className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10"
                     onMouseLeave={() => setShowProfileDropdown(false)}
                   >
                     <Link to="/Dashboard" className={dropdownItemStyle}>
                       Dashboard
                     </Link>
-                    <button onClick={handleLogout} className={dropdownItemStyle}>
+                    <button
+                      onClick={handleLogout}
+                      className={dropdownItemStyle}
+                    >
                       Logout
                     </button>
                   </div>
                 )}
               </div>
             ) : (
-              <Link to="/LogInPage" className={`${navLinkStyle} ml-3 flex items-center`}>
+              <Link
+                to="/LogInPage"
+                className={`${navLinkStyle} ml-3 flex items-center`}
+              >
                 <FaUser className="mr-1" />
                 Log In
               </Link>
@@ -206,7 +220,10 @@ const Navbar = ({ categories, isAuthenticated, onCategoryChange }) => {
       {showMobileMenu && (
         <div className="md:hidden">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-            <Link to="/" className={`${navLinkStyle} block px-3 py-2 rounded-md`}>
+            <Link
+              to="/"
+              className={`${navLinkStyle} block px-3 py-2 rounded-md`}
+            >
               Home
             </Link>
             <div className="relative">
@@ -230,21 +247,36 @@ const Navbar = ({ categories, isAuthenticated, onCategoryChange }) => {
                 </div>
               )}
             </div>
-            <Link to="/contact" className={`${navLinkStyle} block px-3 py-2 rounded-md`}>
+            <Link
+              to="/contact"
+              className={`${navLinkStyle} block px-3 py-2 rounded-md`}
+            >
               Contact Us
             </Link>
-            <Link to="/about" className={`${navLinkStyle} block px-3 py-2 rounded-md`}>
+            <Link
+              to="/about"
+              className={`${navLinkStyle} block px-3 py-2 rounded-md`}
+            >
               About Us
             </Link>
-            <Link to="/wishlist" className={`${navLinkStyle} block px-3 py-2 rounded-md`}>
+            <Link
+              to="/wishlist"
+              className={`${navLinkStyle} block px-3 py-2 rounded-md`}
+            >
               Wishlist
             </Link>
-            <Link to="/CartPage" className={`${navLinkStyle} block px-3 py-2 rounded-md`}>
+            <Link
+              to="/cartPage"
+              className={`${navLinkStyle} block px-3 py-2 rounded-md`}
+            >
               Bag
             </Link>
             {loggedInUser ? (
               <>
-                <Link to="/Dashboard" className={`${navLinkStyle} block px-3 py-2 rounded-md`}>
+                <Link
+                  to="/Dashboard"
+                  className={`${navLinkStyle} block px-3 py-2 rounded-md`}
+                >
                   Dashboard
                 </Link>
                 <button
@@ -255,7 +287,10 @@ const Navbar = ({ categories, isAuthenticated, onCategoryChange }) => {
                 </button>
               </>
             ) : (
-              <Link to="/LogInPage" className={`${navLinkStyle} block px-3 py-2 rounded-md`}>
+              <Link
+                to="/LogInPage"
+                className={`${navLinkStyle} block px-3 py-2 rounded-md`}
+              >
                 Log In
               </Link>
             )}
