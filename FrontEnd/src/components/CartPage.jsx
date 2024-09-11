@@ -9,6 +9,7 @@ const CartPage = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
   const userId = localStorage.getItem("userId");
+  const [sidebarVisible, setSidebarVisible] = useState(true);
 
   useEffect(() => {
     if (userId) {
@@ -97,18 +98,52 @@ const CartPage = () => {
 
   const handleBuyNow = (e) => {
     e.preventDefault();
-    const totalAmount = cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
+    const totalAmount = cartItems.reduce(
+      (total, item) => total + item.price * item.quantity,
+      0
+    );
     navigate("/payment", { state: { items: cartItems, totalAmount } });
   };
 
-  if (loading)
+  if (loading) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        <ThreeDots color="#00BFFF" height={80} width={80} />
+      <div className="flex h-screen">
+        {sidebarVisible && (
+          <div className="w-1/5 min-w-[200px]">
+            <Sidebar />
+          </div>
+        )}
+        <div
+          className={`w-${
+            sidebarVisible ? "4/5" : "full"
+          } flex justify-center items-center`}
+        >
+          <div className="flex justify-center items-center h-screen">
+            <ThreeDots color="#00BFFF" height={80} width={80} />
+          </div>
+        </div>
       </div>
     );
+  }
 
-  if (error) return <div>Error: {error}</div>;
+  if (error) {
+    return (
+      <div className="flex h-screen">
+        {sidebarVisible && (
+          <div className="w-1/5 min-w-[200px]">
+            <Sidebar />
+          </div>
+        )}
+        <div
+          className={`w-${
+            sidebarVisible ? "4/5" : "full"
+          } flex justify-center items-center`}
+        >
+          <div className="text-red-500">{error}</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
