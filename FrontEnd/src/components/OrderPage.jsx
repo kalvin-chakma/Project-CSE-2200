@@ -9,6 +9,7 @@ const OrderPage = () => {
   const [error, setError] = useState(null);
   const userId = localStorage.getItem("userId");
   const lastSeenOrderId = localStorage.getItem("lastSeenOrderId");
+  const [sidebarVisible, setsidebarVisible] = useState(true);
 
   useEffect(() => {
     fetchOrders();
@@ -40,19 +41,45 @@ const OrderPage = () => {
     }
   };
 
-  if (loading)
+  if (loading) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        <ThreeDots color="#00BFFF" height={80} width={80} />
+      <div className="flex h-screen">
+        {sidebarVisible && (
+          <div className="w-1/5 min-w-[200px]">
+            <Sidebar />
+          </div>
+        )}
+        <div
+          className={`w-${
+            sidebarVisible ? "4/5" : "full"
+          } flex justify-center items-center`}
+        >
+          <div className="flex justify-center items-center h-screen">
+            <ThreeDots color="#00BFFF" height={80} width={80} />
+          </div>
+        </div>
       </div>
     );
+  }
 
-  if (error)
+  if (error) {
     return (
-      <div className="text-red-500 text-center text-lg mt-5">
-        Error: {error}
+      <div className="flex h-screen">
+        {sidebarVisible && (
+          <div className="w-1/5 min-w-[200px]">
+            <Sidebar />
+          </div>
+        )}
+        <div
+          className={`w-${
+            sidebarVisible ? "4/5" : "full"
+          } flex justify-center items-center`}
+        >
+          <div className="text-red-500">{error}</div>
+        </div>
       </div>
     );
+  }
 
   return (
     <>
