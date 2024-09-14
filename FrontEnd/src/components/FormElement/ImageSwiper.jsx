@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { EffectCoverflow, Keyboard, Mousewheel } from "swiper/modules";
 import "swiper/css";
@@ -8,29 +8,27 @@ import img2 from "../../assets/about2.png";
 import img3 from "../../assets/about3.png";
 import img4 from "../../assets/about4.png";
 
-const travelData = [
-  {
-    image: img1,
-  },
-  {
-    image: img2,
-  },
-  {
-    image: img3,
-  },
-  {
-    image: img4,
-  },
+const imageData = [
+  { image: img1, alt: "About 1" },
+  { image: img2, alt: "About 2" },
+  { image: img3, alt: "About 3" },
+  { image: img4, alt: "About 4" },
 ];
 
 const ImageSwiper = () => {
   const swiperRef = useRef(null);
+  const [imageErrors, setImageErrors] = useState({});
 
   useEffect(() => {
     if (swiperRef.current) {
       swiperRef.current.slideTo(1, false, false);
     }
   }, []);
+
+  const handleImageError = (index) => {
+    setImageErrors((prev) => ({ ...prev, [index]: true }));
+    console.error(`Failed to load image at index ${index}`);
+  };
 
   return (
     <div className="bg-white">
@@ -50,12 +48,8 @@ const ImageSwiper = () => {
           mousewheel={{ thresholdDelta: 70 }}
           spaceBetween={30}
           breakpoints={{
-            640: {
-              slidesPerView: 1,
-            },
-            1024: {
-              slidesPerView: 2,
-            },
+            640: { slidesPerView: 1 },
+            1024: { slidesPerView: 2 },
           }}
           modules={[EffectCoverflow, Keyboard, Mousewheel]}
           onSwiper={(swiper) => {
@@ -63,17 +57,24 @@ const ImageSwiper = () => {
           }}
           className="w-full md:w-[85%] py-7.5"
         >
-          {travelData.map((item, index) => (
+          {imageData.map((item, index) => (
             <SwiperSlide
               key={index}
               className="w-75 h-[35rem] flex flex-col justify-end items-start shadow-md rounded-b-lg"
             >
               <div className="relative w-full h-full overflow-hidden rotate-180 leading-none -bottom-[0.063rem] rounded-b-lg">
-                <img
-                  src={item.image}
-                  alt={item.title}
-                  className="w-full h-full absolute inset-0 object-fit items-center -z-10 transition-transform duration-300 ease-in-out -rotate-180 group-hover:scale-120 group-hover:-rotate-185"
-                />
+                {imageErrors[index] ? (
+                  <div className="w-full h-full flex items-center justify-center bg-gray-200 text-gray-500">
+                    Image failed to load
+                  </div>
+                ) : (
+                  <img
+                    src={item.image}
+                    alt={item.alt}
+                    className="w-full h-full absolute inset-0 object-fit items-center -z-10 transition-transform duration-300 ease-in-out -rotate-180 group-hover:scale-120 group-hover:-rotate-185"
+                    onError={() => handleImageError(index)}
+                  />
+                )}
                 <svg
                   className="relative block w-[calc(300%+1.3px)] h-20 rotate-y-180"
                   data-name="Layer 1"
