@@ -8,6 +8,9 @@
     "rc-slider": "^11.1.5",
     "react-chartjs-2": "^5.2.0",
     "react-icons": "^5.2.1",
-    "react-toastify": "^10.0.5"
+    "react-swiper": "^0.1.5",
+    "react-toastify": "^10.0.5",
+    "swiper": "^11.1.14",
+    "swiper-react": "^1.0.0"
   }
 }
