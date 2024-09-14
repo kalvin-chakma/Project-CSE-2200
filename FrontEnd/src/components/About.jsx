@@ -7,15 +7,15 @@ const About = () => {
     <div className="flex items-center justify-center h-screen w-screen">
       <div className="flex flex-col lg:flex-row w-[80%] max-w-screen-x overflow-hidden justify-between">
         <div className=" lg:w-[50%] flex items-y-center justify-center shadow-xl rounded-md p-2s">
-          {/* <img
+          <img
             src={AboutUsImage}
             alt="About Us"
             className="object-cover w-full h-full rounded-md shadow-xl"
             style={{ maxHeight: "65vh", maxWidth: "100%" }}
-          /> */}
-          <ImageSwiper />
+          />
+          {/* <ImageSwiper /> */}
         </div>
-        <div className="lg:w-[30%] p-8 ml-[5%] mt-20">
+        <div className="lg:w-[30%] p-8 ml-[5%]">
           <h1 className="text-6xl font-bold mb-6 text-gray-800">About Us</h1>
           <p className="text-2xl font-semibold mb-4 text-gray-700">
             Welcome to EdoKan!
