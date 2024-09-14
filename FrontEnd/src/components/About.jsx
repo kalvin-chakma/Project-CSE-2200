@@ -1,19 +1,21 @@
 import React from "react";
 import AboutUsImage from "../assets/about.jpg";
+import ImageSwiper from "./FormElement/ImageSwiper";
 
 const About = () => {
   return (
     <div className="flex items-center justify-center h-screen w-screen">
-      <div className="flex flex-col lg:flex-row w-[80%] max-w-screen-x overflow-hidden">
-        <div className=" lg:w-2/3 flex items-center justify-center rounded-md p-5">
-          <img
+      <div className="flex flex-col lg:flex-row w-[80%] max-w-screen-x overflow-hidden justify-between">
+        <div className=" lg:w-[50%] flex items-y-center justify-center shadow-xl rounded-md p-2s">
+          {/* <img
             src={AboutUsImage}
             alt="About Us"
             className="object-cover w-full h-full rounded-md shadow-xl"
             style={{ maxHeight: "65vh", maxWidth: "100%" }}
-          />
+          /> */}
+          <ImageSwiper />
         </div>
-        <div className="lg:w-1/3 p-8 ml-[5%] ">
+        <div className="lg:w-[30%] p-8 ml-[5%] mt-20">
           <h1 className="text-6xl font-bold mb-6 text-gray-800">About Us</h1>
           <p className="text-2xl font-semibold mb-4 text-gray-700">
             Welcome to EdoKan!
