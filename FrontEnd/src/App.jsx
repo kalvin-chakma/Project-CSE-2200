@@ -21,6 +21,7 @@ import OrderPage from "./components/OrderPage";
 import AdminOrderPage from "./components/AdminOrderPage";
 import UserOrders from "./components/UserOrders";
 import About from "./components/About";
+import Contact from "./components/Contact";
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -141,6 +142,7 @@ export default function App() {
           }
         />
         <Route path="/About" element={<About />} />
+        <Route path="/contact" element={<Contact />} />
 
         <Route
           path="/LogInPage"
