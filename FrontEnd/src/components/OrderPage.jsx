@@ -83,12 +83,12 @@ const OrderPage = () => {
 
   return (
     <>
-      <div className="flex flex-col w-full h-screen">
-        <div className="flex flex-grow overflow-hidden">
-          <div className=" min-w-[200px]">
+      <div className="flex flex-col">
+        <div className=" w-full h-screen flex flex-grow">
+          <div className="overflow-hidden">
             <Sidebar />
           </div>
-          <div className="w-2/3 p-4 mx-auto">
+          <div className="w-2/3 p-4 mx-auto overflow-y-auto no-scrollbar">
             <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">
               Your Orders
             </h2>
