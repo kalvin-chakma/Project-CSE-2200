@@ -5,7 +5,8 @@ import SearchBar from "./SearchBar";
 import Footer from "./Footer";
 import { ThreeDots } from "react-loader-spinner";
 import { FaShoppingCart, FaFilter } from "react-icons/fa";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { motion, AnimatePresence } from "framer-motion";
 
 function Home({ categories, isAuthenticated, selectedCategory, sortOrder }) {
@@ -123,7 +124,7 @@ function Home({ categories, isAuthenticated, selectedCategory, sortOrder }) {
     }
 
     setCart([...cart, product]);
-    toast.success("Added to cart", {
+    toast.success(`Added ${product.title} to cart`, {
       position: "bottom-right",
       autoClose: 2000,
       hideProgressBar: false,
@@ -140,6 +141,7 @@ function Home({ categories, isAuthenticated, selectedCategory, sortOrder }) {
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
+      <ToastContainer />
       <div className="bg-white shadow-md py-6">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between">
