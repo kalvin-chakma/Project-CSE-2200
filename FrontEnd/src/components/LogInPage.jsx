@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -14,14 +14,15 @@ function LogInPage() {
   const [loginSuccess, setLoginSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const isMounted = useRef(true);
 
   useEffect(() => {
     return () => {
-      setIsLoading(false);
+      isMounted.current = false;
     };
   }, []);
 
-  const handleLogin = async (e) => {
+  const handleLogin = useCallback(async (e) => {
     e.preventDefault();
     const { email, password } = loginInfo;
     if (!email || !password) {
@@ -45,6 +46,8 @@ function LogInPage() {
 
       const result = await response.json();
       console.log("Full server response:", result);
+
+      if (!isMounted.current) return;
 
       const {
         success,
@@ -75,7 +78,9 @@ function LogInPage() {
         window.dispatchEvent(new Event("storage"));
 
         setTimeout(() => {
-          navigate(role === "admin" ? "/Home" : "/Home");
+          if (isMounted.current) {
+            navigate(role === "admin" ? "/Home" : "/Home");
+          }
         }, 3000);
       } else if (error) {
         const details = error?.details?.[0]?.message || "An error occurred";
@@ -84,46 +89,54 @@ function LogInPage() {
         handleError(message || "Login failed");
       }
     } catch (err) {
-      handleError(err.message || "An unexpected error occurred");
-      console.error("Fetch error:", err);
+      if (isMounted.current) {
+        handleError(err.message || "An unexpected error occurred");
+        console.error("Fetch error:", err);
+      }
     } finally {
-      setIsLoading(false);
+      if (isMounted.current) {
+        setIsLoading(false);
+      }
     }
-  };
+  }, [loginInfo, navigate]);
 
-  const handleSuccess = (message) => {
-    toast.success(message, {
-      position: "top-right",
-      autoClose: 3000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-    });
-  };
+  const handleSuccess = useCallback((message) => {
+    if (isMounted.current) {
+      toast.success(message, {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+    }
+  }, []);
 
-  const handleError = (message) => {
-    toast.error(message, {
-      position: "top-right",
-      autoClose: 3000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-    });
-  };
+  const handleError = useCallback((message) => {
+    if (isMounted.current) {
+      toast.error(message, {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+    }
+  }, []);
 
-  const handleChange = (e) => {
+  const handleChange = useCallback((e) => {
     const { name, value } = e.target;
     setLoginInfo((prevLoginInfo) => ({
       ...prevLoginInfo,
       [name]: value,
     }));
-  };
+  }, []);
 
-  const AnimatedButton = ({ initialText, successText, onClick, isSuccess, isLoading }) => {
+  const AnimatedButton = React.memo(({ initialText, successText, onClick, isSuccess, isLoading }) => {
     return (
       <button
         className={`w-full px-4 py-2 rounded-md transition-all duration-300 ${
@@ -137,7 +150,7 @@ function LogInPage() {
         {isLoading ? 'Loading...' : isSuccess ? successText : initialText}
       </button>
     );
-  };
+  });
 
   return (
     <div className="max-w-400px mx-auto h-900px">
