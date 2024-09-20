@@ -153,7 +153,7 @@ function RegisterPage() {
                   Already have an account?
                 </h3>
                 <a
-                  href="/LogInPage"
+                  href="/login"
                   className="mt-2 sm:mt-0 text-xs sm:text-sm font-bold text-indigo-400 hover:text-indigo-700"
                 >
                   Log in
