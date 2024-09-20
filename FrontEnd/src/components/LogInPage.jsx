@@ -1,11 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import loginImage from "../assets/loginPageImage.jpg";
 import Password from "./FormElement/Password";
-import EmailAddress from "../components/FormElement/EmailAdress";
-import AnimatedButton from "./AnimatedButton";
+import EmailAddress from "./FormElement/EmailAdress";
 
 function LogInPage() {
   const [loginInfo, setLoginInfo] = useState({
@@ -13,7 +12,14 @@ function LogInPage() {
     password: "",
   });
   const [loginSuccess, setLoginSuccess] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    return () => {
+      setIsLoading(false);
+    };
+  }, []);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -21,6 +27,7 @@ function LogInPage() {
     if (!email || !password) {
       return handleError("Email and password are required");
     }
+    setIsLoading(true);
     try {
       const url = "https://project-cse-2200.vercel.app/auth/login";
       console.log("Sending request to:", url);
@@ -71,14 +78,16 @@ function LogInPage() {
           navigate(role === "admin" ? "/Home" : "/Home");
         }, 3000);
       } else if (error) {
-        const details = error?.details[0]?.message;
+        const details = error?.details?.[0]?.message || "An error occurred";
         handleError(details);
       } else if (!success) {
-        handleError(message);
+        handleError(message || "Login failed");
       }
     } catch (err) {
-      handleError(err.message);
+      handleError(err.message || "An unexpected error occurred");
       console.error("Fetch error:", err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -112,6 +121,22 @@ function LogInPage() {
       ...prevLoginInfo,
       [name]: value,
     }));
+  };
+
+  const AnimatedButton = ({ initialText, successText, onClick, isSuccess, isLoading }) => {
+    return (
+      <button
+        className={`w-full px-4 py-2 rounded-md transition-all duration-300 ${
+          isSuccess
+            ? 'bg-green-500 text-white'
+            : 'bg-indigo-600 text-white hover:bg-indigo-700'
+        } ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+        onClick={onClick}
+        disabled={isLoading}
+      >
+        {isLoading ? 'Loading...' : isSuccess ? successText : initialText}
+      </button>
+    );
   };
 
   return (
@@ -165,6 +190,7 @@ function LogInPage() {
                       successText="Login Successful"
                       onClick={handleLogin}
                       isSuccess={loginSuccess}
+                      isLoading={isLoading}
                     />
                   </div>
                 </form>
