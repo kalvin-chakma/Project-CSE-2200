@@ -4,7 +4,7 @@ import { productContext } from "../utills/Context";
 import SearchBar from "./SearchBar";
 import Footer from "./Footer";
 import { ThreeDots } from "react-loader-spinner";
-import { FaHeart, FaFilter } from "react-icons/fa";
+import { FaShoppingCart, FaFilter } from "react-icons/fa";
 import { toast } from "react-toastify";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -13,7 +13,7 @@ function Home({ categories, isAuthenticated, selectedCategory, sortOrder }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [favorites, setFavorites] = useState([]);
+  const [cart, setCart] = useState([]);
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [priceRange, setPriceRange] = useState([0, 100000]);
   const [showFilters, setShowFilters] = useState(false);
@@ -67,10 +67,9 @@ function Home({ categories, isAuthenticated, selectedCategory, sortOrder }) {
       setFilteredProducts(filtered);
       setIsLoading(false);
 
-      // Set multiple promoted products
       if (filtered.length > 0) {
         const shuffled = [...filtered].sort(() => 0.5 - Math.random());
-        setPromotedProducts(shuffled.slice(0, 5)); // Get 5 random products for promotion
+        setPromotedProducts(shuffled.slice(0, 5));
       }
     }, 500);
 
@@ -90,15 +89,10 @@ function Home({ categories, isAuthenticated, selectedCategory, sortOrder }) {
       setCurrentPromotedIndex(
         (prevIndex) => (prevIndex + 1) % (promotedProducts.length || 1)
       );
-    }, 2500); // Change promoted product every 2.5 seconds
+    }, 2500);
 
     return () => clearInterval(interval);
   }, [promotedProducts]);
-
-  useEffect(() => {
-    const storedFavorites = JSON.parse(localStorage.getItem("favorites")) || [];
-    setFavorites(storedFavorites);
-  }, []);
 
   const handleSearchChange = (value) => {
     setSearchQuery(value);
@@ -122,29 +116,22 @@ function Home({ categories, isAuthenticated, selectedCategory, sortOrder }) {
     setSearchQuery("");
   };
 
-  const handleAddToFavorites = (product) => {
+  const handleAddToCart = (product) => {
     if (!isAuthenticated) {
-      toast.error("Please log in to add items to your favorites.");
+      toast.error("Please log in to add items to your cart.");
       return;
     }
 
-    const newFavorites = [...favorites];
-    const index = newFavorites.findIndex((fav) => fav._id === product._id);
-
-    if (index !== -1) {
-      newFavorites.splice(index, 1);
-      toast.success("Removed from favorites");
-    } else {
-      newFavorites.push(product);
-      toast.success("Added to favorites");
-    }
-
-    setFavorites(newFavorites);
-    localStorage.setItem("favorites", JSON.stringify(newFavorites));
-  };
-
-  const isFavorite = (productId) => {
-    return favorites.some((fav) => fav._id === productId);
+    setCart([...cart, product]);
+    toast.success("Added to cart", {
+      position: "bottom-right",
+      autoClose: 2000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    });
   };
 
   const handleProductClick = (productId) => {
@@ -152,7 +139,7 @@ function Home({ categories, isAuthenticated, selectedCategory, sortOrder }) {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50 ">
+    <div className="flex flex-col min-h-screen bg-gray-50">
       <div className="bg-white shadow-md py-6">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between">
@@ -282,34 +269,33 @@ function Home({ categories, isAuthenticated, selectedCategory, sortOrder }) {
               filteredProducts.map((product) => (
                 <div
                   key={product._id}
-                  className="bg-white rounded-lg shadow-md overflow-hidden transition-transform duration-300 hover:scale-105"
+                  className="bg-white rounded-lg shadow-md overflow-hidden transition-transform duration-300 hover:scale-105 relative group"
                 >
-                  <div
-                    className="w-full h-48 bg-cover bg-center cursor-pointer"
-                    style={{ backgroundImage: `url(${product.image})` }}
-                    onClick={() => handleProductClick(product._id)}
-                  ></div>
-                  <div className="p-4">
-                    <h3 className="text-sm font-semibold text-gray-800 truncate">
-                      {product.title}
-                    </h3>
-                    <p className="mt-2 text-lg font-bold text-pink-600">
-                      ${product.price.toFixed(2)}
-                    </p>
-                    <div className="mt-2 flex items-center justify-between">
-                      <span className="text-xs text-gray-500">
-                        {product.category}
-                      </span>
-                      <button
-                        className={`text-2xl ${
-                          isFavorite(product._id)
-                            ? "text-pink-500"
-                            : "text-gray-400"
-                        } hover:text-pink-500 transition-colors duration-300`}
-                        onClick={() => handleAddToFavorites(product)}
-                      >
-                        <FaHeart />
-                      </button>
+                  <div className="absolute inset-0 bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 opacity-0 group-hover:opacity-75 transition-opacity duration-300"></div>
+                  <div className="relative z-10">
+                    <div
+                      className="w-full h-48 bg-cover bg-center cursor-pointer"
+                      style={{ backgroundImage: `url(${product.image})` }}
+                      onClick={() => handleProductClick(product._id)}
+                    ></div>
+                    <div className="p-4">
+                      <h3 className="text-sm font-semibold text-gray-800 truncate group-hover:text-white transition-colors duration-300">
+                        {product.title}
+                      </h3>
+                      <p className="mt-2 text-lg font-bold text-pink-600 group-hover:text-white transition-colors duration-300">
+                        ${product.price.toFixed(2)}
+                      </p>
+                      <div className="mt-2 flex items-center justify-between">
+                        <span className="text-xs text-gray-500 group-hover:text-white transition-colors duration-300">
+                          {product.category}
+                        </span>
+                        <button
+                          className="text-2xl text-gray-400 hover:text-pink-500 group-hover:text-white transition-colors duration-300"
+                          onClick={() => handleAddToCart(product)}
+                        >
+                          <FaShoppingCart />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
