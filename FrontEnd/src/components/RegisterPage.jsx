@@ -1,5 +1,4 @@
-// RegisterPage.js
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -17,6 +16,13 @@ function RegisterPage() {
   const [registerSuccess, setRegisterSuccess] = useState(false);
 
   const navigate = useNavigate();
+  const isMounted = useRef(true); // Create a ref to track mounted state
+
+  useEffect(() => {
+    return () => {
+      isMounted.current = false; // Set to false when unmounted
+    };
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -52,11 +58,15 @@ function RegisterPage() {
 
       const { success, message, error } = result;
       if (success) {
-        setRegisterSuccess(true);
-        handleSuccess("Registration successful!");
-        setTimeout(() => {
-          navigate("/LogInPage");
-        }, 3000);
+        if (isMounted.current) {
+          setRegisterSuccess(true);
+          handleSuccess("Registration successful!");
+          setTimeout(() => {
+            if (isMounted.current) {
+              navigate("/LogInPage");
+            }
+          }, 3000);
+        }
       } else if (error) {
         const details = error?.details[0]?.message;
         handleError(details);
@@ -153,7 +163,7 @@ function RegisterPage() {
                   Already have an account?
                 </h3>
                 <a
-                  href="/login"
+                  href="/LogInPage"
                   className="mt-2 sm:mt-0 text-xs sm:text-sm font-bold text-indigo-400 hover:text-indigo-700"
                 >
                   Log in
