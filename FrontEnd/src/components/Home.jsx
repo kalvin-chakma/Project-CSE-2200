@@ -16,7 +16,7 @@ function Home({ categories, isAuthenticated, selectedCategory, sortOrder }) {
   const [isLoading, setIsLoading] = useState(true);
   const [cart, setCart] = useState([]);
   const [selectedCategories, setSelectedCategories] = useState([]);
-  const [priceRange, setPriceRange] = useState([0, 100000]);
+  const [priceRange, setPriceRange] = useState([0, 1000000]);
   const [showFilters, setShowFilters] = useState(false);
   const { category } = useParams();
   const navigate = useNavigate();
@@ -113,26 +113,55 @@ function Home({ categories, isAuthenticated, selectedCategory, sortOrder }) {
 
   const handleResetFilters = () => {
     setSelectedCategories([]);
-    setPriceRange([0, 100000]);
+    setPriceRange([0, 1000000]);
     setSearchQuery("");
   };
 
-  const handleAddToCart = (product) => {
-    if (!isAuthenticated) {
+  const handleAddToCart = async (product) => {
+    const token = localStorage.getItem("jwtToken");
+    if (!token) {
       toast.error("Please log in to add items to your cart.");
+      navigate("/LogInPage");
       return;
     }
 
-    setCart([...cart, product]);
-    toast.success(`Added ${product.title} to cart`, {
-      position: "bottom-right",
-      autoClose: 2000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-    });
+    try {
+      const userId = localStorage.getItem("userId");
+      const response = await fetch(
+        "https://project-cse-2200-xi.vercel.app/api/cart/add",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            userId,
+            productId: product._id,
+            image: product.image,
+            quantity: 1,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      toast.success(`Added ${product.title} to cart`, {
+        position: "bottom-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+    } catch (error) {
+      console.error("Error adding product to cart:", error);
+      toast.error(`Failed to add product to cart: ${error.message}`);
+    }
   };
 
   const handleProductClick = (productId) => {
