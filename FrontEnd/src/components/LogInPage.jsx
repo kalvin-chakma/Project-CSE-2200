@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -14,13 +14,6 @@ function LogInPage() {
   const [loginSuccess, setLoginSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const isMounted = useRef(true);
-
-  useEffect(() => {
-    return () => {
-      isMounted.current = false;
-    };
-  }, []);
 
   const handleLogin = useCallback(async (e) => {
     e.preventDefault();
@@ -47,8 +40,6 @@ function LogInPage() {
       const result = await response.json();
       console.log("Full server response:", result);
 
-      if (!isMounted.current) return;
-
       const {
         success,
         message,
@@ -60,13 +51,13 @@ function LogInPage() {
         error,
         userId,
       } = result;
+
       if (success) {
         setLoginSuccess(true);
+        setIsLoading(false); // Set loading to false after success
         handleSuccess("Login successful!");
-        console.log("Access Token:", accessToken);
-        console.log("Refresh Token:", refreshToken);
-        console.log("JWT Token:", jwtToken);
-        console.log("User ID:", userId);
+
+        // Store tokens and user details
         localStorage.setItem("accessToken", accessToken);
         localStorage.setItem("refreshToken", refreshToken);
         localStorage.setItem("jwtToken", jwtToken);
@@ -77,10 +68,9 @@ function LogInPage() {
 
         window.dispatchEvent(new Event("storage"));
 
+        // Redirect to the home page based on role
         setTimeout(() => {
-          if (isMounted.current) {
-            navigate(role === "admin" ? "/Home" : "/Home");
-          }
+          navigate(role === "admin" ? "/Home" : "/Home");
         }, 3000);
       } else if (error) {
         const details = error?.details?.[0]?.message || "An error occurred";
@@ -89,75 +79,67 @@ function LogInPage() {
         handleError(message || "Login failed");
       }
     } catch (err) {
-      if (isMounted.current) {
-        handleError(err.message || "An unexpected error occurred");
-        console.error("Fetch error:", err);
-      }
+      handleError(err.message || "An unexpected error occurred");
+      console.error("Fetch error:", err);
     } finally {
-      if (isMounted.current) {
-        setIsLoading(false);
-      }
+      setIsLoading(false);
     }
   }, [loginInfo, navigate]);
 
-  const handleSuccess = useCallback((message) => {
-    if (isMounted.current) {
-      toast.success(message, {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      });
-    }
-  }, []);
+  const handleSuccess = (message) => {
+    toast.success(message, {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    });
+  };
 
-  const handleError = useCallback((message) => {
-    if (isMounted.current) {
-      toast.error(message, {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      });
-    }
-  }, []);
+  const handleError = (message) => {
+    toast.error(message, {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    });
+  };
 
-  const handleChange = useCallback((e) => {
+  const handleChange = (e) => {
     const { name, value } = e.target;
     setLoginInfo((prevLoginInfo) => ({
       ...prevLoginInfo,
       [name]: value,
     }));
-  }, []);
+  };
 
-  const AnimatedButton = React.memo(({ initialText, successText, onClick, isSuccess, isLoading }) => {
-    return (
-      <button
-        className={`w-full px-4 py-2 rounded-md transition-all duration-300 ${
-          isSuccess
-            ? 'bg-green-500 text-white'
-            : 'bg-indigo-600 text-white hover:bg-indigo-700'
-        } ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
-        onClick={onClick}
-        disabled={isLoading}
-      >
-        {isLoading ? 'Loading...' : isSuccess ? successText : initialText}
-      </button>
-    );
-  });
+  const AnimatedButton = React.memo(
+    ({ initialText, successText, onClick, isSuccess, isLoading }) => {
+      return (
+        <button
+          className={`w-full px-4 py-2 rounded-md transition-all duration-300 ${
+            isSuccess
+              ? "bg-green-500 text-white"
+              : "bg-indigo-600 text-white hover:bg-indigo-700"
+          } ${isLoading ? "opacity-50 cursor-not-allowed" : ""}`}
+          onClick={onClick}
+          disabled={isLoading || isSuccess}
+        >
+          {isLoading ? "Loading..." : isSuccess ? successText : initialText}
+        </button>
+      );
+    }
+  );
 
   return (
     <div className="max-w-400px mx-auto h-900px">
       <div className="h-full flex flex-col">
-        <div className="w-full px-6 sm:px-10 lg:px-40 m-6 sm:m-10 flex justify-start items-center">
-          {/* Add any missing content here */}
-        </div>
+        <div className="w-full px-6 sm:px-10 lg:px-40 m-6 sm:m-10 flex justify-start items-center"></div>
         <div className="flex p-6 flex-col sm:flex-row flex-grow items-center justify-center">
           <div className="w-full h-full sm:w-5/12 flex items-center justify-center rounded-xl shadow-2xl">
             <img
