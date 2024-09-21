@@ -5,8 +5,10 @@ import "react-toastify/dist/ReactToastify.css";
 import loginImage from "../assets/loginPageImage.jpg";
 import Password from "./FormElement/Password";
 import EmailAddress from "./FormElement/EmailAdress";
+import withResponsiveWrapper from './withResponsiveWrapper';
+import ErrorBoundary from './ErrorBoundary';
 
-function LogInPage() {
+function LogInPage({ isMobile, isTablet, isDesktop }) {
   const [loginInfo, setLoginInfo] = useState({
     email: "",
     password: "",
@@ -153,79 +155,83 @@ function LogInPage() {
   });
 
   return (
-    <div className="max-w-400px mx-auto h-900px">
-      <div className="h-full flex flex-col">
-        <div className="w-full px-6 sm:px-10 lg:px-40 m-6 sm:m-10 flex justify-start items-center">
-          {/* Add any missing content here */}
-        </div>
-        <div className="flex p-6 flex-col sm:flex-row flex-grow items-center justify-center">
-          <div className="w-full h-full sm:w-5/12 flex items-center justify-center rounded-xl shadow-2xl">
-            <img
-              src={loginImage}
-              alt="Login"
-              className="object-cover h-full w-full rounded-xl"
-            />
+    <ErrorBoundary>
+      <div className={`max-w-400px mx-auto ${isMobile ? 'h-auto' : 'h-900px'}`}>
+        <div className="h-full flex flex-col">
+          <div className="w-full px-6 sm:px-10 lg:px-40 m-6 sm:m-10 flex justify-start items-center">
+            {/* Add any header content here if needed */}
           </div>
-          <div className="w-full sm:w-5/12 px-6 sm:px-28 py-6 sm:py-12 ml-6 sm:ml-10 flex flex-col relative bg-white">
-            <div className="mt-5 flex flex-col justify-between h-full">
-              <div>
-                <p className="text-lg sm:text-2xl font-semibold">
-                  Welcome Back!
-                </p>
-                <p className="mt-2 font-semibold text-sm sm:text-base opacity-50">
-                  Please login to your account
-                </p>
-                <form
-                  className="mt-10 sm:mt-20 space-y-4 sm:space-y-7"
-                  onSubmit={handleLogin}
-                >
-                  <EmailAddress
-                    name="email"
-                    value={loginInfo.email}
-                    onChange={handleChange}
-                  />
-                  <Password
-                    name="password"
-                    value={loginInfo.password}
-                    onChange={handleChange}
-                  />
-                  <div className="text-right">
-                    <a
-                      href="#"
-                      className="text-sm font-bold text-indigo-400 hover:text-indigo-700"
-                    >
-                      Forgot Password?
-                    </a>
-                  </div>
-                  <div className="mt-8 sm:mt-10 flex justify-center">
-                    <AnimatedButton
-                      initialText="Log In"
-                      successText="Login Successful"
-                      onClick={handleLogin}
-                      isSuccess={loginSuccess}
-                      isLoading={isLoading}
-                    />
-                  </div>
-                </form>
+          <div className={`flex p-6 ${isMobile ? 'flex-col' : 'flex-row'} flex-grow items-center justify-center`}>
+            {!isMobile && (
+              <div className="w-full h-full sm:w-5/12 flex items-center justify-center rounded-xl shadow-2xl">
+                <img
+                  src={loginImage}
+                  alt="Login"
+                  className="object-cover h-full w-full rounded-xl"
+                />
               </div>
-              <div className="mt-10 sm:mt-14 flex flex-col sm:flex-row justify-between">
-                <h3 className="text-xs sm:text-sm font-semibold opacity-50">
-                  Don't have an account yet?
-                </h3>
-                <a
-                  href="/RegisterPage"
-                  className="mt-2 sm:mt-0 text-xs sm:text-sm font-bold text-indigo-400 hover:text-indigo-700"
-                >
-                  Create an account
-                </a>
+            )}
+            <div className={`w-full ${isMobile ? 'mt-6' : 'sm:w-5/12 ml-6 sm:ml-10'} px-6 sm:px-28 py-6 sm:py-12 flex flex-col relative bg-white`}>
+              <div className="mt-5 flex flex-col justify-between h-full">
+                <div>
+                  <p className="text-lg sm:text-2xl font-semibold">
+                    Welcome Back!
+                  </p>
+                  <p className="mt-2 font-semibold text-sm sm:text-base opacity-50">
+                    Please login to your account
+                  </p>
+                  <form
+                    className="mt-10 sm:mt-20 space-y-4 sm:space-y-7"
+                    onSubmit={handleLogin}
+                  >
+                    <EmailAddress
+                      name="email"
+                      value={loginInfo.email}
+                      onChange={handleChange}
+                    />
+                    <Password
+                      name="password"
+                      value={loginInfo.password}
+                      onChange={handleChange}
+                    />
+                    <div className="text-right">
+                      <a
+                        href="#"
+                        className="text-sm font-bold text-indigo-400 hover:text-indigo-700"
+                      >
+                        Forgot Password?
+                      </a>
+                    </div>
+                    <div className="mt-8 sm:mt-10 flex justify-center">
+                      <AnimatedButton
+                        initialText="Log In"
+                        successText="Login Successful"
+                        onClick={handleLogin}
+                        isSuccess={loginSuccess}
+                        isLoading={isLoading}
+                      />
+                    </div>
+                  </form>
+                </div>
+                <div className="mt-10 sm:mt-14 flex flex-col sm:flex-row justify-between">
+                  <h3 className="text-xs sm:text-sm font-semibold opacity-50">
+                    Don't have an account yet?
+                  </h3>
+                  <a
+                    href="/RegisterPage"
+                    className="mt-2 sm:mt-0 text-xs sm:text-sm font-bold text-indigo-400 hover:text-indigo-700"
+                  >
+                    Create an account
+                  </a>
+                </div>
               </div>
             </div>
           </div>
         </div>
+        <ToastContainer />
       </div>
-      <ToastContainer />
-    </div>
+    </ErrorBoundary>
   );
 }
 
-export default LogInPage;
+export default withResponsiveWrapper(LogInPage);
