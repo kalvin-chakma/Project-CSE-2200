@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import Sidebar from "./FormElement/Sidebar";
 
 const AllUsers = () => {
   const [users, setUsers] = useState([]);
@@ -6,7 +7,7 @@ const AllUsers = () => {
   const [error, setError] = useState(null);
   const [editingId, setEditingId] = useState(null);
   const [editedUser, setEditedUser] = useState({});
-  
+
   const API_BASE_URL = "https://project-cse-2200.vercel.app/api/admin";
 
   useEffect(() => {
@@ -20,8 +21,8 @@ const AllUsers = () => {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
 
       if (!response.ok) {
@@ -43,8 +44,8 @@ const AllUsers = () => {
 
   const handleEdit = (id) => {
     setEditingId(id);
-    const userToEdit = users.find(user => user._id === id);
-    setEditedUser(userToEdit);  // Set the user to edit
+    const userToEdit = users.find((user) => user._id === id);
+    setEditedUser(userToEdit); // Set the user to edit
   };
 
   const handleSave = async (id) => {
@@ -54,9 +55,9 @@ const AllUsers = () => {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(editedUser)  // Send the edited user details
+        body: JSON.stringify(editedUser), // Send the edited user details
       });
 
       if (!response.ok) {
@@ -65,8 +66,10 @@ const AllUsers = () => {
 
       const data = await response.json();
       if (data.success) {
-        setUsers(users.map(user => user._id === id ? data.user : user));  // Update user in state
-        setEditingId(null);  // Exit edit mode
+        setUsers((prevUsers) =>
+          prevUsers.map((user) => (user._id === id ? data.user : user))
+        ); // Update user in state
+        setEditingId(null); // Exit edit mode
       } else {
         throw new Error("Failed to save user");
       }
@@ -82,8 +85,8 @@ const AllUsers = () => {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
 
       if (!response.ok) {
@@ -92,7 +95,7 @@ const AllUsers = () => {
 
       const data = await response.json();
       if (data.success) {
-        setUsers(users.filter(user => user._id !== id));  // Remove user from state
+        setUsers((prevUsers) => prevUsers.filter((user) => user._id !== id)); // Remove user from state
       }
     } catch (error) {
       setError(error.message);
@@ -104,72 +107,112 @@ const AllUsers = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h2 className="text-2xl font-bold mb-4">All Users</h2>
-      {error && <div className="text-red-500 mb-4">{error}</div>}
-      {users.length > 0 ? (
-        <div className="overflow-x-auto">
-          <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
-            <thead className="bg-gray-100">
-              <tr>
-                <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">User No.</th>
-                <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Name</th>
-                <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Email</th>
-                <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Role</th>
-                <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {users.map((user, index) => (
-                <tr key={user._id} className="hover:bg-gray-50">
-                  <td className="px-4 py-2 whitespace-nowrap">{index + 1}</td>
-                  <td className="px-4 py-2 whitespace-nowrap">
-                    {editingId === user._id ? (
-                      <input
-                        type="text"
-                        value={editedUser.name || user.name}
-                        onChange={(e) => setEditedUser({ ...editedUser, name: e.target.value })}
-                        className="w-full px-2 py-1 border rounded"
-                      />
-                    ) : (
-                      user.name
-                    )}
-                  </td>
-                  <td className="px-4 py-2 whitespace-nowrap">{user.email}</td>
-                  <td className="px-4 py-2 whitespace-nowrap">
-                    {editingId === user._id ? (
-                      <input
-                        type="text"
-                        value={editedUser.role || user.role}
-                        onChange={(e) => setEditedUser({ ...editedUser, role: e.target.value })}
-                        className="w-full px-2 py-1 border rounded"
-                      />
-                    ) : (
-                      user.role
-                    )}
-                  </td>
-                  <td className="px-4 py-2 whitespace-nowrap">
-                    {editingId === user._id ? (
-                      <button onClick={() => handleSave(user._id)} className="bg-green-500 text-white px-4 py-1 rounded">
-                        Save
-                      </button>
-                    ) : (
-                      <button onClick={() => handleEdit(user._id)} className="bg-blue-500 text-white px-4 py-1 rounded">
-                        Edit
-                      </button>
-                    )}
-                    <button onClick={() => handleDelete(user._id)} className="bg-red-500 text-white px-4 py-1 rounded ml-2">
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+    <div className="flex flex-col min-h-screen">
+      <div className="flex flex-grow overflow-hidden">
+        <div className="w-1/5 min-w-[200px]">
+          <Sidebar />
         </div>
-      ) : (
-        <div className="text-center py-4">No users found.</div>
-      )}
+        <div className="w-3/5 overflow-y-auto p-4">
+          <h2 className="text-2xl font-bold mb-4">All Users</h2>
+          {error && <div className="text-red-500 mb-4">{error}</div>}
+          {users.length > 0 ? (
+            <div className="overflow-x-auto">
+              <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
+                <thead className="bg-gray-100">
+                  <tr>
+                    <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                      User No.
+                    </th>
+                    <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                      Name
+                    </th>
+                    <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                      Email
+                    </th>
+                    <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                      Role
+                    </th>
+                    <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {users.map((user, index) => (
+                    <tr key={user._id} className="hover:bg-gray-50">
+                      <td className="px-4 py-2 whitespace-nowrap">
+                        {index + 1}
+                      </td>
+                      <td className="px-4 py-2 whitespace-nowrap">
+                        {editingId === user._id ? (
+                          <input
+                            type="text"
+                            value={editedUser.name || user.name}
+                            onChange={(e) =>
+                              setEditedUser({
+                                ...editedUser,
+                                name: e.target.value,
+                              })
+                            }
+                            className="w-full px-2 py-1 border rounded"
+                          />
+                        ) : (
+                          user.name
+                        )}
+                      </td>
+                      <td className="px-4 py-2 whitespace-nowrap">
+                        {user.email}
+                      </td>
+                      <td className="px-4 py-2 whitespace-nowrap">
+                        {editingId === user._id ? (
+                          <input
+                            type="text"
+                            value={editedUser.role || user.role}
+                            onChange={(e) =>
+                              setEditedUser({
+                                ...editedUser,
+                                role: e.target.value,
+                              })
+                            }
+                            className="w-full px-2 py-1 border rounded"
+                          />
+                        ) : (
+                          user.role
+                        )}
+                      </td>
+                      <td className="px-4 py-2 whitespace-nowrap">
+                        {editingId === user._id ? (
+                          <button
+                            onClick={() => handleSave(user._id)}
+                            className="bg-green-500 text-white px-4 py-1 rounded"
+                          >
+                            Save
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => handleEdit(user._id)}
+                            className="bg-blue-500 text-white px-4 py-1 rounded"
+                          >
+                            Edit
+                          </button>
+                        )}
+                        <button
+                          onClick={() => handleDelete(user._id)}
+                          className="bg-red-500 text-white px-4 py-1 rounded ml-2"
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <div className="text-center py-4">No users found.</div>
+          )}
+        </div>
+      </div>
     </div>
   );
 };
