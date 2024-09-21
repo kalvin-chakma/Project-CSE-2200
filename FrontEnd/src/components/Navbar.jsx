@@ -156,20 +156,24 @@ const Navbar = ({ categories, isAuthenticated, onCategoryChange }) => {
             </div>
           </div>
           <div className="hidden md:flex items-center">
-            <Link
-              to="/wishlist"
-              className={`${navLinkStyle} mx-3 flex items-center`}
-            >
-              <FaHeart className="mr-1" />
-              Wishlist
-            </Link>
-            <Link
-              to="/CartPage"
-              className={`${navLinkStyle} mx-3 flex items-center`}
-            >
-              <FaShoppingBag className="mr-1" />
-              Bag
-            </Link>
+            {userRole !== "admin" && (
+              <>
+                <Link
+                  to="/wishlist"
+                  className={`${navLinkStyle} mx-3 flex items-center`}
+                >
+                  <FaHeart className="mr-1" />
+                  Wishlist
+                </Link>
+                <Link
+                  to="/CartPage"
+                  className={`${navLinkStyle} mx-3 flex items-center`}
+                >
+                  <FaShoppingBag className="mr-1" />
+                  Bag
+                </Link>
+              </>
+            )}
             {loggedInUser ? (
               <div className="relative" ref={profileDropdownRef}>
                 <button
@@ -259,41 +263,6 @@ const Navbar = ({ categories, isAuthenticated, onCategoryChange }) => {
             >
               About Us
             </Link>
-            <Link
-              to="/wishlist"
-              className={`${navLinkStyle} block px-3 py-2 rounded-md`}
-            >
-              Wishlist
-            </Link>
-            <Link
-              to="/cartPage"
-              className={`${navLinkStyle} block px-3 py-2 rounded-md`}
-            >
-              Bag
-            </Link>
-            {loggedInUser ? (
-              <>
-                <Link
-                  to="/Dashboard"
-                  className={`${navLinkStyle} block px-3 py-2 rounded-md`}
-                >
-                  Dashboard
-                </Link>
-                <button
-                  onClick={handleLogout}
-                  className={`${navLinkStyle} block px-3 py-2 rounded-md w-full text-left`}
-                >
-                  Logout
-                </button>
-              </>
-            ) : (
-              <Link
-                to="/LogInPage"
-                className={`${navLinkStyle} block px-3 py-2 rounded-md`}
-              >
-                Log In
-              </Link>
-            )}
           </div>
         </div>
       )}
@@ -307,3 +276,4 @@ const Navbar = ({ categories, isAuthenticated, onCategoryChange }) => {
 };
 
 export default Navbar;
+``
