@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Sidebar from "./FormElement/Sidebar";
+import Loading from "./Loading";
 
 const AllUsers = () => {
   const [users, setUsers] = useState([]);
@@ -103,7 +104,11 @@ const AllUsers = () => {
   };
 
   if (loading) {
-    return <div className="text-center py-4">Loading...</div>;
+    return (
+      <div className="text-center py-4">
+        <Loading />
+      </div>
+    );
   }
 
   return (
@@ -112,7 +117,7 @@ const AllUsers = () => {
         <div className="w-1/5 min-w-[200px]">
           <Sidebar />
         </div>
-        <div className="w-3/5 overflow-y-auto p-4">
+        <div className="w-3/5 overflow-y-auto p-4 no-scrollbar ">
           <h2 className="text-2xl font-bold mb-4">All Users</h2>
           {error && <div className="text-red-500 mb-4">{error}</div>}
           {users.length > 0 ? (

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "./FormElement/Sidebar"; // Adjust path if necessary
+import Loading from "./Loading";
 
 const AdminOrderPage = () => {
   const [orders, setOrders] = useState([]);
@@ -128,8 +129,8 @@ const AdminOrderPage = () => {
             sidebarVisible ? "4/5" : "full"
           } flex justify-center items-center`}
         >
-          <div className="flex justify-center items-center h-full">
-            <p>Loading...</p>
+          <div className=" justify-center text-center items-center h-full">
+            <Loading />
           </div>
         </div>
       </div>
