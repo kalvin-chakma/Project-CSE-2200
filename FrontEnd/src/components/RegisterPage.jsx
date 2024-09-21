@@ -6,10 +6,8 @@ import registerImage from "../assets/RegisterPageImage.jpg";
 import Password from "./FormElement/Password";
 import EmailAddress from "./FormElement/EmailAdress";
 import AnimatedButton from "./AnimatedButton";
-import withResponsiveWrapper from './withResponsiveWrapper';
-import ErrorBoundary from './ErrorBoundary';
 
-function RegisterPage({ isMobile, isTablet, isDesktop }) {
+function RegisterPage() {
   const [registerInfo, setRegisterInfo] = useState({
     name: "",
     email: "",
@@ -18,11 +16,11 @@ function RegisterPage({ isMobile, isTablet, isDesktop }) {
   const [registerSuccess, setRegisterSuccess] = useState(false);
 
   const navigate = useNavigate();
-  const isMounted = useRef(true);
+  const isMounted = useRef(true); // Create a ref to track mounted state
 
   useEffect(() => {
     return () => {
-      isMounted.current = false;
+      isMounted.current = false; // Set to false when unmounted
     };
   }, []);
 
@@ -106,82 +104,78 @@ function RegisterPage({ isMobile, isTablet, isDesktop }) {
   };
 
   return (
-    <ErrorBoundary>
-      <div className={`max-w-400px mx-auto ${isMobile ? 'h-auto' : 'h-900px'}`}>
-        <div className="h-full flex flex-col">
-          <div className="w-full px-6 sm:px-10 lg:px-40 m-6 sm:m-10 flex justify-start items-center">
-            {/* Content here */}
+    <div className="max-w-400px mx-auto h-900px">
+      <div className="h-full flex flex-col">
+        <div className="w-full px-6 sm:px-10 lg:px-40 m-6 sm:m-10 flex justify-start items-center">
+          {/* Content here */}
+        </div>
+        <div className="flex p-6 flex-col sm:flex-row flex-grow items-center justify-center">
+          <div className="w-full h-full sm:w-5/12 flex items-center justify-center rounded-xl shadow-2xl">
+            <img
+              src={registerImage}
+              alt="Register"
+              className="object-cover h-full w-full rounded-xl"
+            />
           </div>
-          <div className={`flex p-6 ${isMobile ? 'flex-col' : 'flex-row'} flex-grow items-center justify-center`}>
-            {!isMobile && (
-              <div className="w-full h-full sm:w-5/12 flex items-center justify-center rounded-xl shadow-2xl">
-                <img
-                  src={registerImage}
-                  alt="Register"
-                  className="object-cover h-full w-full rounded-xl"
-                />
+          <div className="w-full sm:w-5/12 px-6 sm:px-28 py-6 sm:py-12 ml-6 sm:ml-10 flex flex-col relative bg-white">
+            <div className="mt-5 flex flex-col justify-between h-full">
+              <div>
+                <p className="text-lg sm:text-2xl font-semibold">
+                  Create an Account
+                </p>
+                <p className="mt-2 font-semibold text-sm sm:text-base opacity-50">
+                  Please fill in your details
+                </p>
+                <form
+                  className="mt-10 sm:mt-20 space-y-4 sm:space-y-7"
+                  onSubmit={handleRegister}
+                >
+                  <input
+                    type="text"
+                    name="name"
+                    value={registerInfo.name}
+                    onChange={handleChange}
+                    placeholder="Full Name"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                  />
+                  <EmailAddress
+                    name="email"
+                    value={registerInfo.email}
+                    onChange={handleChange}
+                  />
+                  <Password
+                    name="password"
+                    value={registerInfo.password}
+                    onChange={handleChange}
+                  />
+                  <div className="mt-8 sm:mt-10 flex justify-center">
+                    <AnimatedButton
+                      initialText="Register"
+                      successText="Registration Successful"
+                      onClick={handleRegister}
+                      isSuccess={registerSuccess}
+                    />
+                  </div>
+                </form>
               </div>
-            )}
-            <div className={`w-full ${isMobile ? 'mt-6' : 'sm:w-5/12 ml-6 sm:ml-10'} px-6 sm:px-28 py-6 sm:py-12 flex flex-col relative bg-white`}>
-              <div className="mt-5 flex flex-col justify-between h-full">
-                <div>
-                  <p className="text-lg sm:text-2xl font-semibold">
-                    Create an Account
-                  </p>
-                  <p className="mt-2 font-semibold text-sm sm:text-base opacity-50">
-                    Please fill in your details
-                  </p>
-                  <form
-                    className="mt-10 sm:mt-20 space-y-4 sm:space-y-7"
-                    onSubmit={handleRegister}
-                  >
-                    <input
-                      type="text"
-                      name="name"
-                      value={registerInfo.name}
-                      onChange={handleChange}
-                      placeholder="Full Name"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                    />
-                    <EmailAddress
-                      name="email"
-                      value={registerInfo.email}
-                      onChange={handleChange}
-                    />
-                    <Password
-                      name="password"
-                      value={registerInfo.password}
-                      onChange={handleChange}
-                    />
-                    <div className="mt-8 sm:mt-10 flex justify-center">
-                      <AnimatedButton
-                        initialText="Register"
-                        successText="Registration Successful"
-                        onClick={handleRegister}
-                        isSuccess={registerSuccess}
-                      />
-                    </div>
-                  </form>
-                </div>
-                <div className="mt-10 sm:mt-14 flex flex-col sm:flex-row justify-between">
-                  <h3 className="text-xs sm:text-sm font-semibold opacity-50">
-                    Already have an account?
-                  </h3>
-                  <a
-                    href="/LogInPage"
-                    className="mt-2 sm:mt-0 text-xs sm:text-sm font-bold text-indigo-400 hover:text-indigo-700"
-                  >
-                    Log in
-                  </a>
-                </div>
+              <div className="mt-10 sm:mt-14 flex flex-col sm:flex-row justify-between">
+                <h3 className="text-xs sm:text-sm font-semibold opacity-50">
+                  Already have an account?
+                </h3>
+                <a
+                  href="/LogInPage"
+                  className="mt-2 sm:mt-0 text-xs sm:text-sm font-bold text-indigo-400 hover:text-indigo-700"
+                >
+                  Log in
+                </a>
               </div>
             </div>
           </div>
         </div>
-        <ToastContainer />
       </div>
-    </ErrorBoundary>
+      <ToastContainer />
+    </div>
   );
 }
 
-export default withResponsiveWrapper(RegisterPage);
+export default RegisterPage;
