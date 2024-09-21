@@ -4,7 +4,7 @@ import { productContext } from "../utills/Context";
 import SearchBar from "./SearchBar";
 import Footer from "./Footer";
 import { ThreeDots } from "react-loader-spinner";
-import { FaShoppingCart, FaFilter } from "react-icons/fa";
+import { FaHeart, FaFilter } from "react-icons/fa";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { motion, AnimatePresence } from "framer-motion";
@@ -14,7 +14,7 @@ function Home({ categories, isAuthenticated, selectedCategory, sortOrder }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [cart, setCart] = useState([]);
+  const [favorites, setFavorites] = useState([]);
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [priceRange, setPriceRange] = useState([0, 1000000]);
   const [showFilters, setShowFilters] = useState(false);
@@ -95,6 +95,11 @@ function Home({ categories, isAuthenticated, selectedCategory, sortOrder }) {
     return () => clearInterval(interval);
   }, [promotedProducts]);
 
+  useEffect(() => {
+    const storedFavorites = JSON.parse(localStorage.getItem("favorites")) || [];
+    setFavorites(storedFavorites);
+  }, []);
+
   const handleSearchChange = (value) => {
     setSearchQuery(value);
   };
@@ -117,51 +122,29 @@ function Home({ categories, isAuthenticated, selectedCategory, sortOrder }) {
     setSearchQuery("");
   };
 
-  const handleAddToCart = async (product) => {
-    const token = localStorage.getItem("jwtToken");
-    if (!token) {
-      toast.error("Please log in to add items to your cart.");
-      navigate("/LogInPage");
+  const handleAddToFavorites = (product) => {
+    if (!isAuthenticated) {
+      toast.error("Please log in to add items to your favorites.");
       return;
     }
 
-    try {
-      const userId = localStorage.getItem("userId");
-      const response = await fetch(
-        "https://project-cse-2200-xi.vercel.app/api/cart/add",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            userId,
-            productId: product._id,
-            image: product.image,
-            quantity: 1,
-          }),
-        }
-      );
+    const newFavorites = [...favorites];
+    const index = newFavorites.findIndex((fav) => fav._id === product._id);
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const result = await response.json();
-      toast.success(`Added ${product.title} to cart`, {
-        position: "bottom-right",
-        autoClose: 2000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      });
-    } catch (error) {
-      console.error("Error adding product to cart:", error);
-      toast.error(`Failed to add product to cart: ${error.message}`);
+    if (index !== -1) {
+      newFavorites.splice(index, 1);
+      toast.success("Removed from favorites");
+    } else {
+      newFavorites.push(product);
+      toast.success("Added to favorites");
     }
+
+    setFavorites(newFavorites);
+    localStorage.setItem("favorites", JSON.stringify(newFavorites));
+  };
+
+  const isFavorite = (productId) => {
+    return favorites.some((fav) => fav._id === productId);
   };
 
   const handleProductClick = (productId) => {
@@ -212,7 +195,7 @@ function Home({ categories, isAuthenticated, selectedCategory, sortOrder }) {
                 <input
                   type="range"
                   min="0"
-                  max="100000"
+                  max="1000000"
                   step="1000"
                   value={priceRange[1]}
                   onChange={handlePriceRangeChange}
@@ -321,10 +304,14 @@ function Home({ categories, isAuthenticated, selectedCategory, sortOrder }) {
                           {product.category}
                         </span>
                         <button
-                          className="text-2xl text-gray-400 hover:text-pink-500 group-hover:text-white transition-colors duration-300"
-                          onClick={() => handleAddToCart(product)}
+                          className={`text-2xl ${
+                            isFavorite(product._id)
+                              ? "text-pink-500"
+                              : "text-gray-400"
+                          } hover:text-pink-500 group-hover:text-white transition-colors duration-300`}
+                          onClick={() => handleAddToFavorites(product)}
                         >
-                          <FaShoppingCart />
+                          <FaHeart />
                         </button>
                       </div>
                     </div>
