@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -14,15 +14,9 @@ function RegisterPage() {
     password: "",
   });
   const [registerSuccess, setRegisterSuccess] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
-  const isMounted = useRef(true); // Create a ref to track mounted state
-
-  useEffect(() => {
-    return () => {
-      isMounted.current = false; // Set to false when unmounted
-    };
-  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -38,6 +32,9 @@ function RegisterPage() {
     if (!name || !email || !password) {
       return handleError("All fields are required");
     }
+
+    setIsLoading(true); // Set loading to true while fetching
+
     try {
       const url = "https://project-cse-2200.vercel.app/auth/signup";
       console.log("Sending request to:", url);
@@ -58,17 +55,15 @@ function RegisterPage() {
 
       const { success, message, error } = result;
       if (success) {
-        if (isMounted.current) {
-          setRegisterSuccess(true);
-          handleSuccess("Registration successful!");
-          setTimeout(() => {
-            if (isMounted.current) {
-              navigate("/LogInPage");
-            }
-          }, 3000);
-        }
+        setRegisterSuccess(true);
+        handleSuccess("Registration successful!");
+
+        // Redirect to login after a brief delay
+        setTimeout(() => {
+          navigate("/LogInPage");
+        }, 3000);
       } else if (error) {
-        const details = error?.details[0]?.message;
+        const details = error?.details?.[0]?.message;
         handleError(details);
       } else if (!success) {
         handleError(message);
@@ -76,6 +71,8 @@ function RegisterPage() {
     } catch (err) {
       handleError(err.message);
       console.error("Fetch error:", err);
+    } finally {
+      setIsLoading(false); // Stop loading after completion
     }
   };
 
@@ -106,9 +103,7 @@ function RegisterPage() {
   return (
     <div className="max-w-400px mx-auto h-900px">
       <div className="h-full flex flex-col">
-        <div className="w-full px-6 sm:px-10 lg:px-40 m-6 sm:m-10 flex justify-start items-center">
-          {/* Content here */}
-        </div>
+        <div className="w-full px-6 sm:px-10 lg:px-40 m-6 sm:m-10 flex justify-start items-center"></div>
         <div className="flex p-6 flex-col sm:flex-row flex-grow items-center justify-center">
           <div className="w-full h-full sm:w-5/12 flex items-center justify-center rounded-xl shadow-2xl">
             <img
@@ -154,6 +149,7 @@ function RegisterPage() {
                       successText="Registration Successful"
                       onClick={handleRegister}
                       isSuccess={registerSuccess}
+                      isLoading={isLoading} // Pass loading state to button
                     />
                   </div>
                 </form>
