@@ -153,7 +153,7 @@ const Navbar = ({ categories, isAuthenticated, onCategoryChange }) => {
             </div>
           </div>
           <div className="hidden md:flex items-center">
-            {userRole !== "admin" && (
+{/*             {userRole !== "admin" && (
               <>
                 <Link
                   to="/wishlist"
@@ -170,7 +170,7 @@ const Navbar = ({ categories, isAuthenticated, onCategoryChange }) => {
                   Bag
                 </Link>
               </>
-            )}
+            )} */}
             {loggedInUser ? (
               <div className="relative" ref={profileDropdownRef}>
                 <button
@@ -273,3 +273,4 @@ const Navbar = ({ categories, isAuthenticated, onCategoryChange }) => {
 };
 
 export default Navbar;
+
