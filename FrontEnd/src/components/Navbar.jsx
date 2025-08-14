@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import WebsiteLogo from "../assets/Logo.png";
 import { FaUser, FaHeart, FaShoppingBag, FaBars } from "react-icons/fa";
 
 const Navbar = ({ categories, isAuthenticated, onCategoryChange }) => {
@@ -108,10 +109,12 @@ const Navbar = ({ categories, isAuthenticated, onCategoryChange }) => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
-            <Link to="/" className="flex-shrink-0 flex items-center">
-              <span className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-600">
-                EDokan
-              </span>
+            <Link to="/" className="flex-shrink-0">
+              <img
+                src={WebsiteLogo}
+                alt="Website_Logo"
+                className="h-8 w-auto"
+              />
             </Link>
             <div className="hidden md:block ml-10">
               <div className="flex items-baseline space-x-4">
@@ -153,7 +156,7 @@ const Navbar = ({ categories, isAuthenticated, onCategoryChange }) => {
             </div>
           </div>
           <div className="hidden md:flex items-center">
-{/*             {userRole !== "admin" && (
+            {userRole !== "admin" && (
               <>
                 <Link
                   to="/wishlist"
@@ -170,7 +173,7 @@ const Navbar = ({ categories, isAuthenticated, onCategoryChange }) => {
                   Bag
                 </Link>
               </>
-            )} */}
+            )}
             {loggedInUser ? (
               <div className="relative" ref={profileDropdownRef}>
                 <button
@@ -273,4 +276,4 @@ const Navbar = ({ categories, isAuthenticated, onCategoryChange }) => {
 };
 
 export default Navbar;
-
+``

@@ -11,6 +11,7 @@ import RegisterPage from "./components/RegisterPage";
 import RefrshHandler from "./components/RefrshHandler";
 import Dashboard from "./components/Dashboard";
 import TokenRefresher from "./components/TokenRefresher";
+import { apiRequest } from "./utills/auth";
 import CartPage from "./components/CartPage";
 import AllUsers from "./components/AllUsers";
 import AllCartItems from "./components/AllCartItems";
