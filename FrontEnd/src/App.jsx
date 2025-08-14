@@ -32,44 +32,44 @@ export default function App() {
     return isAuthenticated ? element : <Navigate to="/LogInPage" />;
   };
 
-  // useEffect(() => {
-  //   fetchCategories();
-  // }, [isAuthenticated]);
+  useEffect(() => {
+    fetchCategories();
+  }, [isAuthenticated]);
 
-  // const fetchCategories = async () => {
-  //   try {
-  //     let url = "https://project-cse-2200.vercel.app/api/products";
-  //     let options = {};
+  const fetchCategories = async () => {
+    try {
+      let url = "https://project-cse-2200.vercel.app/api/products";
+      let options = {};
 
-  //     if (isAuthenticated) {
-  //       const token = localStorage.getItem("token");
-  //       if (token) {
-  //         options.headers = {
-  //           Authorization: `Bearer ${token}`,
-  //         };
-  //       }
-  //     }
+      if (isAuthenticated) {
+        const token = localStorage.getItem("token");
+        if (token) {
+          options.headers = {
+            Authorization: `Bearer ${token}`,
+          };
+        }
+      }
 
-  //     const products = await apiRequest("get", url, null, options);
-  //     const uniqueCategories = [
-  //       ...new Set(
-  //         products.map((product) => product.category.toLowerCase().trim())
-  //       ),
-  //     ];
-  //     setCategories(uniqueCategories);
-  //     localStorage.setItem("categories", JSON.stringify(uniqueCategories));
-  //   } catch (error) {
-  //     console.error("Error fetching categories:", error);
-  //     if (error.response && error.response.status === 401) {
-  //       setIsAuthenticated(false);
-  //       localStorage.removeItem("token");
-  //       localStorage.removeItem("refreshToken");
-  //       toast.error("Session expired. Please log in again.");
-  //     } else {
-  //       toast.error("Error fetching categories");
-  //     }
-  //   }
-  // };
+      const products = await apiRequest("get", url, null, options);
+      const uniqueCategories = [
+        ...new Set(
+          products.map((product) => product.category.toLowerCase().trim())
+        ),
+      ];
+      setCategories(uniqueCategories);
+      localStorage.setItem("categories", JSON.stringify(uniqueCategories));
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+      if (error.response && error.response.status === 401) {
+        setIsAuthenticated(false);
+        localStorage.removeItem("token");
+        localStorage.removeItem("refreshToken");
+        toast.error("Session expired. Please log in again.");
+      } else {
+        toast.error("Error fetching categories");
+      }
+    }
+  };
 
   const addCategory = (newCategory) => {
     const normalizedCategory = newCategory.toLowerCase().trim();
