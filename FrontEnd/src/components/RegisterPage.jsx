@@ -37,7 +37,7 @@ function RegisterPage() {
     setIsLoading(true); // Set loading to true while fetching
 
     try {
-      const url = `https://project-cse-2200.vercel.app/auth/signup`;
+      const url = `${API_BASE_URL}/auth/signup`;
       console.log("Sending request to:", url);
       const response = await fetch(url, {
         method: "POST",
@@ -176,4 +176,5 @@ function RegisterPage() {
 }
 
 export default RegisterPage;
+
 
