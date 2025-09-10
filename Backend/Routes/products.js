@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const Product = require('../Models/Product'); // Ensure the correct path
+const UserModel = require('../Models/user');
+const { verifyToken } = require('../Middlewares/authMiddleware');
 
 // Get all products
 router.get('/', async (req, res) => {
@@ -79,6 +81,52 @@ router.get('/category/:category', async (req, res) => {
     res.json(products);
   } catch (error) {
     res.status(500).json({ message: error.message });
+  }
+});
+
+// Add or update a review for a product
+router.post('/:id/reviews', verifyToken, async (req, res) => {
+  try {
+    const { rating, comment } = req.body;
+    if (!rating || rating < 1 || rating > 5) {
+      return res.status(400).json({ message: 'Rating must be between 1 and 5' });
+    }
+
+    const product = await Product.findById(req.params.id);
+    if (!product) return res.status(404).json({ message: 'Product not found' });
+
+    const user = await UserModel.findById(req.user.id).select('name');
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const existingReviewIndex = product.reviews.findIndex(
+      (r) => r.user && r.user.toString() === req.user.id
+    );
+
+    if (existingReviewIndex !== -1) {
+      product.reviews[existingReviewIndex].rating = rating;
+      product.reviews[existingReviewIndex].comment = comment || product.reviews[existingReviewIndex].comment;
+      product.reviews[existingReviewIndex].createdAt = new Date();
+    } else {
+      product.reviews.push({
+        user: req.user.id,
+        name: user.name,
+        rating,
+        comment: comment || '',
+      });
+    }
+
+    product.numReviews = product.reviews.length;
+    product.averageRating =
+      product.reviews.reduce((acc, item) => acc + item.rating, 0) /
+      (product.reviews.length || 1);
+
+    const updated = await product.save();
+    res.status(201).json(updated);
+  } catch (error) {
+    console.error('Error adding review:', error);
+    res.status(500).json({ message: 'Internal server error' });
   }
 });
 

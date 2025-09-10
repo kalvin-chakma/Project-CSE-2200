@@ -20,6 +20,8 @@ const Details = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [userRole, setUserRole] = useState(null);
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewComment, setReviewComment] = useState("");
 
   useEffect(() => {
     const fetchUserRole = async () => {
@@ -144,6 +146,48 @@ const Details = () => {
     }
   };
 
+  const submitReview = async (e) => {
+    e.preventDefault();
+    try {
+      const token = localStorage.getItem("jwtToken");
+      if (!token) {
+        navigate("/LogInPage");
+        return;
+      }
+
+      const response = await fetch(
+        `https://project-cse-2200-xi.vercel.app/api/products/${id}/reviews`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            rating: Number(reviewRating),
+            comment: reviewComment,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        throw new Error(err.message || "Failed to submit review");
+      }
+
+      const updated = await response.json();
+      setProduct(updated);
+      setProducts((prev) =>
+        prev.map((p) => (p._id === updated._id ? updated : p))
+      );
+      setReviewRating(5);
+      setReviewComment("");
+    } catch (err) {
+      console.error("Error submitting review:", err);
+      alert(err.message);
+    }
+  };
+
   const handleAddToCart = async () => {
     const token = localStorage.getItem("jwtToken");
     if (!token) {
@@ -153,7 +197,6 @@ const Details = () => {
 
     try {
       const userId = localStorage.getItem("userId");
-
       const response = await fetch(
         "https://project-cse-2200-xi.vercel.app/api/cart/add",
         {
@@ -175,7 +218,7 @@ const Details = () => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const result = await response.json();
+      await response.json();
       alert("Item added to cart successfully");
       navigate("/CartPage");
     } catch (error) {
@@ -186,12 +229,12 @@ const Details = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen">
+      <div className="flex items-center justify-center min-h-screen bg-gray-100">
         <ThreeDots
           height="80"
           width="80"
           radius="9"
-          color="#4fa94d"
+          color="#10B981"
           ariaLabel="three-dots-loading"
           visible={true}
         />
@@ -200,204 +243,312 @@ const Details = () => {
   }
 
   if (error) {
-    return <div>Error: {error}</div>;
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-100">
+        <p className="text-red-600 text-lg font-semibold">Error: {error}</p>
+      </div>
+    );
   }
 
   if (!product) {
-    return <div>Product not found</div>;
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-100">
+        <p className="text-gray-600 text-lg font-semibold">Product not found</p>
+      </div>
+    );
   }
 
   return (
-    <>
-      <div className="flex items-center justify-center h-screen">
-        <div className="container w-3/5 mx-auto p-4 md:p-10 flex items-center justify-center shadow-2xl">
-          <div className="flex flex-col md:flex-row justify-between items-center">
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center py-6">
+      <div className="container max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-lg">
+        <div className="flex flex-col lg:flex-row gap-8">
+          {/* Product Image */}
+          <div className="flex-shrink-0">
             <img
-              className="object-contain h-64 md:h-96 w-full md:w-96 mb-4 md:mb-0"
+              className="w-full max-w-md h-80 object-contain rounded-lg"
               src={product.image}
               alt={product.title}
             />
-            <div className="md:ml-10">
-              <h1 className="text-ellipsis text-2xl md:text-4xl font-bold mb-2 md:mb-4">
-                {product.title}
-              </h1>
-              <h3 className="text-lg md:text-xl text-gray-500 mb-2 md:mb-4">
-                Category: {product.category}
-              </h3>
-              <h2 className="text-xl md:text-2xl text-red-500 mb-2 md:mb-4">
-                $ {product.price}
-              </h2>
-              <p className="text-base md:text-lg mb-4">{product.description}</p>
-              {isEditing ? (
-                <form onSubmit={ProductEditHandler} className="space-y-4">
-                  <div className="mb-4">
-                    <label
-                      htmlFor="title"
-                      className="block text-sm font-bold text-gray-700"
-                    >
-                      Title
-                    </label>
-                    <input
-                      type="text"
-                      id="title"
-                      value={editProduct.title}
-                      onChange={(e) =>
-                        setEditProduct({
-                          ...editProduct,
-                          title: e.target.value,
-                        })
-                      }
-                      className="w-full p-2 border rounded"
-                    />
-                  </div>
-                  <div className="mb-4">
-                    <label
-                      htmlFor="category"
-                      className="block text-sm font-bold text-gray-700"
-                    >
-                      Category
-                    </label>
-                    <input
-                      type="text"
-                      id="category"
-                      value={editProduct.category}
-                      onChange={(e) =>
-                        setEditProduct({
-                          ...editProduct,
-                          category: e.target.value,
-                        })
-                      }
-                      className="w-full p-2 border rounded"
-                    />
-                  </div>
-                  <div className="mb-4">
-                    <label
-                      htmlFor="price"
-                      className="block text-sm font-bold text-gray-700"
-                    >
-                      Price
-                    </label>
-                    <input
-                      type="number"
-                      id="price"
-                      value={editProduct.price}
-                      onChange={(e) =>
-                        setEditProduct({
-                          ...editProduct,
-                          price: e.target.value,
-                        })
-                      }
-                      className="w-full p-2 border rounded"
-                    />
-                  </div>
-                  <div className="mb-4">
-                    <label
-                      htmlFor="description"
-                      className="block text-sm font-bold text-gray-700"
-                    >
-                      Description
-                    </label>
-                    <textarea
-                      id="description"
-                      value={editProduct.description}
-                      onChange={(e) =>
-                        setEditProduct({
-                          ...editProduct,
-                          description: e.target.value,
-                        })
-                      }
-                      className="w-full p-2 border rounded"
-                    />
-                  </div>
-                  <div className="mb-4">
-                    <label
-                      htmlFor="image"
-                      className="block text-sm font-bold text-gray-700"
-                    >
-                      Image URL
-                    </label>
-                    <input
-                      type="text"
-                      id="image"
-                      value={editProduct.image}
-                      onChange={(e) =>
-                        setEditProduct({
-                          ...editProduct,
-                          image: e.target.value,
-                        })
-                      }
-                      className="w-full p-2 border rounded"
-                    />
-                  </div>
-                  <div className="flex space-x-4">
+          </div>
+
+          {/* Product Details */}
+          <div className="flex-1">
+            <h1 className="text-2xl lg:text-3xl font-bold text-gray-800 mb-3">
+              {product.title}
+            </h1>
+            <p className="text-lg text-gray-600 mb-3">
+              Category: {product.category}
+            </p>
+            <p className="text-2xl text-red-600 font-semibold mb-3">
+              ${product.price}
+            </p>
+            {typeof product.averageRating === "number" && (
+              <div className="flex items-center text-sm text-gray-600 mb-3">
+                <span className="text-yellow-500">
+                  {"★".repeat(Math.round(product.averageRating))}
+                  {"☆".repeat(5 - Math.round(product.averageRating))}
+                </span>
+                <span className="ml-2">
+                  {product.averageRating.toFixed(1)} / 5 (
+                  {product.numReviews || 0} reviews)
+                </span>
+              </div>
+            )}
+            <p className="text-gray-700 mb-6">{product.description}</p>
+
+            {/* Edit Form or Action Buttons */}
+            {isEditing ? (
+              <form onSubmit={ProductEditHandler} className="space-y-4">
+                <div>
+                  <label
+                    htmlFor="title"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Title
+                  </label>
+                  <input
+                    type="text"
+                    id="title"
+                    value={editProduct.title}
+                    onChange={(e) =>
+                      setEditProduct({ ...editProduct, title: e.target.value })
+                    }
+                    className="mt-1 w-full p-3 border rounded-md focus:ring-2 focus:ring-indigo-500"
+                    required
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="category"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Category
+                  </label>
+                  <input
+                    type="text"
+                    id="category"
+                    value={editProduct.category}
+                    onChange={(e) =>
+                      setEditProduct({ ...editProduct, category: e.target.value })
+                    }
+                    className="mt-1 w-full p-3 border rounded-md focus:ring-2 focus:ring-indigo-500"
+                    required
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="price"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Price
+                  </label>
+                  <input
+                    type="number"
+                    id="price"
+                    value={editProduct.price}
+                    onChange={(e) =>
+                      setEditProduct({ ...editProduct, price: e.target.value })
+                    }
+                    className="mt-1 w-full p-3 border rounded-md focus:ring-2 focus:ring-indigo-500"
+                    required
+                    min="0"
+                    step="0.01"
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="description"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Description
+                  </label>
+                  <textarea
+                    id="description"
+                    value={editProduct.description}
+                    onChange={(e) =>
+                      setEditProduct({
+                        ...editProduct,
+                        description: e.target.value,
+                      })
+                    }
+                    className="mt-1 w-full p-3 border rounded-md focus:ring-2 focus:ring-indigo-500"
+                    rows="4"
+                    required
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="image"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Image URL
+                  </label>
+                  <input
+                    type="url"
+                    id="image"
+                    value={editProduct.image}
+                    onChange={(e) =>
+                      setEditProduct({ ...editProduct, image: e.target.value })
+                    }
+                    className="mt-1 w-full p-3 border rounded-md focus:ring-2 focus:ring-indigo-500"
+                    required
+                  />
+                </div>
+                <div className="flex gap-4">
+                  <button
+                    type="submit"
+                    className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  >
+                    Save
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setIsEditing(false)}
+                    className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            ) : (
+              <div className="flex flex-col sm:flex-row gap-4">
+                {userRole === "admin" ? (
+                  <>
                     <button
-                      type="submit"
-                      className="rounded bg-green-500 hover:bg-green-400 text-white font-bold py-2 px-4"
+                      onClick={() => setIsEditing(true)}
+                      className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     >
-                      Save
+                      Edit
                     </button>
                     <button
-                      type="button"
-                      onClick={() => setIsEditing(false)}
-                      className="rounded bg-red-500 hover:bg-red-400 text-white font-bold py-2 px-4"
+                      onClick={ProductDeleteHandler}
+                      className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
                     >
-                      Cancel
+                      Delete
                     </button>
-                  </div>
-                </form>
-              ) : (
-                <div className="flex flex-col md:flex-row items-start space-y-4 md:space-x-4 md:space-y-0">
-                  {userRole === "admin" ? (
-                    <>
+                  </>
+                ) : (
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center border rounded-md">
                       <button
-                        onClick={() => setIsEditing(true)}
-                        className="rounded bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 w-full md:w-auto"
+                        onClick={() =>
+                          setQuantity((prev) => (prev > 1 ? prev - 1 : 1))
+                        }
+                        className="px-3 py-2 bg-gray-200 hover:bg-gray-300 focus:outline-none"
+                        aria-label="Decrease quantity"
                       >
-                        Edit
+                        -
                       </button>
+                      <span className="px-4 py-2 text-gray-800">{quantity}</span>
                       <button
-                        onClick={ProductDeleteHandler}
-                        className="rounded bg-red-500 hover:bg-red-400 text-white font-bold py-2 px-4 w-full md:w-auto"
+                        onClick={() => setQuantity((prev) => prev + 1)}
+                        className="px-3 py-2 bg-gray-200 hover:bg-gray-300 focus:outline-none"
+                        aria-label="Increase quantity"
                       >
-                        Delete
-                      </button>
-                    </>
-                  ) : (
-                    <div className="flex items-center space-x-4">
-                      <div className="flex items-center">
-                        <button
-                          onClick={() =>
-                            setQuantity((prev) => (prev > 1 ? prev - 1 : 1))
-                          }
-                          className="rounded-l bg-gray-300 hover:bg-gray-400 text-black font-bold py-2 px-4"
-                        >
-                          -
-                        </button>
-                        <span className="bg-white text-black font-bold py-2 px-4">
-                          {quantity}
-                        </span>
-                        <button
-                          onClick={() => setQuantity((prev) => prev + 1)}
-                          className="rounded-r bg-gray-300 hover:bg-gray-400 text-black font-bold py-2 px-4"
-                        >
-                          +
-                        </button>
-                      </div>
-                      <button
-                        onClick={handleAddToCart}
-                        className="rounded bg-green-500 hover:bg-green-400 text-white font-bold py-2 px-4 w-full md:w-auto"
-                      >
-                        Add to Cart
+                        +
                       </button>
                     </div>
-                  )}
-                </div>
-              )}
-            </div>
+                    <button
+                      onClick={handleAddToCart}
+                      className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
+                    >
+                      Add to Cart
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
+
+        {/* Reviews Section */}
+        <div className="mt-10">
+          <h3 className="text-xl font-semibold text-gray-800 mb-4">Reviews</h3>
+          <div className="max-h-64 overflow-y-auto space-y-4 pr-2">
+            {product.reviews && product.reviews.length > 0 ? (
+              product.reviews
+                .slice()
+                .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+                .map((rev, idx) => (
+                  <div
+                    key={idx}
+                    className="border rounded-lg p-4 bg-gray-50"
+                    role="article"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="font-medium text-gray-800">
+                        {rev.name || "User"}
+                      </span>
+                      <span className="text-yellow-600">
+                        {"★".repeat(rev.rating)}
+                        {"☆".repeat(5 - rev.rating)}
+                      </span>
+                    </div>
+                    <p className="text-gray-700 mt-2">{rev.comment}</p>
+                    {rev.createdAt && (
+                      <p className="text-xs text-gray-500 mt-2">
+                        {new Date(rev.createdAt).toLocaleString()}
+                      </p>
+                    )}
+                  </div>
+                ))
+            ) : (
+              <p className="text-gray-500">No reviews yet.</p>
+            )}
+          </div>
+
+          {/* Add Review Form */}
+          {userRole !== "admin" && (
+            <form onSubmit={submitReview} className="mt-6 space-y-4">
+              <div>
+                <label
+                  htmlFor="rating"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Your Rating
+                </label>
+                <select
+                  id="rating"
+                  value={reviewRating}
+                  onChange={(e) => setReviewRating(e.target.value)}
+                  className="mt-1 w-full p-3 border rounded-md focus:ring-2 focus:ring-indigo-500"
+                  required
+                >
+                  <option value={5}>5 - Excellent</option>
+                  <option value={4}>4 - Good</option>
+                  <option value={3}>3 - Average</option>
+                  <option value={2}>2 - Poor</option>
+                  <option value={1}>1 - Terrible</option>
+                </select>
+              </div>
+              <div>
+                <label
+                  htmlFor="comment"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Comment
+                </label>
+                <textarea
+                  id="comment"
+                  value={reviewComment}
+                  onChange={(e) => setReviewComment(e.target.value)}
+                  className="mt-1 w-full p-3 border rounded-md focus:ring-2 focus:ring-indigo-500"
+                  rows="4"
+                  placeholder="Share your experience..."
+                  required
+                />
+              </div>
+              <button
+                type="submit"
+                className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              >
+                Submit Review
+              </button>
+            </form>
+          )}
+        </div>
       </div>
-    </>
+    </div>
   );
 };
 
