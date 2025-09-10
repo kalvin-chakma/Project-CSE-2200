@@ -30,7 +30,9 @@ const upload = multer({ storage });
 router.get('/', async (req, res) => {
   try {
     const products = await Product.find();
-    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    const baseUrl = process.env.NODE_ENV === 'production' 
+      ? 'https://project-cse-2200-xi.vercel.app' 
+      : `${req.protocol}://${req.get('host')}`;
     const toAbsolute = (url) => (url && url.startsWith('/uploads/') ? `${baseUrl}${url}` : url);
     const mapped = products.map(p => ({
       ...p.toObject(),
@@ -47,7 +49,9 @@ router.get('/:id', async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
     if (!product) return res.status(404).json({ message: 'Product not found' });
-    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    const baseUrl = process.env.NODE_ENV === 'production' 
+      ? 'https://project-cse-2200-xi.vercel.app' 
+      : `${req.protocol}://${req.get('host')}`;
     const toAbsolute = (url) => (url && url.startsWith('/uploads/') ? `${baseUrl}${url}` : url);
     const mapped = { ...product.toObject(), image: toAbsolute(product.image) };
     res.json(mapped);

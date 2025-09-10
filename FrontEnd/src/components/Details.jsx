@@ -307,18 +307,14 @@ const Details = () => {
         setIsInWishlist(false);
         toast.success("Removed from wishlist");
       } else {
-        // Add to wishlist
-        const response = await fetch(
-          "https://project-cse-2200-xi.vercel.app/api/wishlist/add",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({ productId: id }),
-          }
-        );
+        const response =  await fetch(`https://project-cse-2200-xi.vercel.app/api/wishlist/add`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ productId: product._id }),
+        });
 
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({}));
