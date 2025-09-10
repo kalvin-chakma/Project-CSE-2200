@@ -117,7 +117,7 @@ function Home({ categories, isAuthenticated, selectedCategory, sortOrder }) {
           setFavorites((data.items || []).map((it) => it.product));
         }
       } catch (e) {
-        // silent
+       
       }
     };
     fetchWishlist();

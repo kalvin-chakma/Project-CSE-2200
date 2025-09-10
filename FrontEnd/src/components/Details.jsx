@@ -37,7 +37,7 @@ const Details = () => {
         if (token) {
           setIsAuthenticated(true);
           const response = await fetch(
-            "http://localhost:8080/api/user/role",
+            "https://project-cse-2200-xi.vercel.app/api/user/role",
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -64,7 +64,7 @@ const Details = () => {
         if (!token || !id) return;
 
         const response = await fetch(
-          "http://localhost:8080/api/wishlist",
+          "https://project-cse-2200-xi.vercel.app/api/wishlist",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -100,7 +100,7 @@ const Details = () => {
       try {
         const token = localStorage.getItem("jwtToken");
         const response = await fetch(
-          `http://localhost:8080/api/products/${id}`,
+          `https://project-cse-2200-xi.vercel.app/api/products/${id}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -136,7 +136,7 @@ const Details = () => {
     try {
       const token = localStorage.getItem("jwtToken");
       const response = await fetch(
-        `http://localhost:8080/api/products/${id}`,
+        `https://project-cse-2200-xi.vercel.app/api/products/${id}`,
         {
           method: "DELETE",
           headers: {
@@ -171,7 +171,7 @@ const Details = () => {
     try {
       const token = localStorage.getItem("jwtToken");
       const response = await fetch(
-        `http://localhost:8080/api/products/${id}`,
+        `https://project-cse-2200-xi.vercel.app/api/products/${id}`,
         {
           method: "PUT",
           headers: {
@@ -206,7 +206,7 @@ const Details = () => {
       }
 
       const response = await fetch(
-        `http://localhost:8080/api/products/${id}/reviews`,
+        `https://project-cse-2200-xi.vercel.app/api/products/${id}/reviews`,
         {
           method: "POST",
           headers: {
@@ -248,7 +248,7 @@ const Details = () => {
     try {
       const userId = localStorage.getItem("userId");
       const response = await fetch(
-        "http://localhost:8080/api/cart/add",
+        "https://project-cse-2200-xi.vercel.app/api/cart/add",
         {
           method: "POST",
           headers: {
@@ -290,7 +290,7 @@ const Details = () => {
       if (isInWishlist) {
         // Remove from wishlist
         const response = await fetch(
-          `http://localhost:8080/api/wishlist/remove/${id}`,
+          `https://project-cse-2200-xi.vercel.app/api/wishlist/remove/${id}`,
           {
             method: "DELETE",
             headers: {
@@ -309,7 +309,7 @@ const Details = () => {
       } else {
         // Add to wishlist
         const response = await fetch(
-          "http://localhost:8080/api/wishlist/add",
+          "https://project-cse-2200-xi.vercel.app/api/wishlist/add",
           {
             method: "POST",
             headers: {
