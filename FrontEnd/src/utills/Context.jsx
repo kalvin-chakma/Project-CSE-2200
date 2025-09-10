@@ -1,4 +1,4 @@
-import React, { createContext, useEffect, useState } from "react";
+import React, { createContext, useEffect, useState, useRef } from "react";
 import axios from "axios";
 
 // Create a context for products
@@ -6,6 +6,7 @@ export const productContext = createContext();
 
 const Context = ({ children }) => {
   const [products, setProducts] = useState([]);
+  const hasFetchedRef = useRef(false);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -20,6 +21,8 @@ const Context = ({ children }) => {
       }
     };
 
+    if (hasFetchedRef.current) return;
+    hasFetchedRef.current = true;
     fetchProducts();
   }, []);
 

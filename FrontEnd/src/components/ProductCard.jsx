@@ -1,12 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FaHeart } from "react-icons/fa";
 
-const ProductCard = ({ product, isAuthenticated, onAddToFavorites }) => {
-  const [isFavorite, setIsFavorite] = useState(false);
-
+const ProductCard = ({ product, isAuthenticated, onAddToFavorites, isFavorite }) => {
   const handleFavoriteClick = () => {
     if (isAuthenticated) {
-      setIsFavorite(!isFavorite);
       onAddToFavorites(product);
     } else {
       // Redirect to login page or show login modal

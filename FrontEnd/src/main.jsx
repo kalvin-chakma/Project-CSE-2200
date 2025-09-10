@@ -67,13 +67,11 @@ console.error = function (...args) {
 };
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <React.StrictMode>
-    <ErrorBoundary>
-      <Context>
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      </Context>
-    </ErrorBoundary>
-  </React.StrictMode>
+  <ErrorBoundary>
+    <Context>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </Context>
+  </ErrorBoundary>
 );

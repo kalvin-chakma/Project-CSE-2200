@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -23,8 +23,10 @@ import UserOrders from "./components/UserOrders";
 import About from "./components/About";
 import Contact from "./components/Contact";
 import Wishlist from "./components/Wishlist";
+import { productContext } from "./utills/Context";
 
 export default function App() {
+  const [products] = useContext(productContext);
   const [isAuthenticated, setIsAuthenticated] = useState(
     !!localStorage.getItem("jwtToken")
   );
@@ -40,43 +42,24 @@ export default function App() {
     // Keep auth state in sync with storage (e.g., after refresh/login)
     const token = localStorage.getItem("jwtToken");
     setIsAuthenticated(!!token);
-    fetchCategories();
   }, [isAuthenticated]);
 
-  const fetchCategories = async () => {
-    try {
-      let url = "https://project-cse-2200-xi.vercel.app/api/products";
-      let options = {};
-
-      if (isAuthenticated) {
-        const token = localStorage.getItem("token");
-        if (token) {
-          options.headers = {
-            Authorization: `Bearer ${token}`,
-          };
-        }
-      }
-
-      const products = await apiRequest("get", url, null, options);
-      const uniqueCategories = [
-        ...new Set(
-          products.map((product) => product.category.toLowerCase().trim())
-        ),
-      ];
-      setCategories(uniqueCategories);
-      localStorage.setItem("categories", JSON.stringify(uniqueCategories));
-    } catch (error) {
-      console.error("Error fetching categories:", error);
-      if (error.response && error.response.status === 401) {
-        setIsAuthenticated(false);
-        localStorage.removeItem("token");
-        localStorage.removeItem("refreshToken");
-        toast.error("Session expired. Please log in again.");
-      } else {
-        toast.error("Error fetching categories");
-      }
+  useEffect(() => {
+    if (!products || products.length === 0) {
+      setCategories([]);
+      return;
     }
-  };
+    const uniqueCategories = [
+      ...new Set(
+        products
+          .map((product) => product.category)
+          .filter(Boolean)
+          .map((c) => c.toLowerCase().trim())
+      ),
+    ];
+    setCategories(uniqueCategories);
+    localStorage.setItem("categories", JSON.stringify(uniqueCategories));
+  }, [products]);
 
   const addCategory = (newCategory) => {
     const normalizedCategory = newCategory.toLowerCase().trim();

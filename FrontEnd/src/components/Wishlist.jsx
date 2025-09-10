@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { ThreeDots } from "react-loader-spinner";
 
 const Wishlist = () => {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
-
-  const baseUrl = "https://project-cse-2200-xi.vercel.app/"; // adjust if needed
 
   const fetchWishlist = async () => {
     try {
@@ -16,7 +15,7 @@ const Wishlist = () => {
         navigate("/LogInPage");
         return;
       }
-      const res = await fetch(`${baseUrl}/api/wishlist`, {
+      const res = await fetch("https://project-cse-2200-xi.vercel.app/api/wishlist", {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) throw new Error("Failed to fetch wishlist");
@@ -36,7 +35,7 @@ const Wishlist = () => {
   const removeFromWishlist = async (productId) => {
     try {
       const token = localStorage.getItem("jwtToken");
-      const res = await fetch(`${baseUrl}/api/wishlist/remove/${productId}`, {
+      const res = await fetch(`https://project-cse-2200-xi.vercel.app/api/wishlist/remove/${productId}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -47,7 +46,20 @@ const Wishlist = () => {
     }
   };
 
-  if (loading) return <div className="p-6">Loading...</div>;
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-100">
+        <ThreeDots
+          height="80"
+          width="80"
+          radius="9"
+          color="#10B981"
+          ariaLabel="three-dots-loading"
+          visible={true}
+        />
+      </div>
+    );
+  }
   if (error)
     return <div className="p-6 text-red-600">Error loading wishlist: {error}</div>;
 
@@ -90,5 +102,3 @@ const Wishlist = () => {
 };
 
 export default Wishlist;
-
-

@@ -159,7 +159,10 @@ function Home({ categories, isAuthenticated, selectedCategory, sortOrder }) {
             `https://project-cse-2200-xi.vercel.app/api/wishlist/remove/${product._id}`,
             { method: "DELETE", headers: { Authorization: `Bearer ${token}` } }
           );
-          if (!res.ok) throw new Error("Failed to remove from wishlist");
+          if (!res.ok) {
+            const errorData = await res.json().catch(() => ({}));
+            throw new Error(errorData.message || "Failed to remove from wishlist");
+          }
           toast.success("Removed from wishlist");
           const updated = favorites.filter((f) => f._id !== product._id);
           setFavorites(updated);
@@ -173,7 +176,10 @@ function Home({ categories, isAuthenticated, selectedCategory, sortOrder }) {
             },
             body: JSON.stringify({ productId: product._id }),
           });
-          if (!res.ok) throw new Error("Failed to add to wishlist");
+          if (!res.ok) {
+            const errorData = await res.json().catch(() => ({}));
+            throw new Error(errorData.message || "Failed to add to wishlist");
+          }
           toast.success("Added to wishlist");
           const updated = [...favorites, product];
           setFavorites(updated);

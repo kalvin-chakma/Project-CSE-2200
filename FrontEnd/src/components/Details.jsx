@@ -3,7 +3,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import { productContext } from "../utills/Context";
 import { ThreeDots } from "react-loader-spinner";
 import { CiStar } from "react-icons/ci";
-import { FaStar } from "react-icons/fa";
+import { FaStar, FaHeart } from "react-icons/fa";
+import { toast } from "react-toastify";
 
 const Details = () => {
   const [products, setProducts] = useContext(productContext);
@@ -26,22 +27,27 @@ const Details = () => {
   const [userRole, setUserRole] = useState(null);
   const [reviewRating, setReviewRating] = useState(5);
   const [reviewComment, setReviewComment] = useState("");
+  const [isInWishlist, setIsInWishlist] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
     const fetchUserRole = async () => {
       try {
         const token = localStorage.getItem("jwtToken");
-        const response = await fetch(
-          "https://project-cse-2200-xi.vercel.app/api/user/role",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
+        if (token) {
+          setIsAuthenticated(true);
+          const response = await fetch(
+            "http://localhost:8080/api/user/role",
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+          if (response.ok) {
+            const data = await response.json();
+            setUserRole(data.role);
           }
-        );
-        if (response.ok) {
-          const data = await response.json();
-          setUserRole(data.role);
         }
       } catch (error) {
         console.error("Error fetching user data:", error);
@@ -50,6 +56,36 @@ const Details = () => {
 
     fetchUserRole();
   }, []);
+
+  useEffect(() => {
+    const checkWishlistStatus = async () => {
+      try {
+        const token = localStorage.getItem("jwtToken");
+        if (!token || !id) return;
+
+        const response = await fetch(
+          "http://localhost:8080/api/wishlist",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (response.ok) {
+          const data = await response.json();
+          const isInWishlist = (data.items || []).some(
+            (item) => item.product?._id === id
+          );
+          setIsInWishlist(isInWishlist);
+        }
+      } catch (error) {
+        console.error("Error checking wishlist status:", error);
+      }
+    };
+
+    checkWishlistStatus();
+  }, [id]);
 
   useEffect(() => {
     if (!id) {
@@ -64,7 +100,7 @@ const Details = () => {
       try {
         const token = localStorage.getItem("jwtToken");
         const response = await fetch(
-          `https://project-cse-2200-xi.vercel.app/api/products/${id}`,
+          `http://localhost:8080/api/products/${id}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -100,7 +136,7 @@ const Details = () => {
     try {
       const token = localStorage.getItem("jwtToken");
       const response = await fetch(
-        `https://project-cse-2200-xi.vercel.app/api/products/${id}`,
+        `http://localhost:8080/api/products/${id}`,
         {
           method: "DELETE",
           headers: {
@@ -135,7 +171,7 @@ const Details = () => {
     try {
       const token = localStorage.getItem("jwtToken");
       const response = await fetch(
-        `https://project-cse-2200-xi.vercel.app/api/products/${id}`,
+        `http://localhost:8080/api/products/${id}`,
         {
           method: "PUT",
           headers: {
@@ -170,7 +206,7 @@ const Details = () => {
       }
 
       const response = await fetch(
-        `https://project-cse-2200-xi.vercel.app/api/products/${id}/reviews`,
+        `http://localhost:8080/api/products/${id}/reviews`,
         {
           method: "POST",
           headers: {
@@ -212,7 +248,7 @@ const Details = () => {
     try {
       const userId = localStorage.getItem("userId");
       const response = await fetch(
-        "https://project-cse-2200-xi.vercel.app/api/cart/add",
+        "http://localhost:8080/api/cart/add",
         {
           method: "POST",
           headers: {
@@ -238,6 +274,63 @@ const Details = () => {
     } catch (error) {
       console.error("Error adding product to cart:", error);
       setError(`Failed to add product to cart: ${error.message}`);
+    }
+  };
+
+  const handleWishlistToggle = async () => {
+    if (!isAuthenticated) {
+      toast.error("Please log in to add items to your wishlist.");
+      navigate("/LogInPage");
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("jwtToken");
+
+      if (isInWishlist) {
+        // Remove from wishlist
+        const response = await fetch(
+          `http://localhost:8080/api/wishlist/remove/${id}`,
+          {
+            method: "DELETE",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.message || "Failed to remove from wishlist");
+        }
+
+        setIsInWishlist(false);
+        toast.success("Removed from wishlist");
+      } else {
+        // Add to wishlist
+        const response = await fetch(
+          "http://localhost:8080/api/wishlist/add",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ productId: id }),
+          }
+        );
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.message || "Failed to add to wishlist");
+        }
+
+        setIsInWishlist(true);
+        toast.success("Added to wishlist");
+      }
+    } catch (error) {
+      console.error("Error toggling wishlist:", error);
+      toast.error(error.message);
     }
   };
 
@@ -284,12 +377,12 @@ const Details = () => {
             />
             <button className="absolute top-2 left-2 bg-white rounded-full p-1 shadow-md">
               <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"/>
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
               </svg>
             </button>
             <button className="absolute top-2 right-2 bg-white rounded-full p-1 shadow-md">
               <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"/>
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
               </svg>
             </button>
           </div>
@@ -422,16 +515,16 @@ const Details = () => {
               <div>
                 <span className="block text-sm font-medium text-gray-700 mb-1">Sizes</span>
                 <div className="flex gap-4">
-                  {['s','m','xl','xxl'].map((sz) => (
+                  {['s', 'm', 'xl', 'xxl'].map((sz) => (
                     <label key={sz} className="inline-flex items-center gap-2">
                       <input
                         type="checkbox"
                         checked={Array.isArray(editProduct.sizes) && editProduct.sizes.includes(sz)}
                         onChange={(e) => {
                           if (e.target.checked) {
-                            setEditProduct({ ...editProduct, sizes: Array.from(new Set([...(editProduct.sizes||[]), sz])) });
+                            setEditProduct({ ...editProduct, sizes: Array.from(new Set([...(editProduct.sizes || []), sz])) });
                           } else {
-                            setEditProduct({ ...editProduct, sizes: (editProduct.sizes||[]).filter((v) => v !== sz) });
+                            setEditProduct({ ...editProduct, sizes: (editProduct.sizes || []).filter((v) => v !== sz) });
                           }
                         }}
                       />
@@ -474,31 +567,48 @@ const Details = () => {
                   </button>
                 </>
               ) : (
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center border rounded-md">
+                <div className="flex flex-col gap-4">
+
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center border rounded-md">
+                      <button
+                        onClick={() => setQuantity((prev) => (prev > 1 ? prev - 1 : 1))}
+                        className="px-3 py-2 bg-gray-200 hover:bg-gray-300 focus:outline-none"
+                        aria-label="Decrease quantity"
+                      >
+                        -
+                      </button>
+                      <span className="px-4 py-2 text-gray-800">{quantity}</span>
+                      <button
+                        onClick={() => setQuantity((prev) => prev + 1)}
+                        className="px-3 py-2 bg-gray-200 hover:bg-gray-300 focus:outline-none"
+                        aria-label="Increase quantity"
+                      >
+                        +
+                      </button>
+                    </div>
                     <button
-                      onClick={() => setQuantity((prev) => (prev > 1 ? prev - 1 : 1))}
-                      className="px-3 py-2 bg-gray-200 hover:bg-gray-300 focus:outline-none"
-                      aria-label="Decrease quantity"
+                      onClick={handleAddToCart}
+                      className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
                     >
-                      -
-                    </button>
-                    <span className="px-4 py-2 text-gray-800">{quantity}</span>
-                    <button
-                      onClick={() => setQuantity((prev) => prev + 1)}
-                      className="px-3 py-2 bg-gray-200 hover:bg-gray-300 focus:outline-none"
-                      aria-label="Increase quantity"
-                    >
-                      +
+                      Add to Cart
                     </button>
                   </div>
-                  <button
-                    onClick={handleAddToCart}
-                    className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
-                  >
-                    Add to Cart
-                  </button>
+
+                  <div>
+                    <button
+                      onClick={handleWishlistToggle}
+                      className={`px-4 py-2 rounded-md focus:outline-none transition-colors duration-200 ${isInWishlist
+                        ? "bg-pink-600 text-white hover:bg-pink-700"
+                        : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                        }`}
+                      title={isInWishlist ? "Remove from wishlist" : "Add to wishlist"}
+                    >
+                      {isInWishlist ? "Remove from Wishlist" : "Add to Wishlist"}
+                    </button>
+                  </div>
                 </div>
+
               )}
             </div>
           )}

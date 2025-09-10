@@ -26,18 +26,25 @@ router.get('/', verifyToken, async (req, res) => {
 router.post('/add', verifyToken, async (req, res) => {
   try {
     const { productId } = req.body;
-    if (!productId) return res.status(400).json({ message: 'productId required' });
-    if (!mongoose.Types.ObjectId.isValid(productId)) {
-      return res.status(400).json({ message: 'Invalid productId' });
+    if (!productId) {
+      return res.status(400).json({ message: 'productId required', success: false });
     }
+    if (!mongoose.Types.ObjectId.isValid(productId)) {
+      return res.status(400).json({ message: 'Invalid productId', success: false });
+    }
+    
     const product = await Product.findById(productId);
-    if (!product) return res.status(404).json({ message: 'Product not found' });
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found', success: false });
+    }
 
-    const doc = await WishlistItem.findOneAndUpdate(
-      { userId: req.user.id, productId },
-      { $setOnInsert: { userId: req.user.id, productId } },
-      { new: true, upsert: true }
-    );
+    // Check if item already exists in wishlist
+    const existingItem = await WishlistItem.findOne({ userId: req.user.id, productId });
+    if (existingItem) {
+      return res.status(200).json({ message: 'Product already in wishlist', item: existingItem, success: true });
+    }
+
+    const doc = await WishlistItem.create({ userId: req.user.id, productId });
     res.status(201).json({ message: 'Added to wishlist', item: doc, success: true });
   } catch (error) {
     console.error('Error adding to wishlist:', error);
@@ -50,9 +57,14 @@ router.delete('/remove/:productId', verifyToken, async (req, res) => {
   try {
     const { productId } = req.params;
     if (!mongoose.Types.ObjectId.isValid(productId)) {
-      return res.status(400).json({ message: 'Invalid productId' });
+      return res.status(400).json({ message: 'Invalid productId', success: false });
     }
-    await WishlistItem.findOneAndDelete({ userId: req.user.id, productId });
+    
+    const deletedItem = await WishlistItem.findOneAndDelete({ userId: req.user.id, productId });
+    if (!deletedItem) {
+      return res.status(404).json({ message: 'Item not found in wishlist', success: false });
+    }
+    
     res.json({ message: 'Removed from wishlist', success: true });
   } catch (error) {
     console.error('Error removing from wishlist:', error);
