@@ -7,10 +7,10 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 
-// Ensure uploads directory exists
+// Ensure uploads directory exists (only in development)
 const uploadsDir = path.join(__dirname, '..', 'uploads');
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir);
+if (process.env.NODE_ENV !== 'production' && !fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
 }
 
 // Multer storage
@@ -106,6 +106,14 @@ router.put('/:id', async (req, res) => {
 // Upload product image
 router.post('/upload', upload.single('image'), async (req, res) => {
   try {
+    // In production, file uploads should be handled by cloud storage
+    if (process.env.NODE_ENV === 'production') {
+      return res.status(501).json({ 
+        message: 'File uploads not supported in production. Use cloud storage instead.',
+        success: false 
+      });
+    }
+    
     if (!req.file) {
       return res.status(400).json({ message: 'No file uploaded' });
     }

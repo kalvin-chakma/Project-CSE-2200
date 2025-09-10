@@ -6,6 +6,12 @@ const connectDB = require("./Models/db"); // Initialize MongoDB connection
 // Connect to database
 connectDB();
 
+// Add request logging for debugging
+app.use((req, res, next) => {
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
+  next();
+});
+
 // Handle uncaught exceptions
 process.on('uncaughtException', (err) => {
   console.error('Uncaught Exception:', err);
@@ -19,7 +25,7 @@ process.on('unhandledRejection', (err) => {
 });
 const bodyParser = require("body-parser");
 const cors = require("cors");
-
+const path = require("path");
 
 // Import routers
 const AuthRouter = require("./Routes/AuthRouter");
@@ -42,6 +48,17 @@ app.get("/health", (req, res) => {
     status: "OK",
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
+    environment: process.env.NODE_ENV || 'development',
+    nodeVersion: process.version,
+    platform: process.platform
+  });
+});
+
+// Test endpoint for debugging
+app.get("/test", (req, res) => {
+  res.status(200).json({
+    message: "Backend is working!",
+    timestamp: new Date().toISOString(),
     environment: process.env.NODE_ENV || 'development'
   });
 });
@@ -49,6 +66,11 @@ app.get("/health", (req, res) => {
 // Middleware
 app.use(cors()); // Enable CORS for all routes
 app.use(bodyParser.json()); // Parse application/json requests
+
+// Serve uploads statically (only in development or if uploads exist)
+if (process.env.NODE_ENV !== 'production') {
+  app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+}
 
 
 // Authentication routes
@@ -93,8 +115,4 @@ if (process.env.NODE_ENV === 'production') {
     console.log(`Server is running on port ${PORT}`);
   });
 }
-
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
 
