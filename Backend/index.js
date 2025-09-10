@@ -4,6 +4,7 @@ require("dotenv").config();
 require("./Models/db"); // Initialize MongoDB connection
 const bodyParser = require("body-parser");
 const cors = require("cors");
+const path = require("path");
 
 // Import routers
 const AuthRouter = require("./Routes/AuthRouter");
@@ -12,6 +13,7 @@ const cartRoutes = require('./Routes/cartRoutes');
 const AdminRouter = require('./Routes/AdminRouter');
 const OrderRoutes = require('./Routes/OrderRoutes');
 const UserRouter = require('./Routes/UserRouter');
+const WishlistRoutes = require('./Routes/wishlistRoutes');
 
 
 
@@ -23,6 +25,8 @@ app.get("/ping", (req, res) => {
 // Middleware
 app.use(cors()); // Enable CORS for all routes
 app.use(bodyParser.json()); // Parse application/json requests
+// Serve uploads statically
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Authentication routes
 app.use("/auth", AuthRouter);
@@ -33,6 +37,7 @@ app.use("/api/products", products);
 app.use('/api/cart', cartRoutes);
 app.use('/api/admin',  AdminRouter);
 app.use('/api/orders', OrderRoutes); 
+app.use('/api/wishlist', WishlistRoutes);
 
 // Error handling middleware (must be placed after all routes/middleware)
 app.use((err, req, res, next) => {

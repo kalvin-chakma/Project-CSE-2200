@@ -63,10 +63,17 @@ router.get('/:userId', async (req, res) => {
 
     const cartItems = await CartItem.find({ userId }).populate('productId');
 
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    const toAbsolute = (url) => {
+      if (!url) return url;
+      return url.startsWith('/uploads/') ? `${baseUrl}${url}` : url;
+    };
+
     const formattedCart = cartItems.map(item => ({
       productId: item.productId?._id || null,
       title: item.productId?.title || 'Product not found',
       price: item.productId?.price || 0,
+      image: toAbsolute(item.productId?.image || null),
       quantity: item.quantity
     }));
 

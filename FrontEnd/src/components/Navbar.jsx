@@ -204,6 +204,13 @@ const Navbar = ({ categories, isAuthenticated, onCategoryChange }) => {
             ) : (
               <Link
                 to="/LogInPage"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setShowProfileDropdown(false);
+                  setShowCategoryDropdown(false);
+                  setShowMobileMenu(false);
+                  navigate('/LogInPage');
+                }}
                 className={`${navLinkStyle} ml-3 flex items-center`}
               >
                 <FaUser className="mr-1" />

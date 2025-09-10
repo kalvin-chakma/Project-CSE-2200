@@ -11,7 +11,7 @@ const Context = ({ children }) => {
     const fetchProducts = async () => {
       try {
         const response = await axios.get(
-          "https://project-cse-2200.vercel.app/api/products"
+          "https://project-cse-2200-xi.vercel.app/api/products"
         );
         setProducts(response.data);
       } catch (error) {

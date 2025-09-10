@@ -9,7 +9,7 @@ export const refreshTokens = async () => {
 
   try {
     const response = await axios.post(
-      "https://project-cse-2200.vercel.app/auth/refresh-token",
+      "https://project-cse-2200-xi.vercel.app/auth/refresh-token",
       { refreshToken }
     );
     const {

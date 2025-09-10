@@ -28,7 +28,7 @@ const AdminOrderPage = () => {
       }
 
       const response = await axios.get(
-        "https://project-cse-2200.vercel.app/api/orders/all",
+        "https://project-cse-2200-xi.vercel.app/api/orders/all",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -66,7 +66,7 @@ const AdminOrderPage = () => {
         }
 
         await axios.delete(
-          `https://project-cse-2200.vercel.app/api/orders/${orderId}`,
+          `https://project-cse-2200-xi.vercel.app/api/orders/${orderId}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -94,7 +94,7 @@ const AdminOrderPage = () => {
       }
 
       await axios.put(
-        `https://project-cse-2200.vercel.app/api/orders/${orderId}/status`,
+        `https://project-cse-2200-xi.vercel.app/api/orders/${orderId}/status`,
         { status: newStatus },
         { headers: { Authorization: `Bearer ${token}` } }
       );

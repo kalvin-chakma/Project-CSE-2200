@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "./FormElement/Sidebar";
 import { ThreeDots } from "react-loader-spinner";
+import { FaBars } from "react-icons/fa";
 
 const CartPage = () => {
   const [cartItems, setCartItems] = useState([]);
@@ -9,14 +10,12 @@ const CartPage = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
   const userId = localStorage.getItem("userId");
-  const [sidebarVisible, setSidebarVisible] = useState(true);
+  const [sidebarVisible, setSidebarVisible] = useState(false);
 
   useEffect(() => {
     if (userId) {
-      console.log("Fetching cart items for user:", userId);
       fetchCartItems();
     } else {
-      console.log("User not logged in");
       setError("User not logged in");
       setLoading(false);
     }
@@ -25,17 +24,12 @@ const CartPage = () => {
   const fetchCartItems = async () => {
     setLoading(true);
     try {
-      const response = await fetch(
-        `https://project-cse-2200.vercel.app/api/cart/${userId}`
-      );
-      if (!response.ok) {
-        throw new Error("Failed to fetch cart items");
-      }
+      const response = await fetch(`https://project-cse-2200-xi.vercel.app/api/cart/${userId}`);
+      if (!response.ok) throw new Error("Failed to fetch cart items");
+
       const data = await response.json();
-      console.log("Received cart items:", data);
       setCartItems(data);
     } catch (error) {
-      console.error("Error fetching cart items:", error);
       setError(error.message);
     } finally {
       setLoading(false);
@@ -45,19 +39,13 @@ const CartPage = () => {
   const updateQuantity = async (e, productId, newQuantity) => {
     e.preventDefault();
     try {
-      const response = await fetch(
-        `https://project-cse-2200.vercel.app/api/cart/update`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ userId, productId, quantity: newQuantity }),
-        }
-      );
-      if (!response.ok) {
-        throw new Error("Failed to update quantity");
-      }
+      const response = await fetch(`https://project-cse-2200-xi.vercel.app/api/cart/update`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId, productId, quantity: newQuantity }),
+      });
+      if (!response.ok) throw new Error("Failed to update quantity");
+
       setCartItems((prevItems) =>
         prevItems.map((item) =>
           item.productId === productId
@@ -66,7 +54,6 @@ const CartPage = () => {
         )
       );
     } catch (error) {
-      console.error("Error updating quantity:", error);
       setError(error.message);
     }
   };
@@ -74,24 +61,17 @@ const CartPage = () => {
   const removeItem = async (e, productId) => {
     e.preventDefault();
     try {
-      const response = await fetch(
-        `https://project-cse-2200.vercel.app/api/cart/remove`,
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ userId, productId }),
-        }
-      );
-      if (!response.ok) {
-        throw new Error("Failed to remove item");
-      }
+      const response = await fetch(`https://project-cse-2200-xi.vercel.app/api/cart/remove`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId, productId }),
+      });
+      if (!response.ok) throw new Error("Failed to remove item");
+
       setCartItems((prevItems) =>
         prevItems.filter((item) => item.productId !== productId)
       );
     } catch (error) {
-      console.error("Error removing item:", error);
       setError(error.message);
     }
   };
@@ -105,120 +85,122 @@ const CartPage = () => {
     navigate("/payment", { state: { items: cartItems, totalAmount } });
   };
 
-  if (loading) {
-    return (
-      <div className="flex h-screen">
-        {sidebarVisible && (
-          <div className="w-1/5 min-w-[200px]">
-            <Sidebar />
-          </div>
-        )}
-        <div
-          className={`w-${
-            sidebarVisible ? "4/5" : "full"
-          } flex justify-center items-center`}
-        >
-          <div className="flex justify-center items-center h-screen">
-            <ThreeDots color="#00BFFF" height={80} width={80} />
-          </div>
-        </div>
+  const renderLoader = () => (
+    <div className="flex flex-col md:flex-row h-screen">
+      <SidebarContainer />
+      <div className="flex-1 flex items-center justify-center">
+        <ThreeDots color="#00BFFF" height={80} width={80} />
       </div>
-    );
-  }
+    </div>
+  );
 
-  if (error) {
-    return (
-      <div className="flex h-screen">
-        {sidebarVisible && (
-          <div className="w-1/5 min-w-[200px]">
-            <Sidebar />
-          </div>
-        )}
-        <div
-          className={`w-${
-            sidebarVisible ? "4/5" : "full"
-          } flex justify-center items-center`}
-        >
-          <div className="text-red-500">{error}</div>
-        </div>
+  const renderError = () => (
+    <div className="flex flex-col md:flex-row h-screen">
+      <SidebarContainer />
+      <div className="flex-1 flex items-center justify-center text-red-600">
+        {error}
       </div>
-    );
-  }
+    </div>
+  );
+
+  const SidebarContainer = () => (
+    <>
+      {/* Toggle Sidebar on Mobile */}
+      <button
+        className="md:hidden absolute top-4 left-4 z-50 text-2xl"
+        onClick={() => setSidebarVisible(!sidebarVisible)}
+      >
+        <FaBars />
+      </button>
+
+      {/* Sidebar */}
+      <div
+        className={`fixed md:static z-40 top-0 left-0 h-full transition-transform duration-300
+          ${sidebarVisible ? "translate-x-0" : "-translate-x-full"} 
+          md:translate-x-0 w-64 bg-white shadow-lg`}
+      >
+        <Sidebar />
+      </div>
+    </>
+  );
+
+  if (loading) return renderLoader();
+  if (error) return renderError();
 
   return (
-    <>
-      <div className="flex flex-col w-full h-screen">
-        <div className="flex flex-grow overflow-hidden">
-          <div className="min-w-[200px]">
-            <Sidebar />
-          </div>
-          <div className="w-2/3 p-4 mx-auto">
-            <h1 className="max-w-2xl mx-auto text-center font-bold text-2xl mb-10">
-              Your Cart
-            </h1>
-            {cartItems.length === 0 ? (
-              <p className="flex justify-center items-center h-full">
-                Your cart is empty.
-              </p>
-            ) : (
-              <div>
-                {cartItems.map((item) => (
-                  <div
-                    key={item.productId}
-                    className="flex items-center justify-between border-b py-2 mb-4 shadow-[0_3px_10px_rgb(0,0,0,0.2)] p-5 h-40"
-                  >
-                    <div className="flex flex-col w-80 overflow-hidden text-ellipsis">
-                      <h2 className="font-semibold">{item.title}</h2>
-                      <p className="flex">Price: ${item.price}</p>
-                    </div>
+    <div className="flex flex-col md:flex-row min-h-screen">
+      <SidebarContainer />
 
-                    <div className="flex items-center space-x-4">
-                      <button
-                        onClick={(e) =>
-                          updateQuantity(
-                            e,
-                            item.productId,
-                            Math.max(1, item.quantity - 1)
-                          )
-                        }
-                        className="px-2 py-1 bg-gray-200 rounded-md"
-                      >
-                        -
-                      </button>
-                      <span>{item.quantity}</span>
-                      <button
-                        onClick={(e) =>
-                          updateQuantity(e, item.productId, item.quantity + 1)
-                        }
-                        className="px-2 py-1 bg-gray-200 rounded-md"
-                      >
-                        +
-                      </button>
-                    </div>
-                    <div>
-                      <button
-                        onClick={(e) => removeItem(e, item.productId)}
-                        className="px-2 py-1 bg-red-500 text-white rounded-md"
-                      >
-                        Remove
-                      </button>
-                    </div>
-                  </div>
-                ))}
-                <div className="flex justify-center mt-6">
+      <div className="flex-1 p-4 mt-16 md:mt-0">
+        <h1 className="text-3xl font-bold text-center mb-6">Your Cart</h1>
+
+        {cartItems.length === 0 ? (
+          <p className="text-center text-lg text-gray-600">
+            Your cart is empty.
+          </p>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {cartItems.map((item) => (
+              <div
+                key={item.productId}
+                className="border rounded-lg shadow-lg p-4 flex flex-col items-center justify-between"
+              >
+                <img
+                  src={item.image || "https://via.placeholder.com/100"}
+                  alt={item.title}
+                  className="w-24 h-24 object-contain mb-4"
+                />
+                <h2 className="text-md font-semibold text-center">
+                  {item.title}
+                </h2>
+                <p className="text-sm text-gray-700 mb-2">
+                  Price: ${item.price}
+                </p>
+
+                <div className="flex items-center mb-3 space-x-2">
+                  <button
+                    onClick={(e) =>
+                      updateQuantity(
+                        e,
+                        item.productId,
+                        Math.max(1, item.quantity - 1)
+                      )
+                    }
+                    className="px-2 py-1 bg-gray-200 rounded-md"
+                  >
+                    -
+                  </button>
+                  <span>{item.quantity}</span>
+                  <button
+                    onClick={(e) =>
+                      updateQuantity(e, item.productId, item.quantity + 1)
+                    }
+                    className="px-2 py-1 bg-gray-200 rounded-md"
+                  >
+                    +
+                  </button>
+                </div>
+
+                <div className="flex space-x-2">
+                  <button
+                    onClick={(e) => removeItem(e, item.productId)}
+                    className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600"
+                  >
+                    Remove
+                  </button>
                   <button
                     onClick={handleBuyNow}
-                    className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600"
+                    className="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600"
                   >
                     Buy Now
                   </button>
                 </div>
               </div>
-            )}
+            ))}
           </div>
-        </div>
+        )}
       </div>
-    </>
+    </div>
   );
 };
 

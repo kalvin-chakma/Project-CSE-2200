@@ -3,12 +3,40 @@ const router = express.Router();
 const Product = require('../Models/Product'); // Ensure the correct path
 const UserModel = require('../Models/user');
 const { verifyToken } = require('../Middlewares/authMiddleware');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
+
+// Ensure uploads directory exists
+const uploadsDir = path.join(__dirname, '..', 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir);
+}
+
+// Multer storage
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, uploadsDir);
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+    const ext = path.extname(file.originalname) || '.jpg';
+    cb(null, 'product-' + uniqueSuffix + ext);
+  },
+});
+const upload = multer({ storage });
 
 // Get all products
 router.get('/', async (req, res) => {
   try {
     const products = await Product.find();
-    res.json(products);
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    const toAbsolute = (url) => (url && url.startsWith('/uploads/') ? `${baseUrl}${url}` : url);
+    const mapped = products.map(p => ({
+      ...p.toObject(),
+      image: toAbsolute(p.image),
+    }));
+    res.json(mapped);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -19,7 +47,10 @@ router.get('/:id', async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
     if (!product) return res.status(404).json({ message: 'Product not found' });
-    res.json(product);
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    const toAbsolute = (url) => (url && url.startsWith('/uploads/') ? `${baseUrl}${url}` : url);
+    const mapped = { ...product.toObject(), image: toAbsolute(product.image) };
+    res.json(mapped);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -31,6 +62,8 @@ router.post('/', async (req, res) => {
     title: req.body.title,
     category: req.body.category,
     price: req.body.price,
+    gender: req.body.gender || 'unisex',
+    sizes: Array.isArray(req.body.sizes) ? req.body.sizes : [],
     description: req.body.description,
     image: req.body.image,
   });
@@ -52,6 +85,10 @@ router.put('/:id', async (req, res) => {
     product.title = req.body.title || product.title;
     product.category = req.body.category || product.category;
     product.price = req.body.price || product.price;
+    product.gender = req.body.gender || product.gender;
+    if (req.body.sizes) {
+      product.sizes = Array.isArray(req.body.sizes) ? req.body.sizes : product.sizes;
+    }
     product.description = req.body.description || product.description;
     product.image = req.body.image || product.image;
 
@@ -59,6 +96,19 @@ router.put('/:id', async (req, res) => {
     res.json(updatedProduct);
   } catch (error) {
     res.status(400).json({ message: error.message });
+  }
+});
+
+// Upload product image
+router.post('/upload', upload.single('image'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: 'No file uploaded' });
+    }
+    const fileUrl = `/uploads/${req.file.filename}`;
+    res.status(201).json({ url: fileUrl });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 });
 

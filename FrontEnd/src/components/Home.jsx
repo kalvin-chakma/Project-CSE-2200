@@ -99,6 +99,29 @@ function Home({ categories, isAuthenticated, selectedCategory, sortOrder }) {
     const storedFavorites = JSON.parse(localStorage.getItem("favorites")) || [];
     setFavorites(storedFavorites);
   }, []);
+  useEffect(() => {
+    const fetchWishlist = async () => {
+      try {
+        const token = localStorage.getItem("jwtToken");
+        if (!token) return;
+        const res = await fetch("https://project-cse-2200-xi.vercel.app/api/wishlist", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (res.ok) {
+          const data = await res.json();
+          const favs = (data.items || []).map((it) => it.product?._id).filter(Boolean);
+          localStorage.setItem(
+            "favorites",
+            JSON.stringify((data.items || []).map((it) => it.product))
+          );
+          setFavorites((data.items || []).map((it) => it.product));
+        }
+      } catch (e) {
+        // silent
+      }
+    };
+    fetchWishlist();
+  }, []);
 
   const handleSearchChange = (value) => {
     setSearchQuery(value);
@@ -127,20 +150,40 @@ function Home({ categories, isAuthenticated, selectedCategory, sortOrder }) {
       toast.error("Please log in to add items to your favorites.");
       return;
     }
-
-    const newFavorites = [...favorites];
-    const index = newFavorites.findIndex((fav) => fav._id === product._id);
-
-    if (index !== -1) {
-      newFavorites.splice(index, 1);
-      toast.success("Removed from favorites");
-    } else {
-      newFavorites.push(product);
-      toast.success("Added to favorites");
-    }
-
-    setFavorites(newFavorites);
-    localStorage.setItem("favorites", JSON.stringify(newFavorites));
+    const toggle = async () => {
+      try {
+        const token = localStorage.getItem("jwtToken");
+        const exists = favorites.some((fav) => fav._id === product._id);
+        if (exists) {
+          const res = await fetch(
+            `https://project-cse-2200-xi.vercel.app/api/wishlist/remove/${product._id}`,
+            { method: "DELETE", headers: { Authorization: `Bearer ${token}` } }
+          );
+          if (!res.ok) throw new Error("Failed to remove from wishlist");
+          toast.success("Removed from wishlist");
+          const updated = favorites.filter((f) => f._id !== product._id);
+          setFavorites(updated);
+          localStorage.setItem("favorites", JSON.stringify(updated));
+        } else {
+          const res = await fetch(`https://project-cse-2200-xi.vercel.app/api/wishlist/add`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ productId: product._id }),
+          });
+          if (!res.ok) throw new Error("Failed to add to wishlist");
+          toast.success("Added to wishlist");
+          const updated = [...favorites, product];
+          setFavorites(updated);
+          localStorage.setItem("favorites", JSON.stringify(updated));
+        }
+      } catch (e) {
+        toast.error(e.message);
+      }
+    };
+    toggle();
   };
 
   const isFavorite = (productId) => {

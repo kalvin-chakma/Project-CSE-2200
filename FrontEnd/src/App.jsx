@@ -22,6 +22,7 @@ import AdminOrderPage from "./components/AdminOrderPage";
 import UserOrders from "./components/UserOrders";
 import About from "./components/About";
 import Contact from "./components/Contact";
+import Wishlist from "./components/Wishlist";
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -39,7 +40,7 @@ export default function App() {
 
   const fetchCategories = async () => {
     try {
-      let url = "https://project-cse-2200.vercel.app/api/products";
+      let url = "https://project-cse-2200-xi.vercel.app/api/products";
       let options = {};
 
       if (isAuthenticated) {
@@ -156,6 +157,7 @@ export default function App() {
           }
         />
         <Route path="/details/:id" element={<Details />} />
+        <Route path="/wishlist" element={<PrivateRoute element={<Wishlist />} />} />
         <Route
           path="/dashboard"
           element={<PrivateRoute element={<Dashboard />} />}
