@@ -31,7 +31,7 @@ router.get('/', async (req, res) => {
   try {
     const products = await Product.find();
     const baseUrl = process.env.NODE_ENV === 'production' 
-      ? 'https://project-cse-2200-xi.vercel.app' 
+      ? process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : `${req.protocol}://${req.get('host')}`
       : `${req.protocol}://${req.get('host')}`;
     const toAbsolute = (url) => (url && url.startsWith('/uploads/') ? `${baseUrl}${url}` : url);
     const mapped = products.map(p => ({
@@ -50,7 +50,7 @@ router.get('/:id', async (req, res) => {
     const product = await Product.findById(req.params.id);
     if (!product) return res.status(404).json({ message: 'Product not found' });
     const baseUrl = process.env.NODE_ENV === 'production' 
-      ? 'https://project-cse-2200-xi.vercel.app' 
+      ? process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : `${req.protocol}://${req.get('host')}`
       : `${req.protocol}://${req.get('host')}`;
     const toAbsolute = (url) => (url && url.startsWith('/uploads/') ? `${baseUrl}${url}` : url);
     const mapped = { ...product.toObject(), image: toAbsolute(product.image) };
