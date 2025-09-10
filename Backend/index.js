@@ -19,7 +19,7 @@ process.on('unhandledRejection', (err) => {
 });
 const bodyParser = require("body-parser");
 const cors = require("cors");
-const path = require("path");
+
 
 // Import routers
 const AuthRouter = require("./Routes/AuthRouter");
@@ -49,8 +49,7 @@ app.get("/health", (req, res) => {
 // Middleware
 app.use(cors()); // Enable CORS for all routes
 app.use(bodyParser.json()); // Parse application/json requests
-// Serve uploads statically
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 
 // Authentication routes
 app.use("/auth", AuthRouter);
@@ -94,3 +93,8 @@ if (process.env.NODE_ENV === 'production') {
     console.log(`Server is running on port ${PORT}`);
   });
 }
+
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
+

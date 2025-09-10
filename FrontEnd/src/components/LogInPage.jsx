@@ -210,3 +210,5 @@ function LogInPage({ setIsAuthenticated }) {
 }
 
 export default LogInPage;
+
+
