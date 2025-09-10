@@ -24,7 +24,7 @@ function LogInPage({ setIsAuthenticated }) {
     }
     setIsLoading(true);
     try {
-      const url = `${API_BASE_URL}/auth/login`;
+      const url = `https://project-cse-2200.vercel.app/auth/login`;
       console.log("Sending request to:", url);
       const response = await fetch(url, {
         method: "POST",
@@ -210,3 +210,4 @@ function LogInPage({ setIsAuthenticated }) {
 }
 
 export default LogInPage;
+
