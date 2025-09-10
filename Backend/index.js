@@ -1,48 +1,46 @@
+// index.js
 const express = require("express");
 const app = express();
 require("dotenv").config();
-const connectDB = require("./Models/db"); // Initialize MongoDB connection
+const connectDB = require("./Models/db"); 
 
-// Connect to database
+const cors = require("cors");
+const bodyParser = require("body-parser");
+const path = require("path");
+
+// Connect to MongoDB
 connectDB();
 
-// Add request logging for debugging
 app.use((req, res, next) => {
   console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
   next();
 });
 
-// Handle uncaught exceptions
-process.on('uncaughtException', (err) => {
-  console.error('Uncaught Exception:', err);
-  process.exit(1);
-});
+app.use(cors());
+app.use(bodyParser.json());
 
-// Handle unhandled promise rejections
-process.on('unhandledRejection', (err) => {
-  console.error('Unhandled Rejection:', err);
-  process.exit(1);
-});
-const bodyParser = require("body-parser");
-const cors = require("cors");
-const path = require("path");
+if (process.env.NODE_ENV !== 'production') {
+  app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+}
 
-// Import routers
+// Routes
 const AuthRouter = require("./Routes/AuthRouter");
+const UserRouter = require('./Routes/UserRouter');
 const products = require("./Routes/products");
 const cartRoutes = require('./Routes/cartRoutes');
 const AdminRouter = require('./Routes/AdminRouter');
 const OrderRoutes = require('./Routes/OrderRoutes');
-const UserRouter = require('./Routes/UserRouter');
 const WishlistRoutes = require('./Routes/wishlistRoutes');
 
+app.use("/auth", AuthRouter);
+app.use("/api/user", UserRouter);
+app.use("/api/products", products);
+app.use("/api/cart", cartRoutes);
+app.use("/api/admin", AdminRouter);
+app.use("/api/orders", OrderRoutes);
+app.use("/api/wishlist", WishlistRoutes);
 
-
-// Health check routes
-app.get("/ping", (req, res) => {
-  res.send("PONG");
-});
-
+app.get("/ping", (req, res) => res.send("PONG"));
 app.get("/health", (req, res) => {
   res.status(200).json({
     status: "OK",
@@ -53,8 +51,6 @@ app.get("/health", (req, res) => {
     platform: process.platform
   });
 });
-
-// Test endpoint for debugging
 app.get("/test", (req, res) => {
   res.status(200).json({
     message: "Backend is working!",
@@ -63,28 +59,7 @@ app.get("/test", (req, res) => {
   });
 });
 
-// Middleware
-app.use(cors()); // Enable CORS for all routes
-app.use(bodyParser.json()); // Parse application/json requests
 
-// Serve uploads statically (only in development or if uploads exist)
-if (process.env.NODE_ENV !== 'production') {
-  app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-}
-
-
-// Authentication routes
-app.use("/auth", AuthRouter);
-
-// Products routes
-app.use("/api/user", UserRouter);
-app.use("/api/products", products);
-app.use('/api/cart', cartRoutes);
-app.use('/api/admin',  AdminRouter);
-app.use('/api/orders', OrderRoutes); 
-app.use('/api/wishlist', WishlistRoutes);
-
-// 404 handler for undefined routes
 app.use('*', (req, res) => {
   res.status(404).json({
     message: 'Route not found',
@@ -93,10 +68,8 @@ app.use('*', (req, res) => {
   });
 });
 
-// Error handling middleware (must be placed after all routes/middleware)
 app.use((err, req, res, next) => {
   console.error("Error:", err);
-  console.error("Error stack:", err.stack);
   res.status(err.status || 500).json({
     message: err.message || "Internal Server Error",
     success: false,
@@ -104,15 +77,22 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Start server
+process.on('uncaughtException', (err) => {
+  console.error(' Uncaught Exception:', err);
+  process.exit(1);
+});
+
+process.on('unhandledRejection', (err) => {
+  console.error(' Unhandled Rejection:', err);
+  process.exit(1);
+});
+
 const PORT = process.env.PORT || 8080;
 
-// For Vercel deployment, we need to export the app
 if (process.env.NODE_ENV === 'production') {
-  module.exports = app;
+  module.exports = app; 
 } else {
   app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+    console.log(` Server is running on http://localhost:${PORT}`);
   });
 }
-
