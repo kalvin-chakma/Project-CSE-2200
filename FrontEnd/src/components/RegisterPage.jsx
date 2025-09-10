@@ -36,7 +36,7 @@ function RegisterPage() {
     setIsLoading(true); // Set loading to true while fetching
 
     try {
-      const url = "https://project-cse-2200-xi.vercel.app//auth/signup";
+      const url = "https://project-cse-2200-xi.vercel.app/auth/signup";
       console.log("Sending request to:", url);
       const response = await fetch(url, {
         method: "POST",

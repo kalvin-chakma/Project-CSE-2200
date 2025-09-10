@@ -24,7 +24,7 @@ const CartPage = () => {
   const fetchCartItems = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`https://project-cse-2200-xi.vercel.app//api/cart/${userId}`);
+      const response = await fetch(`https://project-cse-2200-xi.vercel.app/api/cart/${userId}`);
       if (!response.ok) throw new Error("Failed to fetch cart items");
 
       const data = await response.json();
@@ -39,7 +39,7 @@ const CartPage = () => {
   const updateQuantity = async (e, productId, newQuantity) => {
     e.preventDefault();
     try {
-      const response = await fetch(`https://project-cse-2200-xi.vercel.app//api/cart/update`, {
+      const response = await fetch(`https://project-cse-2200-xi.vercel.app/api/cart/update`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId, productId, quantity: newQuantity }),
@@ -61,7 +61,7 @@ const CartPage = () => {
   const removeItem = async (e, productId) => {
     e.preventDefault();
     try {
-      const response = await fetch(`https://project-cse-2200-xi.vercel.app//api/cart/remove`, {
+      const response = await fetch(`https://project-cse-2200-xi.vercel.app/api/cart/remove`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId, productId }),

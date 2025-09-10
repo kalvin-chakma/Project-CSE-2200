@@ -18,7 +18,7 @@ const OrderPage = () => {
   const fetchOrders = async () => {
     try {
       const response = await axios.get(
-        `https://project-cse-2200-xi.vercel.app//api/orders/user/${userId}`,
+        `https://project-cse-2200-xi.vercel.app/api/orders/user/${userId}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,

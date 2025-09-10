@@ -31,7 +31,7 @@ const Create = ({ addCategory }) => {
       const formData = new FormData();
       formData.append('image', imageFile);
       try {
-        const uploadRes = await fetch('https://project-cse-2200-xi.vercel.app//api/products/upload', {
+        const uploadRes = await fetch('https://project-cse-2200-xi.vercel.app/api/products/upload', {
           method: 'POST',
           body: formData,
         });
@@ -58,7 +58,7 @@ const Create = ({ addCategory }) => {
 
     try {
       const response = await fetch(
-        "https://project-cse-2200-xi.vercel.app//api/products",
+        "https://project-cse-2200-xi.vercel.app/api/products",
         {
           method: "POST",
           headers: {

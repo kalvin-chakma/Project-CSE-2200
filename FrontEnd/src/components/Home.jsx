@@ -104,7 +104,7 @@ function Home({ categories, isAuthenticated, selectedCategory, sortOrder }) {
       try {
         const token = localStorage.getItem("jwtToken");
         if (!token) return;
-        const res = await fetch("https://project-cse-2200-xi.vercel.app//api/wishlist", {
+        const res = await fetch("https://project-cse-2200-xi.vercel.app/api/wishlist", {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (res.ok) {
@@ -156,7 +156,7 @@ function Home({ categories, isAuthenticated, selectedCategory, sortOrder }) {
         const exists = favorites.some((fav) => fav._id === product._id);
         if (exists) {
           const res = await fetch(
-            `https://project-cse-2200-xi.vercel.app//api/wishlist/remove/${product._id}`,
+            `https://project-cse-2200-xi.vercel.app/api/wishlist/remove/${product._id}`,
             { method: "DELETE", headers: { Authorization: `Bearer ${token}` } }
           );
           if (!res.ok) throw new Error("Failed to remove from wishlist");
@@ -165,7 +165,7 @@ function Home({ categories, isAuthenticated, selectedCategory, sortOrder }) {
           setFavorites(updated);
           localStorage.setItem("favorites", JSON.stringify(updated));
         } else {
-          const res = await fetch(`https://project-cse-2200-xi.vercel.app//api/wishlist/add`, {
+          const res = await fetch(`https://project-cse-2200-xi.vercel.app/api/wishlist/add`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",

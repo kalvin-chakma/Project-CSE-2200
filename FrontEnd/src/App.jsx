@@ -45,7 +45,7 @@ export default function App() {
 
   const fetchCategories = async () => {
     try {
-      let url = "https://project-cse-2200-xi.vercel.app//api/products";
+      let url = "https://project-cse-2200-xi.vercel.app/api/products";
       let options = {};
 
       if (isAuthenticated) {

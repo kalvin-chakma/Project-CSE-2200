@@ -32,7 +32,7 @@ const Details = () => {
       try {
         const token = localStorage.getItem("jwtToken");
         const response = await fetch(
-          "https://project-cse-2200-xi.vercel.app//api/user/role",
+          "https://project-cse-2200-xi.vercel.app/api/user/role",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -64,7 +64,7 @@ const Details = () => {
       try {
         const token = localStorage.getItem("jwtToken");
         const response = await fetch(
-          `https://project-cse-2200-xi.vercel.app//api/products/${id}`,
+          `https://project-cse-2200-xi.vercel.app/api/products/${id}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -100,7 +100,7 @@ const Details = () => {
     try {
       const token = localStorage.getItem("jwtToken");
       const response = await fetch(
-        `https://project-cse-2200-xi.vercel.app//api/products/${id}`,
+        `https://project-cse-2200-xi.vercel.app/api/products/${id}`,
         {
           method: "DELETE",
           headers: {
@@ -135,7 +135,7 @@ const Details = () => {
     try {
       const token = localStorage.getItem("jwtToken");
       const response = await fetch(
-        `https://project-cse-2200-xi.vercel.app//api/products/${id}`,
+        `https://project-cse-2200-xi.vercel.app/api/products/${id}`,
         {
           method: "PUT",
           headers: {
@@ -170,7 +170,7 @@ const Details = () => {
       }
 
       const response = await fetch(
-        `https://project-cse-2200-xi.vercel.app//api/products/${id}/reviews`,
+        `https://project-cse-2200-xi.vercel.app/api/products/${id}/reviews`,
         {
           method: "POST",
           headers: {
@@ -212,7 +212,7 @@ const Details = () => {
     try {
       const userId = localStorage.getItem("userId");
       const response = await fetch(
-        "https://project-cse-2200-xi.vercel.app//api/cart/add",
+        "https://project-cse-2200-xi.vercel.app/api/cart/add",
         {
           method: "POST",
           headers: {

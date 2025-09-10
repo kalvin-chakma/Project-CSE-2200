@@ -23,7 +23,7 @@ function LogInPage({ setIsAuthenticated }) {
     }
     setIsLoading(true);
     try {
-      const url = "https://project-cse-2200-xi.vercel.app//auth/login";
+      const url = "https://project-cse-2200-xi.vercel.app/auth/login";
       console.log("Sending request to:", url);
       const response = await fetch(url, {
         method: "POST",
