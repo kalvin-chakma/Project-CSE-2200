@@ -12,7 +12,7 @@ const UserOrders = () => {
         const userId = localStorage.getItem("userId");
         const token = localStorage.getItem("jwtToken");
         const response = await axios.get(
-          `https://project-cse-2200-xi.vercel.app/api/orders/user/${userId}`,
+          `https://project-cse-2200-xi.vercel.app//api/orders/user/${userId}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }

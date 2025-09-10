@@ -7,7 +7,7 @@ const Wishlist = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  const baseUrl = "https://project-cse-2200-xi.vercel.app"; // adjust if needed
+  const baseUrl = "https://project-cse-2200-xi.vercel.app/"; // adjust if needed
 
   const fetchWishlist = async () => {
     try {

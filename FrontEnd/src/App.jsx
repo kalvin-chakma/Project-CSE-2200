@@ -25,7 +25,9 @@ import Contact from "./components/Contact";
 import Wishlist from "./components/Wishlist";
 
 export default function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(
+    !!localStorage.getItem("jwtToken")
+  );
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [sortOrder, setSortOrder] = useState("asc");
@@ -35,12 +37,15 @@ export default function App() {
   };
 
   useEffect(() => {
+    // Keep auth state in sync with storage (e.g., after refresh/login)
+    const token = localStorage.getItem("jwtToken");
+    setIsAuthenticated(!!token);
     fetchCategories();
   }, [isAuthenticated]);
 
   const fetchCategories = async () => {
     try {
-      let url = "https://project-cse-2200-xi.vercel.app/api/products";
+      let url = "https://project-cse-2200-xi.vercel.app//api/products";
       let options = {};
 
       if (isAuthenticated) {

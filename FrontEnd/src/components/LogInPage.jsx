@@ -6,7 +6,7 @@ import loginImage from "../assets/loginPageImage.jpg";
 import Password from "./FormElement/Password";
 import EmailAddress from "./FormElement/EmailAdress";
 
-function LogInPage() {
+function LogInPage({ setIsAuthenticated }) {
   const [loginInfo, setLoginInfo] = useState({
     email: "",
     password: "",
@@ -23,7 +23,7 @@ function LogInPage() {
     }
     setIsLoading(true);
     try {
-      const url = "https://project-cse-2200-xi.vercel.app/auth/login";
+      const url = "https://project-cse-2200-xi.vercel.app//auth/login";
       console.log("Sending request to:", url);
       const response = await fetch(url, {
         method: "POST",
@@ -68,10 +68,8 @@ function LogInPage() {
 
         window.dispatchEvent(new Event("storage"));
 
-        // Redirect to the home page based on role
-        setTimeout(() => {
-          navigate(role === "admin" ? "/Home" : "/Home");
-        }, 3000);
+        setIsAuthenticated?.(true);
+        navigate("/Home", { replace: true });
       } else if (error) {
         const details = error?.details?.[0]?.message || "An error occurred";
         handleError(details);

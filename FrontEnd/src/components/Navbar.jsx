@@ -48,6 +48,14 @@ const Navbar = ({ categories, isAuthenticated, onCategoryChange }) => {
     };
   }, []);
 
+  // Also react when parent auth state flips without a storage event
+  useEffect(() => {
+    const user = localStorage.getItem("loggedInUser");
+    const role = localStorage.getItem("userRole");
+    setLoggedInUser(user);
+    setUserRole(role);
+  }, [isAuthenticated]);
+
   const showNotification = (message) => {
     setNotification(message);
     setTimeout(() => setNotification(null), 3000);
@@ -204,13 +212,6 @@ const Navbar = ({ categories, isAuthenticated, onCategoryChange }) => {
             ) : (
               <Link
                 to="/LogInPage"
-                onClick={(e) => {
-                  e.preventDefault();
-                  setShowProfileDropdown(false);
-                  setShowCategoryDropdown(false);
-                  setShowMobileMenu(false);
-                  navigate('/LogInPage');
-                }}
                 className={`${navLinkStyle} ml-3 flex items-center`}
               >
                 <FaUser className="mr-1" />
