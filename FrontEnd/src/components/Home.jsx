@@ -8,6 +8,7 @@ import { FaHeart, FaFilter } from "react-icons/fa";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { motion, AnimatePresence } from "framer-motion";
+import API_BASE_URL from "../config/api.js";
 
 function Home({ categories, isAuthenticated, selectedCategory, sortOrder }) {
   const [products] = useContext(productContext);
@@ -104,7 +105,7 @@ function Home({ categories, isAuthenticated, selectedCategory, sortOrder }) {
       try {
         const token = localStorage.getItem("jwtToken");
         if (!token) return;
-        const res = await fetch("https://project-cse-2200-xi.vercel.app/api/wishlist", {
+        const res = await fetch("${API_BASE_URL}/api/wishlist", {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (res.ok) {
@@ -156,7 +157,7 @@ function Home({ categories, isAuthenticated, selectedCategory, sortOrder }) {
         const exists = favorites.some((fav) => fav._id === product._id);
         if (exists) {
           const res = await fetch(
-            `https://project-cse-2200-xi.vercel.app/api/wishlist/remove/${product._id}`,
+            `${API_BASE_URL}/api/wishlist/remove/${product._id}`,
             { method: "DELETE", headers: { Authorization: `Bearer ${token}` } }
           );
           if (!res.ok) {
@@ -168,7 +169,7 @@ function Home({ categories, isAuthenticated, selectedCategory, sortOrder }) {
           setFavorites(updated);
           localStorage.setItem("favorites", JSON.stringify(updated));
         } else {
-          const res = await fetch(`https://project-cse-2200-xi.vercel.app/api/wishlist/add`, {
+          const res = await fetch(`${API_BASE_URL}/api/wishlist/add`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { ThreeDots } from "react-loader-spinner";
 import Sidebar from "./FormElement/Sidebar";
+import API_BASE_URL from "../config/api.js";
 
 const OrderPage = () => {
   const [orders, setOrders] = useState([]);
@@ -18,7 +19,7 @@ const OrderPage = () => {
   const fetchOrders = async () => {
     try {
       const response = await axios.get(
-        `https://project-cse-2200-xi.vercel.app/api/orders/user/${userId}`,
+        `${API_BASE_URL}/api/orders/user/${userId}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,

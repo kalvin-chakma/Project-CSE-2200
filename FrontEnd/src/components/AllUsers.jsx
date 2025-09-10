@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import Sidebar from "./FormElement/Sidebar";
 import Loading from "./Loading";
 
-const API_BASE_URL = "https://project-cse-2200-xi.vercel.app/api/admin";
+import API_BASE_URL from "../config/api.js";
 
 const AllUsers = () => {
   const [users, setUsers] = useState([]);

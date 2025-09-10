@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ThreeDots } from "react-loader-spinner";
+import API_BASE_URL from "../config/api.js";
 
 const Wishlist = () => {
   const [items, setItems] = useState([]);
@@ -15,7 +16,7 @@ const Wishlist = () => {
         navigate("/LogInPage");
         return;
       }
-      const res = await fetch("https://project-cse-2200-xi.vercel.app/api/wishlist", {
+      const res = await fetch("${API_BASE_URL}/api/wishlist", {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) throw new Error("Failed to fetch wishlist");
@@ -35,7 +36,7 @@ const Wishlist = () => {
   const removeFromWishlist = async (productId) => {
     try {
       const token = localStorage.getItem("jwtToken");
-      const res = await fetch(`https://project-cse-2200-xi.vercel.app/api/wishlist/remove/${productId}`, {
+      const res = await fetch(`${API_BASE_URL}/api/wishlist/remove/${productId}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });

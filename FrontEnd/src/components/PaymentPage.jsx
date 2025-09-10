@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Sidebar from "./FormElement/Sidebar";
+import API_BASE_URL from "../config/api.js";
 
 const PaymentPage = () => {
   const [paymentMethod, setPaymentMethod] = useState("");
@@ -29,7 +30,7 @@ const PaymentPage = () => {
     setError("");
     try {
       const response = await axios.post(
-        "https://project-cse-2200-xi.vercel.app/api/orders/create",
+        "${API_BASE_URL}/api/orders/create",
         { userId, paymentMethod, address },
         {
           headers: {

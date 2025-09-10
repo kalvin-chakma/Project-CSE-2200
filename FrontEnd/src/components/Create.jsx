@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { productContext } from "../utills/Context";
 import Navbar from "./Navbar";
 import Sidebar from "./FormElement/Sidebar";
+import API_BASE_URL from "../config/api.js";
 
 const Create = ({ addCategory }) => {
   const [products, setProducts] = useContext(productContext);
@@ -31,13 +32,13 @@ const Create = ({ addCategory }) => {
       const formData = new FormData();
       formData.append('image', imageFile);
       try {
-        const uploadRes = await fetch('https://project-cse-2200-xi.vercel.app/api/products/upload', {
+        const uploadRes = await fetch('${API_BASE_URL}/api/products/upload', {
           method: 'POST',
           body: formData,
         });
         if (!uploadRes.ok) throw new Error('Image upload failed');
         const { url } = await uploadRes.json();
-        imageUrl = `https://project-cse-2200-xi.vercel.app/${url}`;
+        imageUrl = `${API_BASE_URL}/${url}`;
       } catch (err) {
         console.error(err);
         alert('Image upload failed');
@@ -58,7 +59,7 @@ const Create = ({ addCategory }) => {
 
     try {
       const response = await fetch(
-        "https://project-cse-2200-xi.vercel.app/api/products",
+        "${API_BASE_URL}/api/products",
         {
           method: "POST",
           headers: {

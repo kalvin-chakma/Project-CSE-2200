@@ -1,4 +1,5 @@
 import axios from "axios";
+import API_BASE_URL from "../config/api.js";
 
 export const refreshTokens = async () => {
   const refreshToken = localStorage.getItem("refreshToken");
@@ -9,7 +10,7 @@ export const refreshTokens = async () => {
 
   try {
     const response = await axios.post(
-      "https://project-cse-2200-xi.vercel.app/auth/refresh-token",
+      `${API_BASE_URL}/auth/refresh-token`,
       { refreshToken }
     );
     const {

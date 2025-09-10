@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Sidebar from "./FormElement/Sidebar";
 import { ThreeDots } from "react-loader-spinner";
 import { FaBars } from "react-icons/fa";
+import API_BASE_URL from "../config/api.js";
 
 const CartPage = () => {
   const [cartItems, setCartItems] = useState([]);
@@ -24,7 +25,7 @@ const CartPage = () => {
   const fetchCartItems = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`https://project-cse-2200-xi.vercel.app/api/cart/${userId}`);
+      const response = await fetch(`${API_BASE_URL}/api/cart/${userId}`);
       if (!response.ok) throw new Error("Failed to fetch cart items");
 
       const data = await response.json();
@@ -39,7 +40,7 @@ const CartPage = () => {
   const updateQuantity = async (e, productId, newQuantity) => {
     e.preventDefault();
     try {
-      const response = await fetch(`https://project-cse-2200-xi.vercel.app/api/cart/update`, {
+      const response = await fetch(`${API_BASE_URL}/api/cart/update`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId, productId, quantity: newQuantity }),
@@ -61,7 +62,7 @@ const CartPage = () => {
   const removeItem = async (e, productId) => {
     e.preventDefault();
     try {
-      const response = await fetch(`https://project-cse-2200-xi.vercel.app/api/cart/remove`, {
+      const response = await fetch(`${API_BASE_URL}/api/cart/remove`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId, productId }),

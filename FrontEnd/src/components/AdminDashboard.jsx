@@ -3,6 +3,7 @@ import axios from "axios";
 import { ThreeDots } from "react-loader-spinner";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, PointElement, LineElement, Title } from 'chart.js';
 import { Bar, Pie, Line } from 'react-chartjs-2';
+import API_BASE_URL from "../config/api.js";
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, PointElement, LineElement, Title);
 
@@ -24,10 +25,10 @@ const AdminDashboard = () => {
 
       try {
         const [profileResponse, statsResponse] = await Promise.all([
-          axios.get("https://project-cse-2200-xi.vercel.app/api/admin/profile", {
+          axios.get("${API_BASE_URL}/api/admin/profile", {
             headers: { Authorization: `Bearer ${token}` },
           }),
-          axios.get("https://project-cse-2200-xi.vercel.app/api/admin/dashboard-stats", {
+          axios.get("${API_BASE_URL}/api/admin/dashboard-stats", {
             headers: { Authorization: `Bearer ${token}` },
           }),
         ]);

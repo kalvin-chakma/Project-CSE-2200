@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { ThreeDots } from "react-loader-spinner";
 import axios from "axios";
+import API_BASE_URL from "../config/api.js";
 
 const UserDashboard = () => {
   const [userData, setUserData] = useState({ name: "", email: "" });
@@ -19,7 +20,7 @@ const UserDashboard = () => {
 
       try {
         const response = await axios.get(
-          "https://project-cse-2200-xi.vercel.app/api/user/profile",
+          "${API_BASE_URL}/api/user/profile",
           {
             headers: {
               Authorization: `Bearer ${token}`,

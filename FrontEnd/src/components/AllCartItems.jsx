@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import API_BASE_URL from "../config/api.js";
 
 const AllCartItems = () => {
   const [cartItems, setCartItems] = useState([]);
@@ -9,7 +10,7 @@ const AllCartItems = () => {
     const fetchCartItems = async () => {
       const token = localStorage.getItem("jwtToken");
       try {
-        const response = await fetch("https://project-cse-2200-xi.vercel.app/api/admin/cartitems", {
+        const response = await fetch("${API_BASE_URL}/api/admin/cartitems", {
           method: "GET",
           headers: {
             "Content-Type": "application/json",

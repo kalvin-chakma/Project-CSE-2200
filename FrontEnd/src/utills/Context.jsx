@@ -1,5 +1,6 @@
 import React, { createContext, useEffect, useState, useRef } from "react";
 import axios from "axios";
+import API_BASE_URL from "../config/api.js";
 
 // Create a context for products
 export const productContext = createContext();
@@ -12,7 +13,7 @@ const Context = ({ children }) => {
     const fetchProducts = async () => {
       try {
         const response = await axios.get(
-          "https://project-cse-2200-xi.vercel.app/api/products"
+          `${API_BASE_URL}/api/products`
         );
         setProducts(response.data);
       } catch (error) {

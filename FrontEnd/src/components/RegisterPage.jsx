@@ -6,6 +6,7 @@ import registerImage from "../assets/RegisterPageImage.jpg";
 import Password from "./FormElement/Password";
 import EmailAddress from "./FormElement/EmailAdress";
 import AnimatedButton from "./AnimatedButton";
+import API_BASE_URL from "../config/api.js";
 
 function RegisterPage() {
   const [registerInfo, setRegisterInfo] = useState({
@@ -36,7 +37,7 @@ function RegisterPage() {
     setIsLoading(true); // Set loading to true while fetching
 
     try {
-      const url = "https://project-cse-2200-xi.vercel.app/auth/signup";
+      const url = `${API_BASE_URL}/auth/signup`;
       console.log("Sending request to:", url);
       const response = await fetch(url, {
         method: "POST",

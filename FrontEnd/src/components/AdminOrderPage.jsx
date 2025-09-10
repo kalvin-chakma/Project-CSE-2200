@@ -3,6 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "./FormElement/Sidebar"; // Adjust path if necessary
 import Loading from "./Loading";
+import API_BASE_URL from "../config/api.js";
 
 const AdminOrderPage = () => {
   const [orders, setOrders] = useState([]);
@@ -28,7 +29,7 @@ const AdminOrderPage = () => {
       }
 
       const response = await axios.get(
-        "https://project-cse-2200-xi.vercel.app/api/orders/all",
+        "${API_BASE_URL}/api/orders/all",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -66,7 +67,7 @@ const AdminOrderPage = () => {
         }
 
         await axios.delete(
-          `https://project-cse-2200-xi.vercel.app/api/orders/${orderId}`,
+          `${API_BASE_URL}/api/orders/${orderId}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -94,7 +95,7 @@ const AdminOrderPage = () => {
       }
 
       await axios.put(
-        `https://project-cse-2200-xi.vercel.app/api/orders/${orderId}/status`,
+        `${API_BASE_URL}/api/orders/${orderId}/status`,
         { status: newStatus },
         { headers: { Authorization: `Bearer ${token}` } }
       );
