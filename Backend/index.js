@@ -4,7 +4,7 @@ require("dotenv").config();
 require("./Models/db"); // Initialize MongoDB connection
 const bodyParser = require("body-parser");
 const cors = require("cors");
-const path = require("path");
+
 
 // Import routers
 const AuthRouter = require("./Routes/AuthRouter");
@@ -25,8 +25,7 @@ app.get("/ping", (req, res) => {
 // Middleware
 app.use(cors()); // Enable CORS for all routes
 app.use(bodyParser.json()); // Parse application/json requests
-// Serve uploads statically
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 
 // Authentication routes
 app.use("/auth", AuthRouter);
@@ -53,3 +52,4 @@ const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
+
