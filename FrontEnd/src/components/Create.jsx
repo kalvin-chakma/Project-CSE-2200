@@ -193,17 +193,6 @@ const Create = ({ addCategory }) => {
                     <h2 className="text-lg font-medium text-gray-700 mb-4">Pricing Details</h2>
                     <div className="space-y-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-600 mb-1">Bought Price</label>
-                        <input
-                          type="number"
-                          value={price}
-                          onChange={(e) => setPrice(e.target.value)}
-                          className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                          placeholder="Enter product price"
-                          required
-                        />
-                      </div>
-                      <div>
                         <label className="block text-sm font-medium text-gray-600 mb-1">Selling Price</label>
                         <input
                           type="number"
