@@ -22,7 +22,10 @@ app.get("/ping", (req, res) => {
 });
 
 // Middleware
-app.use(cors()); // Enable CORS for all routes
+app.use(cors({
+    origin: "https://project-cse-2200-ui.vercel.app",
+    credentials: true, // if you're using cookies or auth headers
+}));
 app.use(bodyParser.json()); // Parse application/json requests
 
 // Authentication routes
@@ -50,3 +53,4 @@ const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
+
