@@ -32,13 +32,13 @@ const Create = ({ addCategory }) => {
       const formData = new FormData();
       formData.append('image', imageFile);
       try {
-        const uploadRes = await fetch('${API_BASE_URL}/api/products/upload', {
+        const uploadRes = await fetch('https://project-cse-2200.vercel.app/api/products/upload', {
           method: 'POST',
           body: formData,
         });
         if (!uploadRes.ok) throw new Error('Image upload failed');
         const { url } = await uploadRes.json();
-        imageUrl = `${API_BASE_URL}/${url}`;
+        imageUrl = `https://project-cse-2200.vercel.app/${url}`;
       } catch (err) {
         console.error(err);
         alert('Image upload failed');
@@ -59,7 +59,7 @@ const Create = ({ addCategory }) => {
 
     try {
       const response = await fetch(
-        "${API_BASE_URL}/api/products",
+        "https://project-cse-2200.vercel.app/api/products",
         {
           method: "POST",
           headers: {
