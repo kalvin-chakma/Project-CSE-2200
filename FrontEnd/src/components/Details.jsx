@@ -291,7 +291,7 @@ const Details = () => {
       if (isInWishlist) {
         // Remove from wishlist
         const response = await fetch(
-          `https://project-cse-2200-xi.vercel.app/api/wishlist/remove/${id}`,
+          `https://project-cse-2200-xi.vercel.app/wishlist/remove/${id}`,
           {
             method: "DELETE",
             headers: {
@@ -308,7 +308,7 @@ const Details = () => {
         setIsInWishlist(false);
         toast.success("Removed from wishlist");
       } else {
-        const response =  await fetch(`https://project-cse-2200-xi.vercel.app/api/wishlist/add`, {
+        const response =  await fetch(`https://project-cse-2200-xi.vercel.app/wishlist/add`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
