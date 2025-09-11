@@ -116,6 +116,21 @@ export default function App() {
           }
         />
         <Route
+          path="/home"
+          element={
+            <PrivateRoute
+              element={
+                <Home
+                  categories={categories}
+                  isAuthenticated={isAuthenticated}
+                  selectedCategory={selectedCategory}
+                  sortOrder={sortOrder}
+                />
+              }
+            />
+          }
+        />
+        <Route
           path="/category/:category"
           element={
             <PrivateRoute
@@ -182,6 +197,7 @@ export default function App() {
           path="/your-orders"
           element={<PrivateRoute element={<UserOrders />} />}
         />
+        <Route path="*" element={<Navigate to={isAuthenticated ? "/home" : "/LogInPage"} replace />} />
       </Routes>
       <ToastContainer />
     </div>

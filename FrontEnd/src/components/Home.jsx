@@ -105,7 +105,7 @@ function Home({ categories, isAuthenticated, selectedCategory, sortOrder }) {
       try {
         const token = localStorage.getItem("jwtToken");
         if (!token) return;
-        const res = await fetch("${API_BASE_URL}/api/wishlist", {
+        const res = await fetch(`${API_BASE_URL}/api/wishlist`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (res.ok) {

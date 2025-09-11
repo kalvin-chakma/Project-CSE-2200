@@ -20,7 +20,7 @@ const UserDashboard = () => {
 
       try {
         const response = await axios.get(
-          "https://project-cse-2200-xi.vercel.app/api/user/profile",
+          `${API_BASE_URL}/api/user/profile`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

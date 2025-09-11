@@ -25,10 +25,10 @@ const AdminDashboard = () => {
 
       try {
         const [profileResponse, statsResponse] = await Promise.all([
-          axios.get("https://project-cse-2200-xi.vercel.app/api/admin/profile", {
+          axios.get(`${API_BASE_URL}/api/admin/profile`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
-          axios.get("https://project-cse-2200-xi.vercel.app/api/admin/dashboard-stats", {
+          axios.get(`${API_BASE_URL}/api/admin/dashboard-stats`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
         ]);

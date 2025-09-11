@@ -30,7 +30,7 @@ const PaymentPage = () => {
     setError("");
     try {
       const response = await axios.post(
-        "https://project-cse-2200-xi.vercel.app/api/orders/create",
+        `${API_BASE_URL}/api/orders/create`,
         { userId, paymentMethod, address },
         {
           headers: {

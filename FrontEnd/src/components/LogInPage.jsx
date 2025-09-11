@@ -70,7 +70,7 @@ function LogInPage({ setIsAuthenticated }) {
         window.dispatchEvent(new Event("storage"));
 
         setIsAuthenticated?.(true);
-        navigate("/Home", { replace: true });
+        navigate("/home", { replace: true });
       } else if (error) {
         const details = error?.details?.[0]?.message || "An error occurred";
         handleError(details);

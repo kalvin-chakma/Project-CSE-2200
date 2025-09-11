@@ -8,9 +8,8 @@ function RefrshHandler({ setIsAuthenticated }) {
     useEffect(() => {
         if (localStorage.getItem('jwtToken')) {
             setIsAuthenticated(true);
-            // If authenticated and on root, send to Home. Allow access to Login/Register explicitly.
             if (location.pathname === '/') {
-                navigate('/Home', { replace: false });
+                navigate('/home', { replace: true });
             }
         } else {
             setIsAuthenticated(false);

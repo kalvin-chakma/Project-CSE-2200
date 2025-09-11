@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import Sidebar from "./FormElement/Sidebar";
 import Loading from "./Loading";
 
- const API_BASE_URL = "https://project-cse-2200-xi.vercel.app/api/admin";
+import API_BASE_URL from "../config/api.js";
 
 const AllUsers = () => {
   const [users, setUsers] = useState([]);
@@ -14,7 +14,7 @@ const AllUsers = () => {
   const fetchUsers = useCallback(async () => {
     const token = localStorage.getItem("jwtToken");
     try {
-      const response = await fetch(`${API_BASE_URL}/users`, {
+      const response = await fetch(`${API_BASE_URL}/api/admin/users`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -52,7 +52,7 @@ const AllUsers = () => {
   const handleSave = async (id) => {
     const token = localStorage.getItem("jwtToken");
     try {
-      const response = await fetch(`${API_BASE_URL}/users/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/api/admin/users/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -82,7 +82,7 @@ const AllUsers = () => {
   const handleDelete = async (id) => {
     const token = localStorage.getItem("jwtToken");
     try {
-      const response = await fetch(`${API_BASE_URL}/users/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/api/admin/users/${id}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
