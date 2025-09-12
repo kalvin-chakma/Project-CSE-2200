@@ -2,19 +2,24 @@ const Order = require('../Models/orderModel');
 const CartItem = require('../Models/cartModel');
 const Product = require('../Models/Product');
 const User = require('../Models/user');
+const mongoose = require("mongoose");
+
+const SSLCommerzPayment = require('sslcommerz-lts');
+
+const store_id = process.env.STORE_ID;
+const store_passwd = process.env.STORE_PASSWORD;
+const is_live = false;
+
 
 const createOrder = async (req, res) => {
   try {
-    const { userId, paymentMethod, address } = req.body;
+    const { userId, paymentMethod, address, phone } = req.body;
 
-    // Fetch cart items
     const cartItems = await CartItem.find({ userId }).populate('productId');
-
     if (cartItems.length === 0) {
       return res.status(400).json({ message: "Cart is empty", success: false });
     }
 
-    // Calculate total amount and prepare order products
     let totalAmount = 0;
     const orderProducts = cartItems.map(item => {
       totalAmount += item.productId.price * item.quantity;
@@ -25,20 +30,22 @@ const createOrder = async (req, res) => {
       };
     });
 
-    // Create new order
     const newOrder = new Order({
       userId,
       products: orderProducts,
       totalAmount,
       paymentMethod,
-      address, // Add address to the order
-      status: 'Pending'
+      address,
+      phone,
+      transactionId: null,
+      status: paymentMethod === 'cod' ? 'Processing' : 'Pending'
     });
 
     await newOrder.save();
 
-    // Clear the user's cart
-    await CartItem.deleteMany({ userId });
+    if (paymentMethod === 'cod') {
+      await CartItem.deleteMany({ userId });
+    }
 
     res.status(201).json({ message: "Order created successfully", orderId: newOrder._id, success: true });
   } catch (error) {
@@ -46,6 +53,8 @@ const createOrder = async (req, res) => {
     res.status(500).json({ message: "Internal server error", error: error.message, success: false });
   }
 };
+
+
 const getUserOrders = async (req, res) => {
   try {
     const userId = req.params.userId;
@@ -59,32 +68,96 @@ const getUserOrders = async (req, res) => {
   }
 };
 
+
+const initiateOnlinePayment = async (req, res) => {
+  try {
+    const { userId, address, phone, paymentMethod } = req.body;
+
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: "User not found", success: false });
+
+    const cartItems = await CartItem.find({ userId }).populate('productId');
+    if (cartItems.length === 0) return res.status(400).json({ message: "Cart is empty", success: false });
+
+    let totalAmount = 0;
+    const orderProducts = cartItems.map(item => {
+      totalAmount += item.productId.price * item.quantity;
+      return { productId: item.productId._id, quantity: item.quantity, price: item.productId.price };
+    });
+
+    const transactionId = new mongoose.Types.ObjectId().toString();
+
+    const newOrder = new Order({
+      userId,
+      products: orderProducts,
+      totalAmount,
+      paymentMethod,
+      address,
+      phone,
+      transactionId,
+      status: 'Pending',
+    });
+
+    await newOrder.save();
+
+    const successUrl = `${process.env.BACKEND_URL}/api/orders/payment/success/${transactionId}`;
+    const failUrl = `${process.env.BACKEND_URL}/api/orders/payment/fail/${transactionId}`;
+    const cancelUrl = `${process.env.BACKEND_URL}/api/orders/payment/fail/${transactionId}`;
+    const ipnUrl = `${process.env.BACKEND_URL}/api/orders/ipn`;
+
+    const data = {
+      total_amount: totalAmount,
+      currency: 'BDT',
+      tran_id: transactionId,
+      success_url: successUrl,
+      fail_url: failUrl,
+      cancel_url: cancelUrl,
+      ipn_url: ipnUrl,
+      shipping_method: 'Courier',
+      product_name: 'Products',
+      product_category: 'E-commerce',
+      product_profile: 'general',
+      cus_name: user.name,
+      cus_email: user.email,
+      cus_add1: address,
+      cus_city: 'Dhaka',
+      cus_state: 'Dhaka',
+      cus_postcode: '1000',
+      cus_country: 'Bangladesh',
+      cus_phone: phone,
+      ship_name: user.name,
+      ship_add1: address,
+      ship_city: 'Dhaka',
+      ship_state: 'Dhaka',
+      ship_postcode: '1000',
+      ship_country: 'Bangladesh'
+    };
+
+    const sslcz = new SSLCommerzPayment(store_id, store_passwd, is_live);
+    const apiResponse = await sslcz.init(data);
+
+    res.status(200).json({ url: apiResponse.GatewayPageURL });
+  } catch (error) {
+    console.error("Error initiating online payment:", error);
+    res.status(500).json({ message: "Internal server error", error: error.message, success: false });
+  }
+};
+
+
 const getAllOrders = async (req, res) => {
   try {
-    console.log('Attempting to fetch all orders');
     const orders = await Order.find()
-      .populate({
-        path: 'userId',
-        select: 'name email',
-        model: User
-      })
-      .populate({
-        path: 'products.productId',
-        model: Product
-      })
+      .populate({ path: 'userId', select: 'name email', model: User })
+      .populate({ path: 'products.productId', model: Product })
       .sort({ createdAt: -1 });
 
-    console.log('Orders fetched successfully:', orders.length);
     res.status(200).json({ orders, success: true });
   } catch (error) {
     console.error("Error fetching all orders:", error);
-    res.status(500).json({
-      message: "Internal server error",
-      error: error.toString(),
-      success: false
-    });
+    res.status(500).json({ message: "Internal server error", error: error.message, success: false });
   }
 };
+
 
 const deleteOrder = async (req, res) => {
   try {
@@ -100,7 +173,7 @@ const deleteOrder = async (req, res) => {
   }
 };
 
-// New function to update order status
+
 const updateOrderStatus = async (req, res) => {
   try {
     const { orderId } = req.params;
@@ -112,12 +185,7 @@ const updateOrderStatus = async (req, res) => {
       return res.status(400).json({ message: "Invalid status", success: false });
     }
 
-    const updatedOrder = await Order.findByIdAndUpdate(
-      orderId,
-      { status },
-      { new: true }
-    );
-
+    const updatedOrder = await Order.findByIdAndUpdate(orderId, { status }, { new: true });
     if (!updatedOrder) {
       return res.status(404).json({ message: "Order not found", success: false });
     }
@@ -129,10 +197,73 @@ const updateOrderStatus = async (req, res) => {
   }
 };
 
+
+const handlePaymentSuccess = async (req, res) => {
+  const { transactionId } = req.params;
+  try {
+    const order = await Order.findOne({ transactionId });
+    if (!order) return res.status(404).json({ message: "Order not found", success: false });
+
+    order.status = "Payment Done";
+    await order.save();
+
+    await CartItem.deleteMany({ userId: order.userId });
+
+    res.redirect(`${process.env.FRONTEND_URL}/payment-success`);
+  } catch (error) {
+    console.error("Error handling payment success:", error);
+    res.status(500).json({ message: "Internal server error", error: error.message, success: false });
+  }
+};
+
+
+const getLatestOrder = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    if (!userId) {
+      return res.status(400).json({ message: "User ID is required", success: false });
+    }
+
+    const latestOrder = await Order.findOne({ userId })
+      .populate("products.productId")
+      .sort({ createdAt: -1 });
+
+    if (!latestOrder) {
+      return res.status(404).json({ message: "No orders found for this user", success: false });
+    }
+
+    res.status(200).json({ order: latestOrder, success: true });
+  } catch (error) {
+    console.error("Error fetching latest order:", error);
+    res.status(500).json({ message: "Internal server error", error: error.message, success: false });
+  }
+};
+
+
+const handlePaymentFail = async (req, res) => {
+  try {
+    const { transactionId } = req.params;
+    const order = await Order.findOne({ transactionId });
+
+   if (order) {
+      await Order.findByIdAndDelete(order._id); 
+    }
+
+    res.redirect(`${process.env.FRONTEND_URL}/cartPage`);
+  } catch (error) {
+    console.error("Error handling payment failure:", error);
+    res.status(500).json({ message: "Internal server error", error: error.message, success: false });
+  }
+};
+
 module.exports = {
   createOrder,
+  initiateOnlinePayment,
   getUserOrders,
   getAllOrders,
   deleteOrder,
-  updateOrderStatus
+  updateOrderStatus,
+  handlePaymentSuccess,
+  getLatestOrder,
+  handlePaymentFail
 };

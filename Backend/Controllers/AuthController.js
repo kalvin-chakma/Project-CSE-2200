@@ -1,4 +1,4 @@
-const bcrypt = require('bcryptjs');
+const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const UserModel = require("../Models/user");
 
@@ -33,8 +33,9 @@ const signup = async (req, res) => {
     if (user) {
       return res.status(409).json({ message: 'User already exists, you can login', success: false });
     }
+
     const hashedPassword = await bcrypt.hash(password, 10);
-    const role = email === ADMIN_EMAIL ? 'admin' : 'user'; // Only check the email for signup
+    const role = email === ADMIN_EMAIL ? 'admin' : 'user'; // Only check email for admin role
     const userModel = new UserModel({ name, email, password: hashedPassword, role });
 
     const { accessToken, refreshToken, jwtToken } = generateTokens(userModel);
@@ -50,14 +51,11 @@ const signup = async (req, res) => {
       name: userModel.name,
       email: userModel.email,
       role: userModel.role,
-      userId: userModel._id.toString() // Include userId in the response
+      userId: userModel._id.toString()
     });
   } catch (err) {
     console.error("Signup error:", err);
-    res.status(500).json({
-      message: "Internal server error",
-      success: false
-    });
+    res.status(500).json({ message: "Internal server error", success: false });
   }
 };
 
@@ -65,26 +63,17 @@ const signup = async (req, res) => {
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    let user = await UserModel.findOne({ email });
-    const errorMsg = 'Auth failed: email or password is wrong';
-    
+
+    // Check user exists
+    const user = await UserModel.findOne({ email });
     if (!user) {
-      if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
-        // Admin login
-        user = new UserModel({
-          email: ADMIN_EMAIL,
-          role: 'admin',
-          name: 'Admin User',
-          password: await bcrypt.hash(ADMIN_PASSWORD, 10)
-        });
-      } else {
-        return res.status(403).json({ message: errorMsg, success: false });
-      }
+      return res.status(403).json({ message: 'Auth failed: email or password is wrong', success: false });
     }
-    
+
+    // Compare password
     const isPassEqual = await bcrypt.compare(password, user.password);
     if (!isPassEqual) {
-      return res.status(403).json({ message: errorMsg, success: false });
+      return res.status(403).json({ message: 'Auth failed: email or password is wrong', success: false });
     }
 
     const { accessToken, refreshToken, jwtToken } = generateTokens(user);
@@ -100,16 +89,14 @@ const login = async (req, res) => {
       email,
       name: user.name,
       role: user.role,
-      userId: user._id.toString() // Ensure userId is included and converted to string
+      userId: user._id.toString()
     });
   } catch (err) {
     console.error("Login error:", err);
-    res.status(500).json({
-      message: "Internal server error",
-      success: false
-    });
+    res.status(500).json({ message: "Internal server error", success: false });
   }
 };
+
 // Refresh token function
 const refreshToken = async (req, res) => {
   const { refreshToken } = req.body;
@@ -134,7 +121,7 @@ const refreshToken = async (req, res) => {
       accessToken,
       refreshToken: newRefreshToken,
       jwtToken,
-      userId: user._id // Include userId in the response
+      userId: user._id.toString()
     });
   } catch (error) {
     console.error("Refresh token error:", error);

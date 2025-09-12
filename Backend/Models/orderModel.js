@@ -9,8 +9,14 @@ const orderSchema = new mongoose.Schema({
   }],
   totalAmount: { type: Number, required: true },
   paymentMethod: { type: String, required: true },
-  address: { type: String, required: true }, // New field
-  status: { type: String, default: 'Pending', enum: ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'] },
+  address: { type: String, required: true },
+  phone: { type:Number, required: true }, 
+  transactionId: { type: String, default: null },
+  status: { 
+    type: String, 
+    default: 'Pending', 
+    enum: ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled', 'Failed', 'Payment Done'] 
+  },
   createdAt: { type: Date, default: Date.now }
 });
 

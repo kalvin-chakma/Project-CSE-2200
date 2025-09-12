@@ -63,9 +63,7 @@ router.get('/:userId', async (req, res) => {
 
     const cartItems = await CartItem.find({ userId }).populate('productId');
 
-    const baseUrl = process.env.NODE_ENV === 'production' 
-      ? 'https://project-cse-2200-xi.vercel.app' 
-      : `${req.protocol}://${req.get('host')}`;
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
     const toAbsolute = (url) => {
       if (!url) return url;
       return url.startsWith('/uploads/') ? `${baseUrl}${url}` : url;

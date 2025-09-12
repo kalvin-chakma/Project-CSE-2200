@@ -24,6 +24,7 @@ function Home({ categories, isAuthenticated, selectedCategory, sortOrder }) {
   const [promotedProducts, setPromotedProducts] = useState([]);
   const [currentPromotedIndex, setCurrentPromotedIndex] = useState(0);
 
+  // filter products
   useEffect(() => {
     setIsLoading(true);
     const timer = setTimeout(() => {
@@ -35,27 +36,33 @@ function Home({ categories, isAuthenticated, selectedCategory, sortOrder }) {
       let filtered = [...products];
 
       if (selectedCategories.length > 0) {
-        filtered = filtered.filter((product) =>
-          selectedCategories.includes(product.category.toLowerCase().trim())
+        filtered = filtered.filter(
+          (product) =>
+            product?.category &&
+            selectedCategories.includes(product.category.toLowerCase().trim())
         );
       } else if (category || selectedCategory) {
         const filterCategory = (category || selectedCategory)
           .toLowerCase()
           .trim();
         filtered = filtered.filter(
-          (product) => product.category.toLowerCase().trim() === filterCategory
+          (product) =>
+            product?.category &&
+            product.category.toLowerCase().trim() === filterCategory
         );
       }
 
       if (searchQuery) {
-        filtered = filtered.filter((product) =>
-          product.title.toLowerCase().includes(searchQuery.toLowerCase())
+        filtered = filtered.filter(
+          (product) =>
+            product?.title &&
+            product.title.toLowerCase().includes(searchQuery.toLowerCase())
         );
       }
 
       filtered = filtered.filter(
         (product) =>
-          product.price >= priceRange[0] && product.price <= priceRange[1]
+          product?.price >= priceRange[0] && product.price <= priceRange[1]
       );
 
       filtered.sort((a, b) => {
@@ -86,6 +93,7 @@ function Home({ categories, isAuthenticated, selectedCategory, sortOrder }) {
     priceRange,
   ]);
 
+  // rotate featured products
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentPromotedIndex(
@@ -96,10 +104,13 @@ function Home({ categories, isAuthenticated, selectedCategory, sortOrder }) {
     return () => clearInterval(interval);
   }, [promotedProducts]);
 
+  // load favorites from localStorage
   useEffect(() => {
     const storedFavorites = JSON.parse(localStorage.getItem("favorites")) || [];
-    setFavorites(storedFavorites);
+    setFavorites(storedFavorites.filter((f) => f && f._id));
   }, []);
+
+  // fetch wishlist from backend
   useEffect(() => {
     const fetchWishlist = async () => {
       try {
@@ -110,15 +121,14 @@ function Home({ categories, isAuthenticated, selectedCategory, sortOrder }) {
         });
         if (res.ok) {
           const data = await res.json();
-          const favs = (data.items || []).map((it) => it.product?._id).filter(Boolean);
-          localStorage.setItem(
-            "favorites",
-            JSON.stringify((data.items || []).map((it) => it.product))
-          );
-          setFavorites((data.items || []).map((it) => it.product));
+          const favs = (data.items || [])
+            .map((it) => it.product)
+            .filter((p) => p && p._id);
+          localStorage.setItem("favorites", JSON.stringify(favs));
+          setFavorites(favs);
         }
       } catch (e) {
-       
+        // optional: handle error
       }
     };
     fetchWishlist();
@@ -154,7 +164,7 @@ function Home({ categories, isAuthenticated, selectedCategory, sortOrder }) {
     const toggle = async () => {
       try {
         const token = localStorage.getItem("jwtToken");
-        const exists = favorites.some((fav) => fav._id === product._id);
+        const exists = favorites.some((fav) => fav?._id === product._id);
         if (exists) {
           const res = await fetch(
             `${API_BASE_URL}/api/wishlist/remove/${product._id}`,
@@ -162,10 +172,12 @@ function Home({ categories, isAuthenticated, selectedCategory, sortOrder }) {
           );
           if (!res.ok) {
             const errorData = await res.json().catch(() => ({}));
-            throw new Error(errorData.message || "Failed to remove from wishlist");
+            throw new Error(
+              errorData.message || "Failed to remove from wishlist"
+            );
           }
           toast.success("Removed from wishlist");
-          const updated = favorites.filter((f) => f._id !== product._id);
+          const updated = favorites.filter((f) => f?._id !== product._id);
           setFavorites(updated);
           localStorage.setItem("favorites", JSON.stringify(updated));
         } else {
@@ -194,7 +206,8 @@ function Home({ categories, isAuthenticated, selectedCategory, sortOrder }) {
   };
 
   const isFavorite = (productId) => {
-    return favorites.some((fav) => fav._id === productId);
+    if (!productId) return false;
+    return favorites?.some((fav) => fav?._id === productId);
   };
 
   const handleProductClick = (productId) => {
@@ -296,7 +309,10 @@ function Home({ categories, isAuthenticated, selectedCategory, sortOrder }) {
                       {promotedProducts[currentPromotedIndex].title}
                     </h3>
                     <p className="text-xl mb-4">
-                      ${promotedProducts[currentPromotedIndex].price.toFixed(2)}
+                      $
+                      {promotedProducts[
+                        currentPromotedIndex
+                      ].price.toFixed(2)}
                     </p>
                     <button
                       onClick={() =>
@@ -330,9 +346,9 @@ function Home({ categories, isAuthenticated, selectedCategory, sortOrder }) {
         <div className="container mx-auto px-4 py-8">
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
             {filteredProducts.length > 0 ? (
-              filteredProducts.map((product) => (
+              filteredProducts.filter(Boolean).map((product) => (
                 <div
-                  key={product._id}
+                  key={product._id || Math.random()}
                   className="bg-white rounded-lg shadow-md overflow-hidden transition-transform duration-300 hover:scale-105 relative group"
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 opacity-0 group-hover:opacity-75 transition-opacity duration-300"></div>
@@ -355,7 +371,7 @@ function Home({ categories, isAuthenticated, selectedCategory, sortOrder }) {
                         </span>
                         <button
                           className={`text-2xl ${
-                            isFavorite(product._id)
+                            isFavorite(product?._id)
                               ? "text-pink-500"
                               : "text-gray-400"
                           } hover:text-pink-500 group-hover:text-white transition-colors duration-300`}
