@@ -3,14 +3,16 @@ const mongoose = require('mongoose');
 const router = express.Router();
 const CartItem = require('../Models/cartModel');
 const Product = require('../Models/Product');
+const { verifyToken } = require('../Middlewares/authMiddleware');
 
 // Add item to cart
-router.post('/add', async (req, res) => {
+router.post('/add', verifyToken, async (req, res) => {
     try {
-      const { userId, productId, quantity } = req.body;
+      const userId = req.user.id;
+      const { productId, quantity } = req.body;
       console.log('Received request to add item to cart:', { userId, productId, quantity });
-  
-      if (!userId || !productId || !quantity) {
+
+      if (!productId || !quantity) {
         return res.status(400).json({ message: 'Missing required fields' });
       }
   
@@ -53,12 +55,16 @@ router.post('/add', async (req, res) => {
   
 
 // Get cart items for a user
-router.get('/:userId', async (req, res) => {
+router.get('/:userId', verifyToken, async (req, res) => {
   try {
     const userId = req.params.userId;
 
     if (!mongoose.Types.ObjectId.isValid(userId)) {
       return res.status(400).json({ message: 'Invalid userId' });
+    }
+
+    if (userId !== req.user.id) {
+      return res.status(403).json({ message: 'Access denied' });
     }
 
     const cartItems = await CartItem.find({ userId }).populate('productId');
@@ -84,16 +90,17 @@ router.get('/:userId', async (req, res) => {
   }
 });
 // Update cart item quantity
-router.put('/update', async (req, res) => {
+router.put('/update', verifyToken, async (req, res) => {
   try {
-    const { userId, productId, quantity } = req.body;
+    const userId = req.user.id;
+    const { productId, quantity } = req.body;
 
-    if (!userId || !productId || quantity == null) {
+    if (!productId || quantity == null) {
       return res.status(400).json({ message: 'Missing required fields' });
     }
 
-    if (!mongoose.Types.ObjectId.isValid(userId) || !mongoose.Types.ObjectId.isValid(productId)) {
-      return res.status(400).json({ message: 'Invalid userId or productId' });
+    if (!mongoose.Types.ObjectId.isValid(productId)) {
+      return res.status(400).json({ message: 'Invalid productId' });
     }
 
     if (quantity < 1) {
@@ -119,16 +126,17 @@ router.put('/update', async (req, res) => {
 });
 
 // Remove item from cart
-router.delete('/remove', async (req, res) => {
+router.delete('/remove', verifyToken, async (req, res) => {
   try {
-    const { userId, productId } = req.body;
+    const userId = req.user.id;
+    const { productId } = req.body;
 
-    if (!userId || !productId) {
+    if (!productId) {
       return res.status(400).json({ message: 'Missing required fields' });
     }
 
-    if (!mongoose.Types.ObjectId.isValid(userId) || !mongoose.Types.ObjectId.isValid(productId)) {
-      return res.status(400).json({ message: 'Invalid userId or productId' });
+    if (!mongoose.Types.ObjectId.isValid(productId)) {
+      return res.status(400).json({ message: 'Invalid productId' });
     }
 
     const result = await CartItem.findOneAndDelete({ userId, productId });

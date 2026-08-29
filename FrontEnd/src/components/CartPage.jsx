@@ -25,7 +25,11 @@ const CartPage = () => {
   const fetchCartItems = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`${API_BASE_URL}/api/cart/${userId}`);
+      const response = await fetch(`${API_BASE_URL}/api/cart/${userId}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
+        },
+      });
       if (!response.ok) throw new Error("Failed to fetch cart items");
 
       const data = await response.json();
@@ -42,7 +46,10 @@ const CartPage = () => {
     try {
       const response = await fetch(`${API_BASE_URL}/api/cart/update`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
+        },
         body: JSON.stringify({ userId, productId, quantity: newQuantity }),
       });
       if (!response.ok) throw new Error("Failed to update quantity");
@@ -64,7 +71,10 @@ const CartPage = () => {
     try {
       const response = await fetch(`${API_BASE_URL}/api/cart/remove`, {
         method: "DELETE",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
+        },
         body: JSON.stringify({ userId, productId }),
       });
       if (!response.ok) throw new Error("Failed to remove item");

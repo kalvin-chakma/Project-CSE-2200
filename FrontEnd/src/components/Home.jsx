@@ -11,7 +11,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import API_BASE_URL from "../config/api.js";
 
 function Home({ categories, isAuthenticated, selectedCategory, sortOrder }) {
-  const [products] = useContext(productContext);
+  const [products, , productsLoading] = useContext(productContext);
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -331,7 +331,7 @@ function Home({ categories, isAuthenticated, selectedCategory, sortOrder }) {
         </div>
       </div>
 
-      {isLoading ? (
+      {isLoading || productsLoading ? (
         <div className="flex justify-center items-center h-64">
           <ThreeDots
             height="80"

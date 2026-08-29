@@ -102,7 +102,7 @@ const OrderPage = () => {
                 <div
                   key={order._id}
                   className={`mb-6 bg-white rounded-lg shadow-md overflow-hidden border-l-4 ${
-                    order.status === "Paid"
+                    order.status === "Payment Done"
                       ? "border-green-500"
                       : "border-red-500"
                   } ${
@@ -117,7 +117,7 @@ const OrderPage = () => {
                     </h3>
                     <span
                       className={`px-3 py-1 rounded-full text-sm font-bold ${
-                        order.status === "Paid"
+                        order.status === "Payment Done"
                           ? "bg-green-100 text-green-800"
                           : "bg-red-100 text-red-800"
                       }`}

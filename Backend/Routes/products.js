@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Product = require('../Models/Product'); // Ensure the correct path
 const UserModel = require('../Models/user');
-const { verifyToken } = require('../Middlewares/authMiddleware');
+const { verifyToken, isAdmin } = require('../Middlewares/authMiddleware');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
@@ -57,7 +57,7 @@ router.get('/:id', async(req, res) => {
 });
 
 // Create a new product
-router.post('/', async(req, res) => {
+router.post('/', verifyToken, isAdmin, async(req, res) => {
     const product = new Product({
         title: req.body.title,
         category: req.body.category,
@@ -77,7 +77,7 @@ router.post('/', async(req, res) => {
 });
 
 // Update a product
-router.put('/:id', async(req, res) => {
+router.put('/:id', verifyToken, isAdmin, async(req, res) => {
     try {
         const product = await Product.findById(req.params.id);
         if (!product) return res.status(404).json({ message: 'Product not found' });
@@ -100,7 +100,7 @@ router.put('/:id', async(req, res) => {
 });
 
 // Upload product image
-router.post('/upload', upload.single('image'), async(req, res) => {
+router.post('/upload', verifyToken, isAdmin, upload.single('image'), async(req, res) => {
     try {
         if (!req.file) {
             return res.status(400).json({ message: 'No file uploaded' });
@@ -113,7 +113,7 @@ router.post('/upload', upload.single('image'), async(req, res) => {
 });
 
 // Delete a product
-router.delete('/:id', async(req, res) => {
+router.delete('/:id', verifyToken, isAdmin, async(req, res) => {
     try {
         const product = await Product.findById(req.params.id);
         if (!product) return res.status(404).json({ message: 'Product not found' });

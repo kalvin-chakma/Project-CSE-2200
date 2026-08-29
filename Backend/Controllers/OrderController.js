@@ -13,7 +13,8 @@ const is_live = false;
 
 const createOrder = async (req, res) => {
   try {
-    const { userId, paymentMethod, address, phone } = req.body;
+    const userId = req.user.id;
+    const { paymentMethod, address, phone } = req.body;
 
     const cartItems = await CartItem.find({ userId }).populate('productId');
     if (cartItems.length === 0) {
@@ -58,6 +59,9 @@ const createOrder = async (req, res) => {
 const getUserOrders = async (req, res) => {
   try {
     const userId = req.params.userId;
+    if (userId !== req.user.id) {
+      return res.status(403).json({ message: "Access denied", success: false });
+    }
     const orders = await Order.find({ userId })
       .populate('products.productId')
       .sort({ createdAt: -1 });
@@ -71,7 +75,8 @@ const getUserOrders = async (req, res) => {
 
 const initiateOnlinePayment = async (req, res) => {
   try {
-    const { userId, address, phone, paymentMethod } = req.body;
+    const userId = req.user.id;
+    const { address, phone, paymentMethod } = req.body;
 
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ message: "User not found", success: false });
@@ -204,6 +209,27 @@ const handlePaymentSuccess = async (req, res) => {
     const order = await Order.findOne({ transactionId });
     if (!order) return res.status(404).json({ message: "Order not found", success: false });
 
+    const valId = req.body.val_id;
+    if (!valId) {
+      console.error("Payment success callback missing val_id for order", transactionId);
+      return res.redirect(`${process.env.FRONTEND_URL}/cartPage`);
+    }
+
+    const sslcz = new SSLCommerzPayment(store_id, store_passwd, is_live);
+    const validation = await sslcz.validate({ val_id: valId });
+
+    const isValid =
+      validation &&
+      (validation.status === 'VALID' || validation.status === 'VALIDATED') &&
+      validation.tran_id === transactionId &&
+      validation.currency === 'BDT' &&
+      Math.abs(parseFloat(validation.amount) - order.totalAmount) < 1;
+
+    if (!isValid) {
+      console.error("Payment validation failed for order", transactionId, validation);
+      return res.redirect(`${process.env.FRONTEND_URL}/cartPage`);
+    }
+
     order.status = "Payment Done";
     await order.save();
 
@@ -222,6 +248,9 @@ const getLatestOrder = async (req, res) => {
     const userId = req.params.userId;
     if (!userId) {
       return res.status(400).json({ message: "User ID is required", success: false });
+    }
+    if (userId !== req.user.id) {
+      return res.status(403).json({ message: "Access denied", success: false });
     }
 
     const latestOrder = await Order.findOne({ userId })

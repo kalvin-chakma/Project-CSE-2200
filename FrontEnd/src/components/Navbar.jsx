@@ -284,4 +284,3 @@ const Navbar = ({ categories, isAuthenticated, onCategoryChange }) => {
 };
 
 export default Navbar;
-``

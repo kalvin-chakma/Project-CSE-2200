@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-function confirmPassword() {
+function ConfirmPassword({ name, value, onChange }) {
   const [showPassword, setShowPassword] = useState(false);
 
   const togglePasswordVisibility = () => {
@@ -18,11 +18,12 @@ function confirmPassword() {
         </label>
         <div className="relative">
           <input
-            id="hs-toggle-password"
-            type={showPassword ? "text" : "Confirm Password"}
-            className={`mt-1 block w-full px-3 py-2 border border-gray-400 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm ${
-              showPassword ? "bg-white text-black" : "bg-white text-black"
-            }`}
+            id="ConfirmPassword"
+            name={name}
+            type={showPassword ? "text" : "password"}
+            value={value}
+            onChange={onChange}
+            className="mt-1 block w-full px-3 py-2 border border-gray-400 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
             placeholder="Enter password Again"
           />
           <button
@@ -86,4 +87,4 @@ function confirmPassword() {
   );
 }
 
-export default confirmPassword;
+export default ConfirmPassword;

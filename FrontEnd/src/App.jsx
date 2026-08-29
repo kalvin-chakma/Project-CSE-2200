@@ -19,7 +19,6 @@ import PaymentPage from "./components/PaymentPage";
 import PaymentSuccessPage from "./components/PaymentSuccessPage";
 import OrderPage from "./components/OrderPage";
 import AdminOrderPage from "./components/AdminOrderPage";
-import UserOrders from "./components/UserOrders";
 import About from "./components/About";
 import Contact from "./components/Contact";
 import Wishlist from "./components/Wishlist";
@@ -192,10 +191,6 @@ export default function App() {
         <Route
           path="/AdminOrderPage"
           element={<PrivateRoute element={<AdminOrderPage />} />}
-        />
-        <Route
-          path="/your-orders"
-          element={<PrivateRoute element={<UserOrders />} />}
         />
         <Route path="*" element={<Navigate to={isAuthenticated ? "/home" : "/LogInPage"} replace />} />
       </Routes>

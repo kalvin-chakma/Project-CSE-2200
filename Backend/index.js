@@ -1,5 +1,6 @@
 const express = require("express");
 const app = express();
+app.set("trust proxy", 1);
 require("dotenv").config();
 require("./Models/db"); // Initialize MongoDB connection
 const bodyParser = require("body-parser");
@@ -26,6 +27,7 @@ app.get("/ping", (req, res) => {
 // Middleware
 app.use(cors()); // Enable CORS for all routes
 app.use(bodyParser.json()); // Parse application/json requests
+app.use(bodyParser.urlencoded({ extended: true })); // Parse SSLCommerz's form-encoded IPN/callback requests
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 
@@ -54,4 +56,6 @@ const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
+
+module.exports = app;
 

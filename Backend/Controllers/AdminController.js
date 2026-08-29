@@ -21,9 +21,9 @@ const getAllCartItems = async (req, res) => {
     console.log("Cart items fetched:", cartItems);
     
     if (!cartItems || cartItems.length === 0) {
-      return res.status(404).json({ message: "No cart items found", success: false });
+      return res.status(200).json({ cartItems: [], success: true });
     }
-    
+
     // Get unique user and product IDs
     const userIds = [...new Set(cartItems.map(item => item.userId))];
     const productIds = [...new Set(cartItems.map(item => item.productId))];
@@ -119,8 +119,22 @@ const getDashboardStats = async (req, res) => {
 const updateUser = async (req, res) => {
   const userId = req.params.id;
   const { name, email, role } = req.body;
-  
+
   try {
+    if (userId === req.user.id && role && role !== 'admin') {
+      return res.status(400).json({ message: "Admins cannot change their own role", success: false });
+    }
+
+    if (role && role !== 'admin') {
+      const targetUser = await UserModel.findById(userId);
+      if (targetUser && targetUser.role === 'admin') {
+        const adminCount = await UserModel.countDocuments({ role: 'admin' });
+        if (adminCount <= 1) {
+          return res.status(400).json({ message: "Cannot demote the last remaining admin", success: false });
+        }
+      }
+    }
+
     const updatedUser = await UserModel.findByIdAndUpdate(userId, { name, email, role }, { new: true });
     if (!updatedUser) {
       return res.status(404).json({ message: "User not found", success: false });
@@ -137,6 +151,18 @@ const deleteUser = async (req, res) => {
   const userId = req.params.id;
 
   try {
+    if (userId === req.user.id) {
+      return res.status(400).json({ message: "Admins cannot delete their own account", success: false });
+    }
+
+    const targetUser = await UserModel.findById(userId);
+    if (targetUser && targetUser.role === 'admin') {
+      const adminCount = await UserModel.countDocuments({ role: 'admin' });
+      if (adminCount <= 1) {
+        return res.status(400).json({ message: "Cannot delete the last remaining admin", success: false });
+      }
+    }
+
     const deletedUser = await UserModel.findByIdAndDelete(userId);
     if (!deletedUser) {
       return res.status(404).json({ message: "User not found", success: false });

@@ -7,6 +7,7 @@ export const productContext = createContext();
 
 const Context = ({ children }) => {
   const [products, setProducts] = useState([]);
+  const [productsLoading, setProductsLoading] = useState(true);
   const hasFetchedRef = useRef(false);
 
   useEffect(() => {
@@ -19,6 +20,8 @@ const Context = ({ children }) => {
       } catch (error) {
         console.error("Error fetching products:", error);
         // You might want to add some error handling here, e.g., setting an error state
+      } finally {
+        setProductsLoading(false);
       }
     };
 
@@ -28,7 +31,7 @@ const Context = ({ children }) => {
   }, []);
 
   return (
-    <productContext.Provider value={[products, setProducts]}>
+    <productContext.Provider value={[products, setProducts, productsLoading]}>
       {children}
     </productContext.Provider>
   );

@@ -28,17 +28,21 @@ const Create = ({ addCategory }) => {
     }
 
     let imageUrl = image;
+    const token = localStorage.getItem("jwtToken");
     if (imageFile) {
       const formData = new FormData();
       formData.append('image', imageFile);
       try {
         const uploadRes = await fetch(`${API_BASE_URL}/api/products/upload`, {
           method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
           body: formData,
         });
         if (!uploadRes.ok) throw new Error('Image upload failed');
         const { url } = await uploadRes.json();
-        imageUrl = `${API_BASE_URL}${url}`;
+        imageUrl = url;
       } catch (err) {
         console.error(err);
         alert('Image upload failed');
@@ -64,6 +68,7 @@ const Create = ({ addCategory }) => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify(newProduct),
         }

@@ -15,7 +15,7 @@ const AdminOrderPage = () => {
   useEffect(() => {
     const token = localStorage.getItem("jwtToken");
     if (!token) {
-      navigate("/login");
+      navigate("/LogInPage");
       return;
     }
     fetchOrders();
@@ -51,7 +51,7 @@ const AdminOrderPage = () => {
       );
       if (error.response?.status === 401) {
         localStorage.removeItem("jwtToken");
-        navigate("/login");
+        navigate("/LogInPage");
       }
     } finally {
       setLoading(false);
@@ -81,7 +81,7 @@ const AdminOrderPage = () => {
         );
         if (error.response?.status === 401) {
           localStorage.removeItem("jwtToken");
-          navigate("/login");
+          navigate("/LogInPage");
         }
       }
     }
@@ -112,7 +112,7 @@ const AdminOrderPage = () => {
       );
       if (error.response?.status === 401) {
         localStorage.removeItem("jwtToken");
-        navigate("/login");
+        navigate("/LogInPage");
       }
     }
   };

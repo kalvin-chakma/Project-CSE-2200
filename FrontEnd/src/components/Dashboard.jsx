@@ -4,6 +4,7 @@ import Navbar from "./Navbar";
 import Sidebar from "./FormElement/Sidebar";
 import AdminDashboard from "./AdminDashboard";
 import UserDashboard from "./UserDashboard";
+import API_BASE_URL from "../config/api.js";
 
 const Dashboard = () => {
   const [loggedInUser, setLoggedInUser] = useState("");
@@ -15,26 +16,27 @@ const Dashboard = () => {
     // Fetch user data from backend
     const fetchUserData = async () => {
       try {
-        const response = await fetch("/api/user", {
+        const response = await fetch(`${API_BASE_URL}/api/user/profile`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
           },
         });
         const data = await response.json();
         if (response.ok) {
-          setLoggedInUser(data.name);
-          setUserEmail(data.email);
-          setUserRole(data.role);
-          localStorage.setItem("loggedInUser", data.name);
-          localStorage.setItem("userEmail", data.email);
-          localStorage.setItem("userRole", data.role);
+          const { name, email, role } = data.user;
+          setLoggedInUser(name);
+          setUserEmail(email);
+          setUserRole(role);
+          localStorage.setItem("loggedInUser", name);
+          localStorage.setItem("userEmail", email);
+          localStorage.setItem("userRole", role);
         } else {
           console.error("Failed to fetch user data");
-          navigate("/login");
+          navigate("/LogInPage");
         }
       } catch (error) {
         console.error("Error fetching user data", error);
-        navigate("/login");
+        navigate("/LogInPage");
       }
     };
 
