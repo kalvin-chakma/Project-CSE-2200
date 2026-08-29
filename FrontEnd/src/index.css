@@ -3,13 +3,54 @@
 @tailwind utilities;
 
 @layer utilities {
-/* src/index.css */
-.hide-scrollbar::-webkit-scrollbar {
-  display: none;
-}
+    /* src/index.css */
+    .hide-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
 
-.hide-scrollbar {
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
-}
+    .hide-scrollbar {
+        -ms-overflow-style: none; /* IE and Edge */
+        scrollbar-width: none; /* Firefox */
+    }
+
+    .range-slider {
+        pointer-events: none;
+        -webkit-appearance: none;
+        appearance: none;
+        background: transparent;
+    }
+
+    .range-slider::-webkit-slider-runnable-track {
+        -webkit-appearance: none;
+        background: transparent;
+    }
+
+    .range-slider::-moz-range-track {
+        background: transparent;
+    }
+
+    .range-slider::-webkit-slider-thumb {
+        pointer-events: auto;
+        -webkit-appearance: none;
+        appearance: none;
+        width: 16px;
+        height: 16px;
+        border-radius: 9999px;
+        background: #111827;
+        border: 2px solid #ffffff;
+        box-shadow: 0 0 0 1px #111827;
+        cursor: pointer;
+        margin-top: 0;
+    }
+
+    .range-slider::-moz-range-thumb {
+        pointer-events: auto;
+        width: 16px;
+        height: 16px;
+        border-radius: 9999px;
+        background: #111827;
+        border: 2px solid #ffffff;
+        box-shadow: 0 0 0 1px #111827;
+        cursor: pointer;
+    }
 }

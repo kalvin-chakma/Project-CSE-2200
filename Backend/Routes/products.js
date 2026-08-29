@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const mongoose = require('mongoose');
 const Product = require('../Models/Product'); // Ensure the correct path
 const UserModel = require('../Models/user');
 const { verifyToken, isAdmin } = require('../Middlewares/authMiddleware');
@@ -26,15 +27,62 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-// Get all products
+// Turn a title into a URL-safe slug
+const slugify = (text) =>
+    String(text)
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '')
+        .slice(0, 80) || 'product';
+
+// Generate a slug from a title, appending -2, -3, ... on collision
+const generateUniqueSlug = async(title, excludeId) => {
+    const base = slugify(title);
+    let slug = base;
+    let suffix = 2;
+    while (true) {
+        const query = { slug };
+        if (excludeId) query._id = { $ne: excludeId };
+        const existing = await Product.findOne(query).select('_id').lean();
+        if (!existing) return slug;
+        slug = `${base}-${suffix}`;
+        suffix += 1;
+    }
+};
+
+// Look a product up by Mongo _id or by slug
+const findProductByIdOrSlug = async(idOrSlug) => {
+    if (mongoose.Types.ObjectId.isValid(idOrSlug)) {
+        const byId = await Product.findById(idOrSlug);
+        if (byId) return byId;
+    }
+    return Product.findOne({ slug: idOrSlug });
+};
+
+// Generate a short, unique SKU when the admin doesn't supply one
+const generateUniqueSku = async(brand, category) => {
+    const prefix = `${(brand || 'GEN').slice(0, 3)}-${(category || 'PRD').slice(0, 3)}`
+        .toUpperCase()
+        .replace(/[^A-Z-]/g, '');
+    while (true) {
+        const suffix = Math.floor(1000 + Math.random() * 9000);
+        const sku = `${prefix}-${suffix}`;
+        const existing = await Product.findOne({ sku }).select('_id').lean();
+        if (!existing) return sku;
+    }
+};
+
+// Get all products (public catalog: active listings only)
 router.get('/', async(req, res) => {
     try {
-        const products = await Product.find();
+        const products = await Product.find({ status: 'active' });
         const baseUrl = `${req.protocol}://${req.get('host')}`;
         const toAbsolute = (url) => (url && url.startsWith('/uploads/') ? `${baseUrl}${url}` : url);
         const mapped = products.map(p => ({
             ...p.toObject(),
             image: toAbsolute(p.image),
+            images: Array.isArray(p.images) ? p.images.map(toAbsolute) : [],
         }));
         res.json(mapped);
     } catch (error) {
@@ -42,14 +90,18 @@ router.get('/', async(req, res) => {
     }
 });
 
-// Get a single product
+// Get a single product by id or slug
 router.get('/:id', async(req, res) => {
     try {
-        const product = await Product.findById(req.params.id);
+        const product = await findProductByIdOrSlug(req.params.id);
         if (!product) return res.status(404).json({ message: 'Product not found' });
         const baseUrl = `${req.protocol}://${req.get('host')}`;
         const toAbsolute = (url) => (url && url.startsWith('/uploads/') ? `${baseUrl}${url}` : url);
-        const mapped = {...product.toObject(), image: toAbsolute(product.image) };
+        const mapped = {
+            ...product.toObject(),
+            image: toAbsolute(product.image),
+            images: Array.isArray(product.images) ? product.images.map(toAbsolute) : [],
+        };
         res.json(mapped);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -58,17 +110,29 @@ router.get('/:id', async(req, res) => {
 
 // Create a new product
 router.post('/', verifyToken, isAdmin, async(req, res) => {
-    const product = new Product({
-        title: req.body.title,
-        category: req.body.category,
-        price: req.body.price,
-        gender: req.body.gender || 'unisex',
-        sizes: Array.isArray(req.body.sizes) ? req.body.sizes : [],
-        description: req.body.description,
-        image: req.body.image,
-    });
-
     try {
+        const slug = await generateUniqueSlug(req.body.title);
+        const sku = req.body.sku || await generateUniqueSku(req.body.brand, req.body.category);
+        const product = new Product({
+            title: req.body.title,
+            slug,
+            sku,
+            status: ['active', 'draft', 'archived'].includes(req.body.status) ? req.body.status : 'active',
+            tags: Array.isArray(req.body.tags) ? req.body.tags : [],
+            brand: req.body.brand || 'Generic',
+            category: req.body.category,
+            price: req.body.price,
+            discountPercentage: req.body.discountPercentage || 0,
+            stock: req.body.stock ?? 0,
+            gender: req.body.gender || 'unisex',
+            sizes: Array.isArray(req.body.sizes) ? req.body.sizes : [],
+            description: req.body.description,
+            image: req.body.image,
+            images: Array.isArray(req.body.images) ? req.body.images : [],
+            features: Array.isArray(req.body.features) ? req.body.features : [],
+            specifications: Array.isArray(req.body.specifications) ? req.body.specifications : [],
+        });
+
         const newProduct = await product.save();
         res.status(201).json(newProduct);
     } catch (error) {
@@ -79,18 +143,47 @@ router.post('/', verifyToken, isAdmin, async(req, res) => {
 // Update a product
 router.put('/:id', verifyToken, isAdmin, async(req, res) => {
     try {
-        const product = await Product.findById(req.params.id);
+        const product = await findProductByIdOrSlug(req.params.id);
         if (!product) return res.status(404).json({ message: 'Product not found' });
 
+        if (req.body.title && req.body.title !== product.title) {
+            product.slug = await generateUniqueSlug(req.body.title, product._id);
+        }
+
         product.title = req.body.title || product.title;
+        if (req.body.sku) {
+            product.sku = req.body.sku;
+        }
+        if (['active', 'draft', 'archived'].includes(req.body.status)) {
+            product.status = req.body.status;
+        }
+        if (req.body.tags) {
+            product.tags = Array.isArray(req.body.tags) ? req.body.tags : product.tags;
+        }
+        product.brand = req.body.brand || product.brand;
         product.category = req.body.category || product.category;
         product.price = req.body.price || product.price;
+        if (req.body.discountPercentage !== undefined) {
+            product.discountPercentage = req.body.discountPercentage;
+        }
+        if (req.body.stock !== undefined) {
+            product.stock = req.body.stock;
+        }
         product.gender = req.body.gender || product.gender;
         if (req.body.sizes) {
             product.sizes = Array.isArray(req.body.sizes) ? req.body.sizes : product.sizes;
         }
         product.description = req.body.description || product.description;
         product.image = req.body.image || product.image;
+        if (req.body.images) {
+            product.images = Array.isArray(req.body.images) ? req.body.images : product.images;
+        }
+        if (req.body.features) {
+            product.features = Array.isArray(req.body.features) ? req.body.features : product.features;
+        }
+        if (req.body.specifications) {
+            product.specifications = Array.isArray(req.body.specifications) ? req.body.specifications : product.specifications;
+        }
 
         const updatedProduct = await product.save();
         res.json(updatedProduct);
@@ -115,10 +208,10 @@ router.post('/upload', verifyToken, isAdmin, upload.single('image'), async(req, 
 // Delete a product
 router.delete('/:id', verifyToken, isAdmin, async(req, res) => {
     try {
-        const product = await Product.findById(req.params.id);
+        const product = await findProductByIdOrSlug(req.params.id);
         if (!product) return res.status(404).json({ message: 'Product not found' });
 
-        await Product.findByIdAndDelete(req.params.id);
+        await Product.findByIdAndDelete(product._id);
         res.json({ message: 'Product deleted' });
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -127,7 +220,7 @@ router.delete('/:id', verifyToken, isAdmin, async(req, res) => {
 
 router.get('/category/:category', async(req, res) => {
     try {
-        const products = await Product.find({ category: req.params.category });
+        const products = await Product.find({ category: req.params.category, status: 'active' });
         res.json(products);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -142,7 +235,7 @@ router.post('/:id/reviews', verifyToken, async(req, res) => {
             return res.status(400).json({ message: 'Rating must be between 1 and 5' });
         }
 
-        const product = await Product.findById(req.params.id);
+        const product = await findProductByIdOrSlug(req.params.id);
         if (!product) return res.status(404).json({ message: 'Product not found' });
 
         const user = await UserModel.findById(req.user.id).select('name');

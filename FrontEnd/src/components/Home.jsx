@@ -1,14 +1,16 @@
-import React, { useContext, useState, useEffect } from "react";
+import  { useContext, useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { productContext } from "../utills/Context";
 import SearchBar from "./SearchBar";
 import Footer from "./Footer";
+import FilterSidebar from "./FilterSidebar";
 import { ThreeDots } from "react-loader-spinner";
-import { FaHeart, FaFilter } from "react-icons/fa";
+import { FaHeart, FaFilter, FaShoppingCart } from "react-icons/fa";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { motion, AnimatePresence } from "framer-motion";
 import API_BASE_URL from "../config/api.js";
+
+const DEFAULT_MAX_PRICE = 1000000;
 
 function Home({ categories, isAuthenticated, selectedCategory, sortOrder }) {
   const [products, , productsLoading] = useContext(productContext);
@@ -17,12 +19,27 @@ function Home({ categories, isAuthenticated, selectedCategory, sortOrder }) {
   const [isLoading, setIsLoading] = useState(true);
   const [favorites, setFavorites] = useState([]);
   const [selectedCategories, setSelectedCategories] = useState([]);
-  const [priceRange, setPriceRange] = useState([0, 1000000]);
+  const [selectedGenders, setSelectedGenders] = useState([]);
+  const [selectedSizes, setSelectedSizes] = useState([]);
+  const [priceRange, setPriceRange] = useState([0, DEFAULT_MAX_PRICE]);
   const [showFilters, setShowFilters] = useState(false);
   const { category } = useParams();
   const navigate = useNavigate();
   const [promotedProducts, setPromotedProducts] = useState([]);
   const [currentPromotedIndex, setCurrentPromotedIndex] = useState(0);
+
+  const maxPrice = useMemo(() => {
+    if (!products || products.length === 0) return DEFAULT_MAX_PRICE;
+    const prices = products.map((p) => p?.price).filter((p) => typeof p === "number");
+    if (prices.length === 0) return DEFAULT_MAX_PRICE;
+    return Math.max(1000, Math.ceil(Math.max(...prices) / 1000) * 1000);
+  }, [products]);
+
+  // sync the slider's upper bound to real product prices once loaded,
+  // unless the user has already moved the slider away from the default
+  useEffect(() => {
+    setPriceRange((prev) => (prev[1] === DEFAULT_MAX_PRICE ? [prev[0], maxPrice] : prev));
+  }, [maxPrice]);
 
   // filter products
   useEffect(() => {
@@ -65,6 +82,22 @@ function Home({ categories, isAuthenticated, selectedCategory, sortOrder }) {
           product?.price >= priceRange[0] && product.price <= priceRange[1]
       );
 
+      if (selectedGenders.length > 0) {
+        filtered = filtered.filter(
+          (product) => product?.gender && selectedGenders.includes(product.gender)
+        );
+      }
+
+      if (selectedSizes.length > 0) {
+        filtered = filtered.filter(
+          (product) =>
+            Array.isArray(product?.sizes) &&
+            product.sizes.some((sz) =>
+              selectedSizes.includes(String(sz).toLowerCase())
+            )
+        );
+      }
+
       filtered.sort((a, b) => {
         if (sortOrder === "asc") {
           return a.price - b.price;
@@ -75,11 +108,6 @@ function Home({ categories, isAuthenticated, selectedCategory, sortOrder }) {
 
       setFilteredProducts(filtered);
       setIsLoading(false);
-
-      if (filtered.length > 0) {
-        const shuffled = [...filtered].sort(() => 0.5 - Math.random());
-        setPromotedProducts(shuffled.slice(0, 5));
-      }
     }, 500);
 
     return () => clearTimeout(timer);
@@ -90,8 +118,20 @@ function Home({ categories, isAuthenticated, selectedCategory, sortOrder }) {
     searchQuery,
     sortOrder,
     selectedCategories,
+    selectedGenders,
+    selectedSizes,
     priceRange,
   ]);
+
+  // pick the featured products once when the catalog loads — kept separate
+  // from search/filter state so typing a search or moving a filter doesn't
+  // reshuffle (and re-key, and glitch the animation of) the featured banner
+  useEffect(() => {
+    if (!products || products.length === 0) return;
+    const shuffled = [...products].sort(() => 0.5 - Math.random());
+    setPromotedProducts(shuffled.slice(0, 5));
+    setCurrentPromotedIndex(0);
+  }, [products]);
 
   // rotate featured products
   useEffect(() => {
@@ -146,13 +186,23 @@ function Home({ categories, isAuthenticated, selectedCategory, sortOrder }) {
     );
   };
 
-  const handlePriceRangeChange = (event) => {
-    setPriceRange([priceRange[0], parseInt(event.target.value)]);
+  const handleGenderChange = (gender) => {
+    setSelectedGenders((prev) =>
+      prev.includes(gender) ? prev.filter((g) => g !== gender) : [...prev, gender]
+    );
+  };
+
+  const handleSizeChange = (size) => {
+    setSelectedSizes((prev) =>
+      prev.includes(size) ? prev.filter((s) => s !== size) : [...prev, size]
+    );
   };
 
   const handleResetFilters = () => {
     setSelectedCategories([]);
-    setPriceRange([0, 1000000]);
+    setSelectedGenders([]);
+    setSelectedSizes([]);
+    setPriceRange([0, maxPrice]);
     setSearchQuery("");
   };
 
@@ -224,83 +274,36 @@ function Home({ categories, isAuthenticated, selectedCategory, sortOrder }) {
               placeholder="Search for products"
               value={searchQuery}
               onChange={handleSearchChange}
-              className="flex-grow max-w-xl py-2 px-4 border border-gray-300 rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-500"
+              className="flex-grow max-w-xl py-2 px-4 border border-gray-300 rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-900"
             />
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className="ml-4 p-2 bg-pink-500 text-white rounded-full hover:bg-pink-600 focus:outline-none focus:ring-2 focus:ring-pink-500"
+              className="ml-4 p-2 bg-gray-900 text-white rounded-full hover:bg-black focus:outline-none focus:ring-2 focus:ring-gray-900 lg:hidden"
+              aria-label="Toggle filters"
             >
               <FaFilter />
             </button>
           </div>
-          {showFilters && (
-            <div className="mt-4 bg-white p-4 rounded-lg shadow-md">
-              <h3 className="text-lg font-semibold mb-2">Categories</h3>
-              <div className="flex flex-wrap gap-2">
-                {categories.map((category) => (
-                  <label key={category} className="inline-flex items-center">
-                    <input
-                      type="checkbox"
-                      className="form-checkbox text-pink-500"
-                      checked={selectedCategories.includes(
-                        category.toLowerCase()
-                      )}
-                      onChange={() =>
-                        handleCategoryChange(category.toLowerCase())
-                      }
-                    />
-                    <span className="ml-2">{category}</span>
-                  </label>
-                ))}
-              </div>
-              <div className="mt-4">
-                <h3 className="text-lg font-semibold mb-2">Price Range</h3>
-                <input
-                  type="range"
-                  min="0"
-                  max="1000000"
-                  step="1000"
-                  value={priceRange[1]}
-                  onChange={handlePriceRangeChange}
-                  className="w-full"
-                />
-                <div className="flex justify-between">
-                  <span>${priceRange[0]}</span>
-                  <span>${priceRange[1]}</span>
-                </div>
-              </div>
-              <button
-                onClick={handleResetFilters}
-                className="mt-4 px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500"
-              >
-                Reset Filters
-              </button>
-            </div>
-          )}
         </div>
       </div>
 
-      <div className="bg-gradient-to-r from-pink-500 to-purple-600 text-white py-8 px-4">
+      <div className="bg-gradient-to-r from-gray-900 to-black text-white py-8 px-4">
         <div className="container mx-auto">
           <h2 className="text-3xl font-bold mb-4">Featured Product</h2>
-          <AnimatePresence mode="wait">
-            {promotedProducts.length > 0 &&
+          {promotedProducts.length > 0 &&
               promotedProducts[currentPromotedIndex] && (
-                <motion.div
+                <div
                   key={promotedProducts[currentPromotedIndex]._id}
-                  initial={{ opacity: 0, y: 50 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -50 }}
-                  transition={{ duration: 0.5 }}
                   className="flex items-center"
                 >
                   <img
                     src={promotedProducts[currentPromotedIndex].image}
                     alt={promotedProducts[currentPromotedIndex].title}
-                    className="w-64 h-64 object-cover rounded-lg shadow-lg mr-8"
+                    className="w-64 h-64 object-contain rounded-lg shadow-lg mr-8 bg-white p-3 cursor-pointer"
                     onClick={() =>
                       handleProductClick(
-                        promotedProducts[currentPromotedIndex]._id
+                        promotedProducts[currentPromotedIndex].slug ||
+                          promotedProducts[currentPromotedIndex]._id
                       )
                     }
                   />
@@ -317,81 +320,116 @@ function Home({ categories, isAuthenticated, selectedCategory, sortOrder }) {
                     <button
                       onClick={() =>
                         handleProductClick(
-                          promotedProducts[currentPromotedIndex]._id
+                          promotedProducts[currentPromotedIndex].slug ||
+                            promotedProducts[currentPromotedIndex]._id
                         )
                       }
-                      className="bg-white text-pink-500 px-6 py-2 rounded-full font-semibold hover:bg-pink-100 transition-colors duration-300"
+                      className="bg-white text-gray-900 px-6 py-2 rounded-full font-semibold hover:bg-gray-200 transition-colors duration-300"
                     >
                       View Details
                     </button>
                   </div>
-                </motion.div>
+                </div>
               )}
-          </AnimatePresence>
         </div>
       </div>
 
-      {isLoading || productsLoading ? (
-        <div className="flex justify-center items-center h-64">
-          <ThreeDots
-            height="80"
-            width="80"
-            radius="9"
-            color="#ec4899"
-            ariaLabel="three-dots-loading"
-            visible={true}
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex flex-col lg:flex-row gap-6 items-start">
+          <FilterSidebar
+            isOpen={showFilters}
+            onClose={() => setShowFilters(false)}
+            categories={categories}
+            selectedCategories={selectedCategories}
+            onCategoryChange={handleCategoryChange}
+            priceRange={priceRange}
+            onPriceRangeChange={setPriceRange}
+            minPrice={0}
+            maxPrice={maxPrice}
+            selectedGenders={selectedGenders}
+            onGenderChange={handleGenderChange}
+            selectedSizes={selectedSizes}
+            onSizeChange={handleSizeChange}
+            onReset={handleResetFilters}
           />
-        </div>
-      ) : (
-        <div className="container mx-auto px-4 py-8">
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
-            {filteredProducts.length > 0 ? (
-              filteredProducts.filter(Boolean).map((product) => (
-                <div
-                  key={product._id || Math.random()}
-                  className="bg-white rounded-lg shadow-md overflow-hidden transition-transform duration-300 hover:scale-105 relative group"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 opacity-0 group-hover:opacity-75 transition-opacity duration-300"></div>
-                  <div className="relative z-10">
+
+          <div className="flex-1 w-full">
+            {isLoading || productsLoading ? (
+              <div className="flex justify-center items-center h-64">
+                <ThreeDots
+                  height="80"
+                  width="80"
+                  radius="9"
+                  color="#ec4899"
+                  ariaLabel="three-dots-loading"
+                  visible={true}
+                />
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {filteredProducts.length > 0 ? (
+                  filteredProducts.filter(Boolean).map((product) => (
                     <div
-                      className="w-full h-48 bg-cover bg-center cursor-pointer"
-                      style={{ backgroundImage: `url(${product.image})` }}
-                      onClick={() => handleProductClick(product._id)}
-                    ></div>
-                    <div className="p-4">
-                      <h3 className="text-sm font-semibold text-gray-800 truncate group-hover:text-white transition-colors duration-300">
-                        {product.title}
-                      </h3>
-                      <p className="mt-2 text-lg font-bold text-pink-600 group-hover:text-white transition-colors duration-300">
-                        ${product.price.toFixed(2)}
-                      </p>
-                      <div className="mt-2 flex items-center justify-between">
-                        <span className="text-xs text-gray-500 group-hover:text-white transition-colors duration-300">
+                      key={product._id || Math.random()}
+                      className="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden flex flex-col"
+                    >
+                      <div
+                        className="w-full h-48 bg-white flex items-center justify-center p-4 cursor-pointer"
+                        onClick={() => handleProductClick(product.slug || product._id)}
+                      >
+                        <img
+                          src={product.image}
+                          alt={product.title}
+                          className="max-h-full max-w-full object-contain"
+                        />
+                      </div>
+                      <div className="p-4 flex flex-col flex-1">
+                        <h3
+                          className="text-sm font-semibold text-gray-800 line-clamp-2 cursor-pointer hover:text-black transition-colors duration-300"
+                          onClick={() => handleProductClick(product.slug || product._id)}
+                        >
+                          {product.title}
+                        </h3>
+                        <span className="text-xs text-gray-500 mt-1">
                           {product.category}
                         </span>
-                        <button
-                          className={`text-2xl ${
-                            isFavorite(product?._id)
-                              ? "text-pink-500"
-                              : "text-gray-400"
-                          } hover:text-pink-500 group-hover:text-white transition-colors duration-300`}
-                          onClick={() => handleAddToFavorites(product)}
-                        >
-                          <FaHeart />
-                        </button>
+                        <p className="mt-2 text-lg font-bold text-gray-900">
+                          ${product.price.toFixed(2)}
+                        </p>
+                        <div className="mt-auto pt-3 space-y-2">
+                          <button
+                            onClick={() => handleProductClick(product.slug || product._id)}
+                            className="w-full flex items-center justify-center gap-2 bg-gray-900 hover:bg-black text-white text-sm font-semibold py-2 rounded transition-colors duration-300"
+                          >
+                            <FaShoppingCart /> View Details
+                          </button>
+                          <button
+                            onClick={() => handleAddToFavorites(product)}
+                            className={`w-full flex items-center justify-center gap-2 text-sm font-medium py-2 rounded border transition-colors duration-300 ${
+                              isFavorite(product?._id)
+                                ? "border-gray-900 text-gray-900 bg-gray-100"
+                                : "border-gray-300 text-gray-600 hover:border-gray-900 hover:text-gray-900"
+                            }`}
+                          >
+                            <FaHeart />{" "}
+                            {isFavorite(product?._id)
+                              ? "In Wishlist"
+                              : "Add to Wishlist"}
+                          </button>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <p className="col-span-full text-center text-gray-500 text-lg">
-                No products found
-              </p>
+                  ))
+                ) : (
+                  <p className="col-span-full text-center text-gray-500 text-lg">
+                    No products found
+                  </p>
+                )}
+              </div>
             )}
           </div>
         </div>
-      )}
+      </div>
 
       <footer className="bg-gray-900 text-white py-6 mt-auto">
         <Footer />

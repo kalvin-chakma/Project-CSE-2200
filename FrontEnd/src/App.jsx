@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
-import { ToastContainer, toast } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Home from "./components/Home";
 import Navbar from "./components/Navbar";
@@ -11,7 +11,6 @@ import RegisterPage from "./components/RegisterPage";
 import RefrshHandler from "./components/RefrshHandler";
 import Dashboard from "./components/Dashboard";
 import TokenRefresher from "./components/TokenRefresher";
-import { apiRequest } from "./utills/auth";
 import CartPage from "./components/CartPage";
 import AllUsers from "./components/AllUsers";
 import AllCartItems from "./components/AllCartItems";
@@ -30,8 +29,8 @@ export default function App() {
     !!localStorage.getItem("jwtToken")
   );
   const [categories, setCategories] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState("");
-  const [sortOrder, setSortOrder] = useState("asc");
+  const [selectedCategory] = useState("");
+  const [sortOrder] = useState("asc");
 
   const PrivateRoute = ({ element }) => {
     return isAuthenticated ? element : <Navigate to="/LogInPage" />;
@@ -69,24 +68,11 @@ export default function App() {
     }
   };
 
-  const handleCategoryChange = (category) => {
-    setSelectedCategory(category);
-  };
-
-  const handleSortOrderChange = (order) => {
-    setSortOrder(order);
-  };
-
   return (
-    <div className="h-screen w-screen flex flex-col">
+    <div className="h-screen w-full flex flex-col">
       <RefrshHandler setIsAuthenticated={setIsAuthenticated} />
       <TokenRefresher />
-      <Navbar
-        categories={categories}
-        isAuthenticated={isAuthenticated}
-        onCategoryChange={handleCategoryChange}
-        onSortOrderChange={handleSortOrderChange}
-      />
+      <Navbar/>
       <Routes>
         <Route
           path="/"
@@ -158,7 +144,7 @@ export default function App() {
             <PrivateRoute element={<Create addCategory={addCategory} />} />
           }
         />
-        <Route path="/details/:id" element={<Details />} />
+        <Route path="/details/:slug" element={<Details />} />
         <Route path="/wishlist" element={<PrivateRoute element={<Wishlist />} />} />
         <Route
           path="/dashboard"

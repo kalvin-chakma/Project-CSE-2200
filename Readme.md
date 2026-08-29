@@ -1,19 +1,19 @@
-# 🛒 EDokan - Full Stack E-Commerce Platform
+# EDokan - Full Stack E-Commerce Platform
 
 EDokan is a modern full-stack e-commerce platform built to provide a seamless online shopping experience. It includes secure authentication, role-based dashboards, shopping cart management, order processing, and an integrated payment system.
 
 ---
 
-## 🚀 Features
+## Features
 
-### 👤 Authentication
+### Authentication
 - User Registration
 - User Login
 - Secure Logout
 - Role-Based Authentication
 - Protected Routes
 
-### 🛍️ User Features
+### User Features
 - Browse Products
 - Product Details
 - Add to Cart
@@ -26,7 +26,7 @@ EDokan is a modern full-stack e-commerce platform built to provide a seamless on
 - User Dashboard
 - Profile Management
 
-### 👨‍💼 Admin Features
+### Admin Features
 - Admin Dashboard
 - Manage Products
 - Manage Categories
@@ -36,7 +36,7 @@ EDokan is a modern full-stack e-commerce platform built to provide a seamless on
 - Dashboard Analytics
 
 
-## 💻 Technology Stack
+## Technology Stack
 
 ### Frontend
 - React.js
@@ -56,13 +56,13 @@ EDokan is a modern full-stack e-commerce platform built to provide a seamless on
 ### Payment
 - Payment Gateway Integration
 
-## 📄 License
+## License
 
 This project is developed for educational and portfolio purposes.
 
 ---
 
-## ❤️ Acknowledgements
+## Acknowledgements
 
 Thanks to all team members for their valuable contributions throughout the development of EDokan.
 
@@ -78,4 +78,4 @@ Thanks to all team members for their valuable contributions throughout the devel
 
 ---
 
-Made with ❤️ by Team EDokan
+Made by Team EDokan

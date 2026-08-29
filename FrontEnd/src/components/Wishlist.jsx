@@ -82,7 +82,7 @@ const Wishlist = () => {
               <p className="text-pink-600 font-bold">${product.price}</p>
               <div className="mt-3 flex gap-2">
                 <button
-                  onClick={() => navigate(`/details/${product._id}`)}
+                  onClick={() => navigate(`/details/${product.slug || product._id}`)}
                   className="px-3 py-1 bg-indigo-600 text-white rounded hover:bg-indigo-700"
                 >
                   View

@@ -15,11 +15,31 @@ const Create = ({ addCategory }) => {
   const [gender, setGender] = useState("unisex");
   const [sizes, setSizes] = useState([]);
   const [imageFile, setImageFile] = useState(null);
+  const [brand, setBrand] = useState("");
+  const [sku, setSku] = useState("");
+  const [status, setStatus] = useState("active");
+  const [tagsText, setTagsText] = useState("");
+  const [stock, setStock] = useState("");
+  const [discountPercentage, setDiscountPercentage] = useState("");
+  const [featuresText, setFeaturesText] = useState("");
+  const [specifications, setSpecifications] = useState([{ key: "", value: "" }]);
   const navigate = useNavigate();
 
-  const generateRandomId = () => Math.floor(Math.random() * 900) + 100;
-
   const normalizeCategory = (cat) => cat.trim().toLowerCase();
+
+  const updateSpecRow = (index, field, value) => {
+    setSpecifications((prev) =>
+      prev.map((row, i) => (i === index ? { ...row, [field]: value } : row))
+    );
+  };
+
+  const addSpecRow = () => {
+    setSpecifications((prev) => [...prev, { key: "", value: "" }]);
+  };
+
+  const removeSpecRow = (index) => {
+    setSpecifications((prev) => prev.filter((_, i) => i !== index));
+  };
 
   const addProduct = async () => {
     if (!title || (!image && !imageFile) || !category || !price || !description) {
@@ -50,8 +70,21 @@ const Create = ({ addCategory }) => {
       }
     }
 
+    const features = featuresText
+      .split("\n")
+      .map((line) => line.trim())
+      .filter(Boolean);
+
+    const cleanSpecifications = specifications
+      .map((row) => ({ key: row.key.trim(), value: row.value.trim() }))
+      .filter((row) => row.key && row.value);
+
+    const tags = tagsText
+      .split(",")
+      .map((t) => t.trim().toLowerCase())
+      .filter(Boolean);
+
     const newProduct = {
-      id: generateRandomId(),
       title,
       image: imageUrl,
       category: normalizeCategory(category),
@@ -59,6 +92,14 @@ const Create = ({ addCategory }) => {
       description,
       gender,
       sizes,
+      brand: brand.trim() || "Generic",
+      sku: sku.trim() || undefined,
+      status,
+      tags,
+      stock: stock === "" ? 0 : Number(stock),
+      discountPercentage: discountPercentage === "" ? 0 : Number(discountPercentage),
+      features,
+      specifications: cleanSpecifications,
     };
 
     try {
@@ -129,6 +170,16 @@ const Create = ({ addCategory }) => {
                     />
                   </div>
                   <div>
+                    <label className="block text-sm font-medium text-gray-600 mb-1">Brand</label>
+                    <input
+                      type="text"
+                      value={brand}
+                      onChange={(e) => setBrand(e.target.value)}
+                      className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Enter brand name"
+                    />
+                  </div>
+                  <div>
                     <label className="block text-sm font-medium text-gray-600 mb-1">Description Product</label>
                     <textarea
                       value={description}
@@ -138,6 +189,56 @@ const Create = ({ addCategory }) => {
                       rows="4"
                       required
                     />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600 mb-1">
+                      Key Features (one per line)
+                    </label>
+                    <textarea
+                      value={featuresText}
+                      onChange={(e) => setFeaturesText(e.target.value)}
+                      className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder={"Lightweight design\nWater resistant\n2-year warranty"}
+                      rows="3"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600 mb-1">Specifications</label>
+                    <div className="space-y-2">
+                      {specifications.map((row, index) => (
+                        <div key={index} className="flex gap-2">
+                          <input
+                            type="text"
+                            value={row.key}
+                            onChange={(e) => updateSpecRow(index, "key", e.target.value)}
+                            placeholder="Spec name (e.g. Material)"
+                            className="w-1/2 p-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          />
+                          <input
+                            type="text"
+                            value={row.value}
+                            onChange={(e) => updateSpecRow(index, "value", e.target.value)}
+                            placeholder="Value (e.g. Cotton)"
+                            className="w-1/2 p-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => removeSpecRow(index)}
+                            className="px-2 text-gray-400 hover:text-red-500"
+                            aria-label="Remove specification"
+                          >
+                            &times;
+                          </button>
+                        </div>
+                      ))}
+                      <button
+                        type="button"
+                        onClick={addSpecRow}
+                        className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                      >
+                        + Add specification
+                      </button>
+                    </div>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-600 mb-1">Size</label>
@@ -166,8 +267,8 @@ const Create = ({ addCategory }) => {
                       <label className="inline-flex items-center">
                         <input
                           type="radio"
-                          value="men"
-                          checked={gender === "men"}
+                          value="male"
+                          checked={gender === "male"}
                           onChange={(e) => setGender(e.target.value)}
                           className="form-radio text-blue-600"
                         />
@@ -176,8 +277,8 @@ const Create = ({ addCategory }) => {
                       <label className="inline-flex items-center">
                         <input
                           type="radio"
-                          value="women"
-                          checked={gender === "women"}
+                          value="female"
+                          checked={gender === "female"}
                           onChange={(e) => setGender(e.target.value)}
                           className="form-radio text-blue-600"
                         />
@@ -196,7 +297,7 @@ const Create = ({ addCategory }) => {
                     </div>
                   </div>
                   <div>
-                    <h2 className="text-lg font-medium text-gray-700 mb-4">Pricing Details</h2>
+                    <h2 className="text-lg font-medium text-gray-700 mb-4">Pricing &amp; Inventory</h2>
                     <div className="space-y-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-600 mb-1">Selling Price</label>
@@ -209,6 +310,31 @@ const Create = ({ addCategory }) => {
                           required
                         />
                       </div>
+                      <div className="flex gap-4">
+                        <div className="w-1/2">
+                          <label className="block text-sm font-medium text-gray-600 mb-1">Discount %</label>
+                          <input
+                            type="number"
+                            min="0"
+                            max="90"
+                            value={discountPercentage}
+                            onChange={(e) => setDiscountPercentage(e.target.value)}
+                            className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="0"
+                          />
+                        </div>
+                        <div className="w-1/2">
+                          <label className="block text-sm font-medium text-gray-600 mb-1">Stock Quantity</label>
+                          <input
+                            type="number"
+                            min="0"
+                            value={stock}
+                            onChange={(e) => setStock(e.target.value)}
+                            className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="0"
+                          />
+                        </div>
+                      </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-600 mb-1">Product Category</label>
                         <input
@@ -218,6 +344,40 @@ const Create = ({ addCategory }) => {
                           className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                           placeholder="Enter product category"
                           required
+                        />
+                      </div>
+                      <div className="flex gap-4">
+                        <div className="w-1/2">
+                          <label className="block text-sm font-medium text-gray-600 mb-1">SKU</label>
+                          <input
+                            type="text"
+                            value={sku}
+                            onChange={(e) => setSku(e.target.value)}
+                            className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="Auto-generated if left blank"
+                          />
+                        </div>
+                        <div className="w-1/2">
+                          <label className="block text-sm font-medium text-gray-600 mb-1">Status</label>
+                          <select
+                            value={status}
+                            onChange={(e) => setStatus(e.target.value)}
+                            className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          >
+                            <option value="active">Active</option>
+                            <option value="draft">Draft</option>
+                            <option value="archived">Archived</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-600 mb-1">Tags (comma-separated)</label>
+                        <input
+                          type="text"
+                          value={tagsText}
+                          onChange={(e) => setTagsText(e.target.value)}
+                          className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          placeholder="e.g. summer, bestseller, new-arrival"
                         />
                       </div>
                     </div>

@@ -1,8 +1,6 @@
-import React from "react";
-
 const Contact = () => {
   return (
-    <div className="flex items-center justify-center h-screen w-screen">
+    <div className="flex items-center justify-center h-screen w-full">
       <div className="flex flex-col lg:flex-row w-[80%] max-w-screen-x overflow-hidden justify-between">
         <div className="lg:w-[50%] p-8">
           <h1 className="text-6xl font-bold mb-6 text-gray-800">Contact Us</h1>

@@ -1,17 +1,15 @@
-import React, { useState, useEffect, useRef } from "react";
+import  { useState, useEffect, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import WebsiteLogo from "../assets/Logo.png";
 import { FaUser, FaHeart, FaShoppingBag, FaBars } from "react-icons/fa";
 
-const Navbar = ({ categories, isAuthenticated, onCategoryChange }) => {
+const Navbar = ({ isAuthenticated }) => {
   const [loggedInUser, setLoggedInUser] = useState("");
   const [userRole, setUserRole] = useState("");
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [notification, setNotification] = useState(null);
-  const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const navigate = useNavigate();
-  const categoryDropdownRef = useRef(null);
   const profileDropdownRef = useRef(null);
 
   useEffect(() => {
@@ -26,12 +24,6 @@ const Navbar = ({ categories, isAuthenticated, onCategoryChange }) => {
     window.addEventListener("storage", checkLoginStatus);
 
     const handleClickOutside = (event) => {
-      if (
-        categoryDropdownRef.current &&
-        !categoryDropdownRef.current.contains(event.target)
-      ) {
-        setShowCategoryDropdown(false);
-      }
       if (
         profileDropdownRef.current &&
         !profileDropdownRef.current.contains(event.target)
@@ -87,24 +79,12 @@ const Navbar = ({ categories, isAuthenticated, onCategoryChange }) => {
     }
   };
 
-  const handleCategoryClick = (category) => {
-    navigate(`/category/${category}`);
-    setShowCategoryDropdown(false);
-    setShowMobileMenu(false);
-  };
-
   const toggleMobileMenu = () => {
     setShowMobileMenu(!showMobileMenu);
   };
 
-  const toggleCategoryDropdown = () => {
-    setShowCategoryDropdown(!showCategoryDropdown);
-    setShowProfileDropdown(false);
-  };
-
   const toggleProfileDropdown = () => {
     setShowProfileDropdown(!showProfileDropdown);
-    setShowCategoryDropdown(false);
   };
 
   const navLinkStyle =
@@ -129,31 +109,6 @@ const Navbar = ({ categories, isAuthenticated, onCategoryChange }) => {
                 <Link to="/" className={navLinkStyle}>
                   Home
                 </Link>
-                <div className="relative" ref={categoryDropdownRef}>
-                  <button
-                    className={`${navLinkStyle} focus:outline-none`}
-                    onClick={toggleCategoryDropdown}
-                    onMouseEnter={() => setShowCategoryDropdown(true)}
-                  >
-                    Category
-                  </button>
-                  {showCategoryDropdown && (
-                    <div
-                      className="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10"
-                      onMouseLeave={() => setShowCategoryDropdown(false)}
-                    >
-                      {categories.map((cat) => (
-                        <button
-                          key={cat}
-                          onClick={() => handleCategoryClick(cat)}
-                          className={dropdownItemStyle}
-                        >
-                          {cat.charAt(0).toUpperCase() + cat.slice(1)}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
                 <Link to="/contact" className={navLinkStyle}>
                   Contact Us
                 </Link>
@@ -238,27 +193,6 @@ const Navbar = ({ categories, isAuthenticated, onCategoryChange }) => {
             >
               Home
             </Link>
-            <div className="relative">
-              <button
-                onClick={toggleCategoryDropdown}
-                className={`${navLinkStyle} block px-3 py-2 rounded-md w-full text-left`}
-              >
-                Category
-              </button>
-              {showCategoryDropdown && (
-                <div className="pl-4">
-                  {categories.map((cat) => (
-                    <button
-                      key={cat}
-                      onClick={() => handleCategoryClick(cat)}
-                      className={`${dropdownItemStyle} block px-3 py-2 rounded-md w-full text-left`}
-                    >
-                      {cat.charAt(0).toUpperCase() + cat.slice(1)}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
             <Link
               to="/contact"
               className={`${navLinkStyle} block px-3 py-2 rounded-md`}
