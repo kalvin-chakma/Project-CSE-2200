@@ -4,6 +4,6 @@
 // this file (and risk shipping a localhost URL in a real deploy).
 const API_BASE_URL = import.meta.env.DEV
   ? "http://localhost:8080"
-  : "https://project-cse-2200-xi.vercel.app";
+  : "https://project-cse-2200.vercel.app";
 export default API_BASE_URL;
 
